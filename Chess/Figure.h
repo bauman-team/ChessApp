@@ -32,6 +32,7 @@ struct Pos
 
 class Figure
 {
+protected:
 	Pos coords;
 	FigureType id;
 	std::vector<Pos> possibleMoves;
