@@ -1,17 +1,24 @@
-class Player:
-string name
-int numOfFigures
-Указатель на короля
-Счетчик времени
+PLAYER:
+	Variables: name, numOfFigures, timer
+	Methods: decrease numOfFigures by 1
+	Other: 
 
-Проверка на мат
-2 проверки на шах (от короля, к королю)
-Проверка на пат
-DecreaseNumOfFigures
--------------------
-King:
-флаг на шах и перемещение
-----------------
-Ладьи:
-флаг на перемещение
-------------------
+KING:
+	Variables: moving and shah flag
+	Methods: checkings for shah, mate and pat
+	Other: 
+
+ROOK:
+	Variables: moving flag
+	Methods: 
+	Other: 
+
+FIGURE:
+	Variables: 2 static pointers to Map and King
+	Methods: 
+	Other: friend class Player (or Player's methods)
+
+-----------------------------------------------------
+
+THOUGHTS:
+	

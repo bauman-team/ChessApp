@@ -28,8 +28,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Targets.txt">
-      <Filter>Файлы заголовков</Filter>
-    </Text>
+    <Text Include="Nodes.txt" />
   </ItemGroup>
 </Project>
