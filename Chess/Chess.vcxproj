@@ -145,7 +145,7 @@
     <ClInclude Include="Map.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Nodes.txt" />
+    <Text Include="Notes.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
