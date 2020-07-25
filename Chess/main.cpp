@@ -1,18 +1,28 @@
 #include <SFML/Graphics.hpp>
-
-using namespace sf;
+#include "TwoPlayersGame.h"
+#include "Game.h"
 
 int main()
 {
-	RenderWindow window(VideoMode(200, 200), "SFML Works!");
+	
+	sf::RenderWindow window(sf::VideoMode(800, 800), "Chess");
+
+	Resources res;
+	res.SetPathToMapImage("images/map.jpg");
+	res.SetPathToFiguresImage("images/figures.png");
+
+	Game* game = new TwoPlayersGame(&window, res);
+
 	while (window.isOpen())
 	{
-		Event event;
+		sf::Event event;
 		while (window.pollEvent(event))
 		{
-			if (event.type == Event::Closed)
+			if (event.type == sf::Event::Closed)
 				window.close();
 		}
+		window.clear(sf::Color::White);
+		game->StartGame();
 		window.display();
 	}
 	return 0;

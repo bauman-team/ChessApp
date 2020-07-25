@@ -150,11 +150,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Drawer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TwoPlayersGame.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Drawer.h" />
     <ClInclude Include="Figure.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="Resources.h" />
+    <ClInclude Include="TwoPlayersGame.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Notes.txt" />

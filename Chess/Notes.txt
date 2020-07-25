@@ -1,6 +1,6 @@
 PLAYER:
-	Variables: name, numOfFigures, timer
-	Methods: decrease numOfFigures by 1
+	Variables: name, numOfFigures, timer, showPossibleMoves
+	Methods: decrease numOfFigures by 1, IsShowingPossibleMoves
 	Other: 
 
 KING:
@@ -14,7 +14,7 @@ ROOK:
 	Other: 
 
 FIGURE:
-	Variables: 2 static pointers to Map and King
+	Variables: 2 static pointers to Map and King (or only to King, because we have access to Map in class Game)
 	Methods: 
 	Other: friend class Player (or Player's methods)
 
