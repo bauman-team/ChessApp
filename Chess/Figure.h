@@ -3,19 +3,23 @@
 
 enum FigureType
 {
-	Empty,
-	King_black,
+	
 	Queen_black,
-	Bishop_black,
-	Knight_black,
 	Rook_black,
+	Bishop_black,
+	
 	Pawn_black,
+
 	King_white,
 	Queen_white,
+	Rook_white,
+	Knight_black,
 	Bishop_white,
 	Knight_white,
-	Rook_white,
 	Pawn_white,
+	King_black,
+	
+	Empty
 };
 
 struct Pos

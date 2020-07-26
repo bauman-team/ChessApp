@@ -3,8 +3,6 @@
 #include "Resources.h"
 #include "Map.h"
 
-#define NUM_OF_FIGURE_TYPES 6
-
 class Drawer
 {
 	sf::RenderWindow* window;
