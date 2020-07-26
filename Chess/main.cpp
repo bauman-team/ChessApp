@@ -3,18 +3,28 @@
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(800, 800), "Chess");
+	sf::RenderWindow window(sf::VideoMode(920, 920), "Chess");
 
 	Resources res;
-	FigureType sequence[NUM_OF_FIGURE_TYPES * 2] =
-	{ King_black, Queen_black, Rook_black, Knight_black, Bishop_black, Pawn_black,
-	  King_white, Queen_white, Rook_white, Knight_white, Bishop_white, Pawn_white };
-	res.SetPathToMapImage("images/map.png");
-	res.SetPathToFiguresImage("images/figures.png");
-	res.SetSequenceOfFiguresInImage(sequence);
-	res.SetRowsAndColsInFiguresImage(2, 6);
+	res.SetMapImage("images/map.png");
+	res.SetFigureImage(King_black, "images/King_black.png");
+	res.SetFigureImage(Queen_black, "images/Queen_black.png");
+	res.SetFigureImage(Rook_black, "images/Rook_black.png");
+	res.SetFigureImage(Bishop_black, "images/Bishop_black.png");
+	res.SetFigureImage(Knight_black, "images/Knight_black.png");
+	res.SetFigureImage(Pawn_black, "images/Pawn_black.png");
+	res.SetFigureImage(King_white, "images/King_white.png");
+	res.SetFigureImage(Queen_white, "images/Queen_white.png");
+	res.SetFigureImage(Rook_white, "images/Rook_white.png");
+	res.SetFigureImage(Bishop_white, "images/Bishop_white.png");
+	res.SetFigureImage(Knight_white, "images/Knight_white.png");
+	res.SetFigureImage(Pawn_white, "images/Pawn_white.png");
 
-	Game* game = new TwoPlayersGame(&window, res);
+	MapProperties prop;
+	prop.SetPlayAreaTopLeft(Pos(60, 60));
+	prop.SetSquareSize(100);
+
+	Game* game = new TwoPlayersGame(&window, res, prop);
 
 	while (window.isOpen())
 	{

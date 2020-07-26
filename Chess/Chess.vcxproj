@@ -159,6 +159,8 @@
     <ClInclude Include="Figure.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="MapProperties.h" />
+    <ClInclude Include="Pos.h" />
     <ClInclude Include="Resources.h" />
     <ClInclude Include="TwoPlayersGame.h" />
   </ItemGroup>

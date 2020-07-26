@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "Pos.h"
 
 enum FigureType
 {
@@ -20,18 +21,6 @@ enum FigureType
 	King_black,
 	
 	Empty
-};
-
-struct Pos
-{
-	uint8_t x, y;
-	Pos(uint8_t _x, uint8_t _y) : x(_x), y(_y) {}
-	Pos& operator=(const Pos& coords)
-	{
-		x = coords.x;
-		y = coords.y;
-		return *this;
-	}
 };
 
 class Figure

@@ -13,9 +13,7 @@ class TwoPlayersGame : public Game
 	Player* activePlayer;
 	*/
 public:
-	//TwoPlayersGame() {}
-	TwoPlayersGame(sf::RenderWindow* window, const Resources& resource);
-	//TwoPlayersGame(const Resources* resource);
+	TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties);
 
 	void virtual StartGame() override;
 	void virtual ChangeActivePlayer() override;

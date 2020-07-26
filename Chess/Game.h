@@ -8,11 +8,8 @@ protected:
 	Drawer drawer;
 	Map map;
 public:
-	//Game() {};
-	Game(sf::RenderWindow* window, const Resources& resource) : drawer(window, resource) {};
-	//Game(const Resources* resource) : drawer(resource) {};
-
-	//void SetResources(const Resources& resource) { drawer.SetResources(resource); }
+	Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
+		: drawer(window, resource, properties) {};
 
 	void virtual StartGame() = 0;
 	void virtual ChangeActivePlayer() = 0;
