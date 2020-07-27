@@ -37,7 +37,7 @@ void Drawer::ShowMap(const Map& map)
 	{
 		for (int i = 0; i != 8; ++i)
 		{
-			FigureType selectedFigure = FigureType::King_white; // map.GetMapArray()[i + j * 8].GetId()
+			FigureType selectedFigure = map.GetFigureAt(Pos(i, j))->GetType();
 			if (selectedFigure != FigureType::Empty)
 			{
 				figuresSprites[to_underlying(selectedFigure)].setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + i * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + (7 - j) * mapProperties.GetSquareSize());

@@ -44,6 +44,7 @@ public:
 	Figure(Pos _coords, FigureType _type) : coords(_coords), type(_type) {}
 	FigureType GetType() const { return type; }
 	const std::vector<Pos>& GetPossibleMoves() const { return possibleMoves; }
+	static void SetMapPtr(Map* _ptrMap) { ptrMap = _ptrMap; }
 };
 
 

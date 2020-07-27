@@ -9,7 +9,10 @@ protected:
 	Map map;
 public:
 	Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
-		: drawer(window, resource, properties), map() {};
+		: drawer(window, resource, properties)
+	{
+		Figure::SetMapPtr(&map);
+	};
 
 	void virtual StartGame() = 0;
 	void virtual ChangeActivePlayer() = 0;

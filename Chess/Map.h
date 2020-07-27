@@ -5,8 +5,6 @@ class Figure;
 class Map
 {
 	Figure* map[64];
-	friend void SetMapPtr(Map* p);
-	void SetMap() { SetMapPtr(this); }
 public:
 	Map(); 
 	void Move(const Pos& from, const Pos& to);
@@ -17,5 +15,6 @@ public:
 	bool CheckingMate(); // Player need info about who makes the move
 	bool CheckingPat(); //
 	int8_t CheckEmpty(const Pos& from, const Pos& to);
-	Figure* GetMapArray() const { return *map; }
+	Figure* GetFigureAt(const Pos& pos) const;
+	Figure* GetFigureAt(int index) const;
 };

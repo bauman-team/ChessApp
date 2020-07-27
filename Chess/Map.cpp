@@ -25,7 +25,7 @@ Map::Map()
 	map[61] = new Bishop(Pos(5, 7), FigureType::Bishop_black);
 	map[62] = new Knight(Pos(6, 7), FigureType::Knight_black);
 	map[63] = new Rook(Pos(7, 7), FigureType::Rook_black);
-	SetMap();
+	//SetMap();
 }
 
 void Map::Move(const Pos& from, const Pos& to)
@@ -90,4 +90,16 @@ int8_t Map::CheckEmpty(const Pos& from, const Pos& to)
 			return 2; // if Pos contains the figure with opposite color
 	}
 	return 0; // if Pos contains the figure with same color or output border
+}
+
+Figure* Map::GetFigureAt(const Pos& pos) const
+{
+	assert(pos.IsValid());
+	return map[pos.ToIndex()];
+}
+
+Figure* Map::GetFigureAt(int index) const
+{
+	assert(index >= 0 && index <= 63);
+	return map[index];
 }
