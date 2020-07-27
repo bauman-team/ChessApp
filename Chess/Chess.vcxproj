@@ -150,14 +150,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Drawer.cpp" />
     <ClCompile Include="Figure.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TwoPlayersGame.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Drawer.h" />
     <ClInclude Include="Figure.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="MapProperties.h" />
+    <ClInclude Include="Pos.h" />
+    <ClInclude Include="Resources.h" />
+    <ClInclude Include="TwoPlayersGame.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>
   <ItemGroup>

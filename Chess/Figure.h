@@ -1,11 +1,11 @@
 #pragma once
 #include <vector>
+#include "Pos.h"
 #include "Player.h"
 #include "Map.h"
 
 enum class FigureType
 {
-	Empty,
 	King_black,
 	Queen_black,
 	Bishop_black,
@@ -18,6 +18,7 @@ enum class FigureType
 	Knight_white,
 	Rook_white,
 	Pawn_white,
+	Empty,
 };
 
 template <typename E>

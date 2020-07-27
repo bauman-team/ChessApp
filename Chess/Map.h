@@ -15,4 +15,5 @@ public:
 	bool CheckingPat(); //
 	int8_t CheckEmpty(const Pos& from, const Pos& to);
 	Figure* GetMap() { return *map; }
+	Figure* GetMapArray() const { return *map; }
 };
