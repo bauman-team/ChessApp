@@ -35,12 +35,12 @@ void Drawer::ShowMap(const Map& map)
 	window->draw(mapSprite);
 	for (int j = 0; j != 8; ++j)
 	{
-		for (int i = 0; i < 8; ++i)
+		for (int i = 0; i != 8; ++i)
 		{
 			FigureType selectedFigure = FigureType::King_white; // map.GetMapArray()[i + j * 8].GetId()
-			if (!(selectedFigure == FigureType::Empty))
+			if (selectedFigure != FigureType::Empty)
 			{
-				figuresSprites[to_underlying(selectedFigure)].setPosition(mapProperties.GetPlayAreaTopLeft().x + i * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().y + (7 - j) * mapProperties.GetSquareSize());
+				figuresSprites[to_underlying(selectedFigure)].setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + i * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + (7 - j) * mapProperties.GetSquareSize());
 				window->draw(figuresSprites[to_underlying(selectedFigure)]);
 				//figuresSprites[to_underlying(x)].move(mapProperties.GetSquareSize(), 0);
 			}

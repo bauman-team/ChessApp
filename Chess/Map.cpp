@@ -1,4 +1,5 @@
 #include "Map.h"
+#include <cassert>
 
 Map::Map()
 {
@@ -29,75 +30,63 @@ Map::Map()
 
 void Map::Move(const Pos& from, const Pos& to)
 {
-	if (map[to.x + to.y * 8]->GetId() == FigureType::Empty)
+	assert(from.IsValid() && to.IsValid());
+	if (map[to.ToIndex()]->GetType() == FigureType::Empty)
 	{
-		delete map[to.x + to.y * 8];
+		delete map[to.ToIndex()];
 	}
 	else
 	{
-		delete map[to.x + to.y * 8]; // decrease numOfFigures
+		delete map[to.ToIndex()]; // decrease numOfFigures
 	}
-	map[to.x + to.y * 8] = map[from.x + from.y * 8];
-	map[from.x + from.y * 8] = new EmptY(Pos(from), FigureType::Empty);
+	map[to.ToIndex()] = map[from.ToIndex()];
+	map[from.ToIndex()] = new EmptY(Pos(from), FigureType::Empty);
 }
 
 void Map::SetToEmpty(const Pos& target)
 {
-	delete map[target.x + target.y * 8];
-	map[target.x + target.y * 8] = new EmptY(Pos(target), FigureType::Empty);
+	assert(target.IsValid());
+	delete map[target.ToIndex()];
+	map[target.ToIndex()] = new EmptY(Pos(target), FigureType::Empty);
 }
 
 void Map::PawnToQueen(const Pos& target)
 {
-	if (map[target.x + target.y * 8]->GetId() == FigureType::Pawn_black)
+	assert(target.IsValid());
+	if (map[target.ToIndex()]->GetType() == FigureType::Pawn_black)
 	{
-		delete map[target.x + target.y * 8];
-		map[target.x + target.y * 8] = new Queen(Pos(target), FigureType::Queen_black);
+		delete map[target.ToIndex()];
+		map[target.ToIndex()] = new Queen(Pos(target), FigureType::Queen_black);
 	}
 	else
 	{
-		delete map[target.x + target.y * 8];
-		map[target.x + target.y * 8] = new Queen(Pos(target), FigureType::Queen_white);
+		delete map[target.ToIndex()];
+		map[target.ToIndex()] = new Queen(Pos(target), FigureType::Queen_white);
 	}
 }
 
 void Map::Castling(const Pos& from, const Pos& to)
 {
-	if (map[from.x + from.y * 8]->GetId() == FigureType::King_black)
+	assert(from.IsValid() && to.IsValid());
+	Move(from, to);
+	if (map[from.ToIndex()]->GetType() == FigureType::King_black)
 	{
-		if (from.x > to.x)
-		{
-			Move(from, to);
-			Move(Pos(0, 7), Pos(3, 7));
-		}
-		else
-		{
-			Move(from, to);
-			Move(Pos(7, 7), Pos(5, 7));
-		}
+		(from.GetX() > to.GetX()) ? Move(Pos(0, 7), Pos(3, 7)) : Move(Pos(7, 7), Pos(5, 7));
 	}
 	else
 	{
-		if (from.x > to.x)
-		{
-			Move(from, to);
-			Move(Pos(0, 0), Pos(3, 0));
-		}
-		else
-		{
-			Move(from, to);
-			Move(Pos(7, 0), Pos(5, 0));
-		}
+		(from.GetX() > to.GetX()) ? Move(Pos(0, 0), Pos(3, 0)) : Move(Pos(7, 0), Pos(5, 0));
 	}
 }
 
 int8_t Map::CheckEmpty(const Pos& from, const Pos& to)
 {
-	if (to.x + to.y * 8 >= 0 && to.x + to.y * 8 < 64)
+	if (to.IsValid())
 	{
-		if (map[to.x + to.y * 8]->GetId() == FigureType::Empty)
+		if (map[to.ToIndex()]->GetType() == FigureType::Empty)
 			return 1; // if Pos to is Empty
-		if (to_underlying(map[from.x + from.y * 8]->GetId()) < 6 && to_underlying(map[to.x + to.y * 8]->GetId()) > 5 || to_underlying(map[from.x + from.y * 8]->GetId()) > 5 && to_underlying(map[to.x + to.y * 8]->GetId()) < 6)
+		if (to_underlying(map[from.ToIndex()]->GetType()) < 6 && to_underlying(map[to.ToIndex()]->GetType()) > 5 ||
+			to_underlying(map[from.ToIndex()]->GetType()) > 5 && to_underlying(map[to.ToIndex()]->GetType()) < 6)
 			return 2; // if Pos contains the figure with opposite color
 	}
 	return 0; // if Pos contains the figure with same color or output border
