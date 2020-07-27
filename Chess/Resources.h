@@ -9,7 +9,6 @@ class Resources
 {
 	std::string pathToMapImage;
 	std::string pathToFigureImage[FIGURE_TYPES];
-
 public:
 	Resources() {}
 	Resources(std::string mapPath, Pos _playAreaTopLeft, int _squareSize) : pathToMapImage(mapPath) {}

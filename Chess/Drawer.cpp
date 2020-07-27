@@ -1,6 +1,13 @@
 #include <SFML/Graphics.hpp>
 #include "Drawer.h"
 
+Drawer::Drawer(sf::RenderWindow* _window, const Resources& resource, const MapProperties& properties)
+	: window(_window), mapProperties(properties)
+{
+	SetResources(resource);
+	SetScale();
+}
+
 void Drawer::SetResources(const Resources& resource)
 {
 	mapTexture.loadFromFile(resource.GetPathToMapImage());
@@ -21,13 +28,6 @@ void Drawer::SetScale()
 	mapProperties.SetScale(mapScale);
 	for (int i = 0; i < FIGURE_TYPES; ++i)
 		figuresSprites[i].setScale(figureScale, figureScale);
-}
-
-Drawer::Drawer(sf::RenderWindow* _window, const Resources& resource, const MapProperties& properties)
-	: window(_window), mapProperties(properties)
-{
-	SetResources(resource);
-	SetScale();
 }
 
 void Drawer::ShowMap(const Map& map)

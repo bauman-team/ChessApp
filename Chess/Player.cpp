@@ -8,3 +8,8 @@
 		return Figure::ptrMap->CheckingPat() ? 2 : 0;
 	return 0;
 }*/
+
+Player::Player(Color _color, std::string _name, double _timer) : color(_color), name(_name), timer(_timer)
+{
+	 numOfFigures = 16; // if need add SAVE MOD replace numOfFigures to params
+}

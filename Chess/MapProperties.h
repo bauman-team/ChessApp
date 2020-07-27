@@ -8,19 +8,12 @@ class MapProperties
 public:
 	MapProperties() {};
 	MapProperties(Pos _playAreaTopLeft, int _squareSize) : playAreaTopLeft(_playAreaTopLeft), squareSize(_squareSize) {}
-	MapProperties(const MapProperties& copy)
-	{
-		playAreaTopLeft = copy.playAreaTopLeft;
-		squareSize = copy.squareSize;
-	}
+	MapProperties(const MapProperties& copy);
+
 	int GetSquareSize() const { return squareSize; }
 	Pos GetPlayAreaTopLeft() const { return playAreaTopLeft; }
 
 	void SetSquareSize(int size) { squareSize = size; }
 	void SetPlayAreaTopLeft(Pos _playAreaTopLeft) { playAreaTopLeft = _playAreaTopLeft; }
-	void SetScale(float scale)
-	{
-		playAreaTopLeft *= scale;
-		squareSize *= scale;
-	}
+	void SetScale(float scale);
 };
