@@ -16,4 +16,8 @@ struct Pos
 		y *= value;
 		return *this;
 	}
+	bool operator==(const Pos& coords)
+	{
+		return x == coords.x && y == coords.y;
+	}
 };

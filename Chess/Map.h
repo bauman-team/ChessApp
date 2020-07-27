@@ -1,9 +1,12 @@
 #pragma once
 #include "Figure.h"
-
+#include "Pos.h"
+class Figure;
 class Map
 {
 	Figure* map[64];
+	friend void SetMapPtr(Map* p);
+	void SetMap() { SetMapPtr(this); }
 public:
 	Map(); 
 	void Move(const Pos& from, const Pos& to);

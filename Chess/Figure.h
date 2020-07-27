@@ -27,23 +27,6 @@ constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept {
 }
 
 
-struct Pos
-{
-	uint8_t x, y;
-	Pos() : x(0), y(0) {}
-	Pos(uint8_t _x, uint8_t _y) : x(_x), y(_y) {}
-	Pos& operator=(const Pos& coords)
-	{
-		x = coords.x;
-		y = coords.y;
-		return *this;
-	}
-	bool operator==(const Pos& coords)
-	{
-		return x == coords.x && y == coords.y;
-	}
-};
-
 class Map;
 class Player;
 class Figure
@@ -56,11 +39,13 @@ protected:
 	std::vector<Pos> possibleMoves;
 	virtual bool MakeMoveTo(const Pos&);
 	virtual std::vector<Pos> FindPossibleMoves() = 0;
+	friend void SetMapPtr(Map*);
 public:
 	Figure(Pos _coords, FigureType _id) : coords(_coords), id(_id) {}
 	FigureType GetId() const { return id; }
 	const std::vector<Pos>& GetPossibleMoves() const { return possibleMoves; }
 };
+
 
 class EmptY : public Figure
 {

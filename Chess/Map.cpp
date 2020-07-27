@@ -24,6 +24,7 @@ Map::Map()
 	map[61] = new Bishop(Pos(5, 7), FigureType::Bishop_black);
 	map[62] = new Knight(Pos(6, 7), FigureType::Knight_black);
 	map[63] = new Rook(Pos(7, 7), FigureType::Rook_black);
+	SetMap();
 }
 
 void Map::Move(const Pos& from, const Pos& to)
@@ -96,7 +97,7 @@ int8_t Map::CheckEmpty(const Pos& from, const Pos& to)
 	{
 		if (map[to.x + to.y * 8]->GetId() == FigureType::Empty)
 			return 1; // if Pos to is Empty
-		if (to_underlying(map[from.x + from.y * 8]->GetId()) < 7 && to_underlying(map[to.x + to.y * 8]->GetId()) > 6 || to_underlying(map[from.x + from.y * 8]->GetId()) > 6 && to_underlying(map[to.x + to.y * 8]->GetId()) < 7)
+		if (to_underlying(map[from.x + from.y * 8]->GetId()) < 6 && to_underlying(map[to.x + to.y * 8]->GetId()) > 5 || to_underlying(map[from.x + from.y * 8]->GetId()) > 5 && to_underlying(map[to.x + to.y * 8]->GetId()) < 6)
 			return 2; // if Pos contains the figure with opposite color
 	}
 	return 0; // if Pos contains the figure with same color or output border
