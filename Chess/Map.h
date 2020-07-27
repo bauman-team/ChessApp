@@ -17,6 +17,5 @@ public:
 	bool CheckingMate(); // Player need info about who makes the move
 	bool CheckingPat(); //
 	int8_t CheckEmpty(const Pos& from, const Pos& to);
-	Figure* GetMap() { return *map; }
 	Figure* GetMapArray() const { return *map; }
 };

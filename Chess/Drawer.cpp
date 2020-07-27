@@ -33,10 +33,17 @@ Drawer::Drawer(sf::RenderWindow* _window, const Resources& resource, const MapPr
 void Drawer::ShowMap(const Map& map)
 {
 	window->draw(mapSprite);
-	figuresSprites[to_underlying(FigureType::Pawn_black)].setPosition(mapProperties.GetPlayAreaTopLeft().x, mapProperties.GetPlayAreaTopLeft().y + 6 * mapProperties.GetSquareSize());
-	for (int i = 0; i < 8; ++i)
+	for (int j = 0; j != 8; ++j)
 	{
-		window->draw(figuresSprites[to_underlying(FigureType::Pawn_black)]);
-		figuresSprites[to_underlying(FigureType::Pawn_black)].move(mapProperties.GetSquareSize(), 0);
+		for (int i = 0; i < 8; ++i)
+		{
+			FigureType selectedFigure = FigureType::King_white; // map.GetMapArray()[i + j * 8].GetId()
+			if (!(selectedFigure == FigureType::Empty))
+			{
+				figuresSprites[to_underlying(selectedFigure)].setPosition(mapProperties.GetPlayAreaTopLeft().x + i * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().y + (7 - j) * mapProperties.GetSquareSize());
+				window->draw(figuresSprites[to_underlying(selectedFigure)]);
+				//figuresSprites[to_underlying(x)].move(mapProperties.GetSquareSize(), 0);
+			}
+		}
 	}
 }
