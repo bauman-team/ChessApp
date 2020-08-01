@@ -20,7 +20,9 @@ public:
 	Pos* GetChosenPosition() { return chosenPos; }
 	Color GetColor() { return color; }
 	
-	void RunFindMoves(Figure* choseFigure) {  } //choseFigure->FindPossibleMoves();
-	void RunMakeMove(Figure* choseFigure, Pos& currentPosition) {  } //choseFigure->MakeMoveTo(currentPosition);
+	void RunFindMoves(Figure* choseFigure);
+	void RunMakeMove(Figure* choseFigure, Pos& currentPosition);
 	//int8_t CheckGameFinal();
 };
+
+

@@ -77,9 +77,15 @@ std::vector<Pos> Queen::FindPossibleMoves() // Rook + Bishop
 			else
 				nextPosition = Pos(nextPosition.GetX(), nextPosition.GetY() + (i == 2 ? 1 : -1));
 			if (ptrMap->CheckEmpty(coords, nextPosition))
+			{
 				possibleMoves.push_back(nextPosition);
+				if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
+					isChecking = false;
+			}
 			else
+			{
 				isChecking = false;
+			}
 		}
 	}
 	for (int i = 0; i != 4; ++i)
@@ -90,9 +96,15 @@ std::vector<Pos> Queen::FindPossibleMoves() // Rook + Bishop
 		{
 			nextPosition = Pos(nextPosition.GetX() + (i == 0 || i == 1 ? 1 : -1), nextPosition.GetY() + (i == 0 || i == 2 ? 1 : -1));
 			if (ptrMap->CheckEmpty(coords, nextPosition))
+			{
 				possibleMoves.push_back(nextPosition);
+				if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
+					isChecking = false;
+			}
 			else
+			{
 				isChecking = false;
+			}
 		}
 	}
 	return possibleMoves;
@@ -110,9 +122,15 @@ std::vector<Pos> Bishop::FindPossibleMoves()
 		{
 			nextPosition = Pos(nextPosition.GetX() + (i == 0 || i == 1 ? 1 : -1), nextPosition.GetY() + (i == 0 || i == 2 ? 1 : -1)); // diagonal
 			if (ptrMap->CheckEmpty(coords, nextPosition))
+			{
 				possibleMoves.push_back(nextPosition);
+				if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
+					isChecking = false;
+			}
 			else
+			{
 				isChecking = false;
+			}
 		}
 	}
 	return possibleMoves;
@@ -126,13 +144,13 @@ std::vector<Pos> Knight::FindPossibleMoves()
 		nextPosition = Pos(coords.GetX() + i % 2 + 1, coords.GetY() + (i + 1) % 2 + 1);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
-		nextPosition = Pos(coords.GetX() - i % 2 + 1, coords.GetY() + (i + 1) % 2 + 1);
+		nextPosition = Pos(coords.GetX() - (i % 2 + 1), coords.GetY() + (i + 1) % 2 + 1);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
-		nextPosition = Pos(coords.GetX() + i % 2 + 1, coords.GetY() - (i + 1) % 2 + 1);
+		nextPosition = Pos(coords.GetX() + i % 2 + 1, coords.GetY() - ((i + 1) % 2 + 1));
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
-		nextPosition = Pos(coords.GetX() - i % 2 + 1, coords.GetY() - (i + 1) % 2 + 1);
+		nextPosition = Pos(coords.GetX() - (i % 2 + 1), coords.GetY() - ((i + 1) % 2 + 1));
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 	}
@@ -154,9 +172,15 @@ std::vector<Pos> Rook::FindPossibleMoves()
 			else // Oy
 				nextPosition = Pos(nextPosition.GetX(), nextPosition.GetY() + (i == 2 ? 1 : -1));
 			if (ptrMap->CheckEmpty(coords, nextPosition))
+			{
 				possibleMoves.push_back(nextPosition);
+				if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
+					isChecking = false;
+			}
 			else
+			{
 				isChecking = false;
+			}
 		}
 	}
 	return possibleMoves;

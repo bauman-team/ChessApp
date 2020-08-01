@@ -15,3 +15,13 @@ Player::Player(Color _color, std::string _name, double _timer) : color(_color), 
 {
 	 numOfFigures = 16; // if need add SAVE MOD replace numOfFigures to params
 }
+
+void Player::RunFindMoves(Figure* choseFigure)
+{
+	choseFigure->FindPossibleMoves();
+}
+
+void Player::RunMakeMove(Figure* choseFigure, Pos& currentPosition)
+{
+	choseFigure->MakeMoveTo(currentPosition);
+}

@@ -1,5 +1,6 @@
 #include "TwoPlayersGame.h"
 #include "Figure.h"
+#include <iostream>
 
 TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
 	: Game(window, resource, properties)
@@ -27,20 +28,34 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 	bool chosenPositionIsPossible = false;
 	if (position->IsValid())
 	{
-		activePlayer->SetChosenPosition(position);
 		if (activePlayer->GetChosenPosition() != nullptr)
 		{
-			for (std::vector<Pos>::const_iterator it = map.GetFigureAt(*position)->GetPossibleMoves().begin(); it != map.GetFigureAt(*position)->GetPossibleMoves().end() && !chosenPositionIsPossible; ++it)
+			for (std::vector<Pos>::const_iterator it = map.GetFigureAt(*activePlayer->GetChosenPosition())->GetPossibleMoves().begin(); it != map.GetFigureAt(*activePlayer->GetChosenPosition())->GetPossibleMoves().end() && !chosenPositionIsPossible;)
+			{
 				if (*it == *position)
 				{
 					chosenPositionIsPossible = true;
 					activePlayer->RunMakeMove(map.GetFigureAt(*activePlayer->GetChosenPosition()), *position);
 					ChangeActivePlayer();
+					break;
 				}
+				else
+				{
+					++it;
+				}
+			}
 		}
-		if (activePlayer->GetColor() == map.GetFigureAt(*position)->GetColor() && !chosenPositionIsPossible)
+		if (chosenPositionIsPossible)
 		{
-			activePlayer->RunFindMoves(map.GetFigureAt(*position));
+			activePlayer->SetChosenPosition(nullptr);
+		}
+		else
+		{
+			activePlayer->SetChosenPosition(position);
+			if (activePlayer->GetColor() == map.GetFigureAt(*position)->GetColor())
+			{
+				activePlayer->RunFindMoves(map.GetFigureAt(*position));
+			}
 		}
 	}
 }

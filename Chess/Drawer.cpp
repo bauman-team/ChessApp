@@ -59,16 +59,16 @@ void Drawer::ShowMap(const Map& map)
 
 void Drawer::ShowActiveFigure(const Map& map, const Pos& chosenFigure)
 {
-	chosenCellSprite.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + chosenFigure.GetX() * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + chosenFigure.GetY() * mapProperties.GetSquareSize());
+	chosenCellSprite.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + chosenFigure.GetX() * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + (7 - chosenFigure.GetY()) * mapProperties.GetSquareSize());
 	window->draw(chosenCellSprite);
 	for (std::vector<Pos>::const_iterator it = map.GetFigureAt(chosenFigure)->GetPossibleMoves().begin(); it != map.GetFigureAt(chosenFigure)->GetPossibleMoves().end(); ++it)
 	{
-		possibleCellSprite.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + it->GetX() * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + it->GetY() * mapProperties.GetSquareSize());
+		possibleCellSprite.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + it->GetX() * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + (7 - it->GetY()) * mapProperties.GetSquareSize());
 		window->draw(possibleCellSprite);
 	}
 }
 
 Pos* Drawer::TransformMousePosition(int mouseX, int mouseY)
 {
-	return new Pos((mouseX - mapProperties.GetPlayAreaTopLeft().GetX()) / mapProperties.GetSquareSize(), (mouseY - mapProperties.GetPlayAreaTopLeft().GetY()) / mapProperties.GetSquareSize());
+	return new Pos((mouseX - mapProperties.GetPlayAreaTopLeft().GetX()) / mapProperties.GetSquareSize(), 7 - (mouseY - mapProperties.GetPlayAreaTopLeft().GetY()) / mapProperties.GetSquareSize());
 }
