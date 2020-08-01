@@ -25,6 +25,6 @@ public:
 	void ShowMap(const Map& map);
 	void ShowActiveFigure(const Map&, const Pos&);
 
-	Pos* TransformMousePosition(int, int);
+	Pos* TransformMousePosition(int, int); // fix negative coords
 	//void ShowPossibleMoves();
 };
