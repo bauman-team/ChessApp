@@ -1,6 +1,5 @@
 #include <SFML/Graphics.hpp>
 #include "TwoPlayersGame.h"
-
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(920, 920), "Chess");
@@ -19,6 +18,8 @@ int main()
 	res.SetFigureImage(FigureType::Bishop_white, "images/Bishop_white.png");
 	res.SetFigureImage(FigureType::Knight_white, "images/Knight_white.png");
 	res.SetFigureImage(FigureType::Pawn_white, "images/Pawn_white.png");
+	res.SetChosenCellImage("images/chosen_cell");
+	res.SetPossibleCellImage("images/possible_cell");
 
 	MapProperties prop;
 	prop.SetPlayAreaTopLeft(Pos(60, 60));

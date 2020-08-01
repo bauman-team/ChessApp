@@ -25,7 +25,6 @@ Map::Map()
 	map[61] = new Bishop(Pos(5, 7), FigureType::Bishop_black);
 	map[62] = new Knight(Pos(6, 7), FigureType::Knight_black);
 	map[63] = new Rook(Pos(7, 7), FigureType::Rook_black);
-	//SetMap();
 }
 
 void Map::Move(const Pos& from, const Pos& to)

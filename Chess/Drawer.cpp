@@ -5,6 +5,12 @@ void Drawer::SetResources(const Resources& resource)
 {
 	mapTexture.loadFromFile(resource.GetPathToMapImage());
 	mapSprite.setTexture(mapTexture);	
+
+	chosenCellTexture.loadFromFile(resource.GetPathToChosenCellImage());
+	chosenCellSprite.setTexture(chosenCellTexture);
+
+	possibleCellTexture.loadFromFile(resource.GetPathToPossibleCellImage());
+	possibleCellSprite.setTexture(possibleCellTexture);
 	
 	for (int i = 0; i < FIGURE_TYPES; ++i)
 		figuresTextures[i].loadFromFile(resource.GetPathToFigure((FigureType)i));
@@ -17,10 +23,13 @@ void Drawer::SetScale()
 {
 	float mapScale = (float)window->getSize().x / mapTexture.getSize().x;
 	float figureScale = mapScale * (float)mapProperties.GetSquareSize() / figuresTextures[0].getSize().x;
+	float cellScale = mapScale * (float)mapProperties.GetSquareSize() / possibleCellTexture.getSize().x;
 	mapSprite.setScale(mapScale, mapScale); // set the mapSprite size to the window size
 	mapProperties.SetScale(mapScale);
 	for (int i = 0; i < FIGURE_TYPES; ++i)
 		figuresSprites[i].setScale(figureScale, figureScale);
+	possibleCellSprite.setScale(cellScale, cellScale);
+	chosenCellSprite.setScale(cellScale, cellScale);
 }
 
 Drawer::Drawer(sf::RenderWindow* _window, const Resources& resource, const MapProperties& properties)

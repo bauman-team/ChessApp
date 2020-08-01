@@ -39,7 +39,6 @@ protected:
 	std::vector<Pos> possibleMoves;
 	virtual bool MakeMoveTo(const Pos&);
 	virtual std::vector<Pos> FindPossibleMoves() = 0;
-	friend void SetMapPtr(Map*); // TODO: maybe replace with 'static void SetMapPtr(Map*);'
 public:
 	Figure(Pos _coords, FigureType _type) : coords(_coords), type(_type) {}
 	FigureType GetType() const { return type; }
@@ -67,7 +66,6 @@ public:
 
 class Queen : public Figure
 {
-	//virtual bool MakeMoveTo(const Pos&);
 	virtual std::vector<Pos> FindPossibleMoves() override;
 public:
 	Queen(Pos _coords, FigureType _type) : Figure(_coords, _type) {}
@@ -75,7 +73,6 @@ public:
 
 class Bishop : public Figure
 {
-	//virtual bool MakeMoveTo(const Pos&);
 	virtual std::vector<Pos> FindPossibleMoves() override;
 public:
 	Bishop(Pos _coords, FigureType _type) : Figure(_coords, _type) {}
@@ -83,7 +80,6 @@ public:
 
 class Knight : public Figure
 {
-	//virtual bool MakeMoveTo(const Pos&);
 	virtual std::vector<Pos> FindPossibleMoves() override;
 public:
 	Knight(Pos _coords, FigureType _type) : Figure(_coords, _type) {}

@@ -9,6 +9,10 @@ class Drawer
 	sf::RenderWindow* window;
 	sf::Texture mapTexture;
 	sf::Sprite mapSprite;
+	sf::Texture chosenCellTexture;
+	sf::Sprite chosenCellSprite;
+	sf::Texture possibleCellTexture;
+	sf::Sprite possibleCellSprite;
 	sf::Texture figuresTextures[FIGURE_TYPES];
 	sf::Sprite figuresSprites[FIGURE_TYPES];
 	MapProperties mapProperties;

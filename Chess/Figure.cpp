@@ -2,11 +2,6 @@
 
 Map* Figure::ptrMap = nullptr;
 
-void SetMapPtr(Map* p)
-{ 
-	Figure::ptrMap = p;
-}
-
 std::vector<Pos> Knight::FindPossibleMoves()
 {
 	Pos nextPosition;
