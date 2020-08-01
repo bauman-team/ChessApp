@@ -1,5 +1,7 @@
 #include "Player.h"
 
+Pos* Player::chosenPos = nullptr;
+
 /*int8_t Player::CheckGameFinal()
 {
 	if (Figure::ptrKing->CheckingShah())

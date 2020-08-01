@@ -19,8 +19,8 @@ int main()
 	res.SetFigureImage(FigureType::Bishop_white, "images/Bishop_white.png");
 	res.SetFigureImage(FigureType::Knight_white, "images/Knight_white.png");
 	res.SetFigureImage(FigureType::Pawn_white, "images/Pawn_white.png");
-	res.SetChosenCellImage("images/chosen_cell");
-	res.SetPossibleCellImage("images/possible_cell");
+	res.SetChosenCellImage("images/chosen_cell.png");
+	res.SetPossibleCellImage("images/possible_cell.png");
 
 	MapProperties prop;
 	prop.SetPlayAreaTopLeft(Pos(60, 60));
@@ -41,7 +41,8 @@ int main()
 			case sf::Event::MouseButtonPressed:
 				if (event.mouseButton.button == sf::Mouse::Left)
 				{
-					//TODO: get coordinates
+					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+					game->SetPlayerChosenCell(mousePos.x, mousePos.y);
 				}
 				break;
 			}

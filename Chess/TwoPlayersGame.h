@@ -1,6 +1,6 @@
 #pragma once
 #include "Game.h"
-//#include "Player.h"
+#include "Player.h"
 #include "Resources.h"
 #include "Drawer.h"
 #include "Map.h"
@@ -18,5 +18,7 @@ public:
 	void virtual StartGame() override;
 	void virtual ChangeActivePlayer() override;
 
-	void SetPlayers(std::string name1, std::string name2, double timeOfGame);
+	void virtual SetPlayerChosenCell(int, int) override;
+
+	void SetPlayers(std::string name1 = "player1", std::string name2 = "player2", double timeOfGame = -1);
 };

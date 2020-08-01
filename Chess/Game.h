@@ -1,6 +1,7 @@
 #pragma once
 #include "Map.h"
 #include "Drawer.h"
+#include "Pos.h"
 
 class Game
 {
@@ -16,4 +17,5 @@ public:
 
 	void virtual StartGame() = 0;
 	void virtual ChangeActivePlayer() = 0;
+	void virtual SetPlayerChosenCell(int, int) = 0;
 };

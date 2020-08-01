@@ -2,17 +2,25 @@
 #include <string>
 #include "Figure.h"
 
+class Figure;
+class Pos;
+enum class Color;
 class Player
 {
 	Color color;
 	std::string name;
 	double timer;
-	//Figure* chosenFigure;
+	static Pos* chosenPos;
 	int numOfFigures;
 public:
 	Player(Color _color, std::string _name, double _timer);
 
 	int DecreaseNumOfFigures() { return --numOfFigures; }
-	//void SetChosenFigure()
+	void SetChosenPosition(Pos* position) { chosenPos = position; }
+	Pos* GetChosenPosition() { return chosenPos; }
+	Color GetColor() { return color; }
+	
+	void RunFindMoves(Figure* choseFigure) {  } //choseFigure->FindPossibleMoves();
+	void RunMakeMove(Figure* choseFigure, Pos& currentPosition) {  } //choseFigure->MakeMoveTo(currentPosition);
 	//int8_t CheckGameFinal();
 };

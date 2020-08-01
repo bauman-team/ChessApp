@@ -23,6 +23,8 @@ public:
 	Drawer(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties);
 
 	void ShowMap(const Map& map);
-	void ShowActiveFigure();
-	void ShowPossibleMoves();
+	void ShowActiveFigure(const Map&, const Pos&);
+
+	Pos* TransformMousePosition(int, int);
+	//void ShowPossibleMoves();
 };
