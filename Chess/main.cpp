@@ -2,7 +2,8 @@
 #include "TwoPlayersGame.h"
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(920, 920), "Chess");
+	int windowSize = 920;
+	sf::RenderWindow window(sf::VideoMode(windowSize, windowSize), "Chess");
 
 	Resources res;
 	res.SetMapImage("images/map.png");

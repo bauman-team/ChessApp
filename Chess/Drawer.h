@@ -16,6 +16,7 @@ class Drawer
 	sf::Texture figuresTextures[FIGURE_TYPES];
 	sf::Sprite figuresSprites[FIGURE_TYPES];
 	MapProperties mapProperties;
+
 	void SetResources(const Resources& resource);
 	void SetScale();
 public:

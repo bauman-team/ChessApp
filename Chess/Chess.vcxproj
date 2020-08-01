@@ -153,6 +153,8 @@
     <ClCompile Include="Drawer.cpp" />
     <ClCompile Include="Figure.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MapProperties.cpp" />
+    <ClCompile Include="Pos.cpp" />
     <ClCompile Include="TwoPlayersGame.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Player.cpp" />

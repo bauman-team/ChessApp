@@ -1,30 +1,47 @@
 #include "Map.h"
+#include "Pos.h"
 #include <cassert>
 
 Map::Map()
 {
-	map[0] = new Rook(Pos(0, 0), FigureType::Rook_white);
-	map[1] = new Knight(Pos(1, 0), FigureType::Knight_white);
-	map[2] = new Bishop(Pos(2, 0), FigureType::Bishop_white);
-	map[3] = new Queen(Pos(3, 0), FigureType::Queen_white);
-	map[4] = new King(Pos(4, 0), FigureType::King_white);
-	map[5] = new Bishop(Pos(5, 0), FigureType::Bishop_white);
-	map[6] = new Knight(Pos(6, 0), FigureType::Knight_white);
-	map[7] = new Rook(Pos(7, 0), FigureType::Rook_white);
+	map[0] = new Rook(Pos(0, 0), Color::White);
+	map[1] = new Knight(Pos(1, 0), Color::White);
+	map[2] = new Bishop(Pos(2, 0), Color::White);
+	map[3] = new Queen(Pos(3, 0), Color::White);
+	map[4] = new King(Pos(4, 0), Color::White);
+	map[5] = new Bishop(Pos(5, 0), Color::White);
+	map[6] = new Knight(Pos(6, 0), Color::White);
+	map[7] = new Rook(Pos(7, 0), Color::White);
+
 	for (int i = 8; i != 16; ++i)
-		map[i] = new Pawn(Pos(i % 8, 1), FigureType::Pawn_white);
+		map[i] = new Pawn(Pos(i % 8, 1), Color::White);
+
 	for (int i = 16; i != 48; ++i)
-		map[i] = new EmptY(Pos(i % 8, i / 8), FigureType::Empty);
+		map[i] = new Empty(Pos(i % 8, i / 8));
+
 	for (int i = 48; i != 56; ++i)
-		map[i] = new Pawn(Pos(i % 8, 6), FigureType::Pawn_black);
-	map[56] = new Rook(Pos(0, 7), FigureType::Rook_black);
-	map[57] = new Knight(Pos(1, 7), FigureType::Knight_black);
-	map[58] = new Bishop(Pos(2, 7), FigureType::Bishop_black);
-	map[59] = new Queen(Pos(3, 7), FigureType::Queen_black);
-	map[60] = new King(Pos(4, 7), FigureType::King_black);
-	map[61] = new Bishop(Pos(5, 7), FigureType::Bishop_black);
-	map[62] = new Knight(Pos(6, 7), FigureType::Knight_black);
-	map[63] = new Rook(Pos(7, 7), FigureType::Rook_black);
+		map[i] = new Pawn(Pos(i % 8, 6), Color::Black);
+
+	map[56] = new Rook(Pos(0, 7), Color::Black);
+	map[57] = new Knight(Pos(1, 7), Color::Black);
+	map[58] = new Bishop(Pos(2, 7), Color::Black);
+	map[59] = new Queen(Pos(3, 7), Color::Black);
+	map[60] = new King(Pos(4, 7), Color::Black);
+	map[61] = new Bishop(Pos(5, 7), Color::Black);
+	map[62] = new Knight(Pos(6, 7), Color::Black);
+	map[63] = new Rook(Pos(7, 7), Color::Black);
+}
+
+Figure* Map::GetFigureAt(const Pos& pos) const
+{
+	assert(pos.IsValid());
+	return map[pos.ToIndex()];
+}
+
+Figure* Map::GetFigureAt(int index) const
+{
+	assert(index >= 0 && index <= 63);
+	return map[index];
 }
 
 void Map::Move(const Pos& from, const Pos& to)
@@ -39,14 +56,14 @@ void Map::Move(const Pos& from, const Pos& to)
 		delete map[to.ToIndex()]; // decrease numOfFigures
 	}
 	map[to.ToIndex()] = map[from.ToIndex()];
-	map[from.ToIndex()] = new EmptY(Pos(from), FigureType::Empty);
+	map[from.ToIndex()] = new Empty(Pos(from));
 }
 
 void Map::SetToEmpty(const Pos& target)
 {
 	assert(target.IsValid());
 	delete map[target.ToIndex()];
-	map[target.ToIndex()] = new EmptY(Pos(target), FigureType::Empty);
+	map[target.ToIndex()] = new Empty(Pos(target));
 }
 
 void Map::PawnToQueen(const Pos& target)
@@ -55,18 +72,18 @@ void Map::PawnToQueen(const Pos& target)
 	if (map[target.ToIndex()]->GetType() == FigureType::Pawn_black)
 	{
 		delete map[target.ToIndex()];
-		map[target.ToIndex()] = new Queen(Pos(target), FigureType::Queen_black);
+		map[target.ToIndex()] = new Queen(Pos(target), Color::Black);
 	}
 	else
 	{
 		delete map[target.ToIndex()];
-		map[target.ToIndex()] = new Queen(Pos(target), FigureType::Queen_white);
+		map[target.ToIndex()] = new Queen(Pos(target), Color::White);
 	}
 }
 
 void Map::Castling(const Pos& from, const Pos& to)
 {
-	assert(from.IsValid() && to.IsValid());
+	//assert(from.IsValid() && to.IsValid());
 	Move(from, to);
 	if (map[from.ToIndex()]->GetType() == FigureType::King_black)
 	{
@@ -78,7 +95,7 @@ void Map::Castling(const Pos& from, const Pos& to)
 	}
 }
 
-int8_t Map::CheckEmpty(const Pos& from, const Pos& to)
+int8_t Map::CheckEmpty(const Pos& from, const Pos& to) const
 {
 	if (to.IsValid())
 	{
@@ -89,16 +106,4 @@ int8_t Map::CheckEmpty(const Pos& from, const Pos& to)
 			return 2; // if Pos contains the figure with opposite color
 	}
 	return 0; // if Pos contains the figure with same color or output border
-}
-
-Figure* Map::GetFigureAt(const Pos& pos) const
-{
-	assert(pos.IsValid());
-	return map[pos.ToIndex()];
-}
-
-Figure* Map::GetFigureAt(int index) const
-{
-	assert(index >= 0 && index <= 63);
-	return map[index];
 }
