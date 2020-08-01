@@ -24,12 +24,12 @@ void TwoPlayersGame::ChangeActivePlayer()
 
 void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 {
-	Pos* position = drawer.TransformMousePosition(mouseX, mouseY);
+	Pos* position = drawer.TransformMousePosition(mouseX, mouseY); // transform coords on window to position on map
 	bool chosenPositionIsPossible = false;
-	if (position->IsValid())
+	if (position->IsValid()) // if position is correct
 	{
-		if (activePlayer->GetChosenPosition() != nullptr)
-		{
+		if (activePlayer->GetChosenPosition() != nullptr) // if this chosen position is not not the first
+		{// compare this position with possible moves for last chosen figure
 			for (std::vector<Pos>::const_iterator it = map.GetFigureAt(*activePlayer->GetChosenPosition())->GetPossibleMoves().begin(); it != map.GetFigureAt(*activePlayer->GetChosenPosition())->GetPossibleMoves().end() && !chosenPositionIsPossible;)
 			{
 				if (*it == *position)
@@ -37,7 +37,7 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 					chosenPositionIsPossible = true;
 					activePlayer->RunMakeMove(map.GetFigureAt(*activePlayer->GetChosenPosition()), *position);
 					ChangeActivePlayer();
-					break;
+					break; // need to delete
 				}
 				else
 				{
@@ -52,7 +52,7 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 		else
 		{
 			activePlayer->SetChosenPosition(position);
-			if (activePlayer->GetColor() == map.GetFigureAt(*position)->GetColor())
+			if (activePlayer->GetColor() == map.GetFigureAt(*position)->GetColor()) // if this figure is an active player
 			{
 				activePlayer->RunFindMoves(map.GetFigureAt(*position));
 			}
