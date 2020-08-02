@@ -18,10 +18,25 @@ Player::Player(Color _color, std::string _name, double _timer) : color(_color), 
 
 void Player::RunFindMoves(Figure* choseFigure)
 {
-	choseFigure->FindPossibleMoves();
+	if (!choseFigure->IsMovesFound())
+		choseFigure->FindPossibleMoves();
 }
 
 void Player::RunMakeMove(Figure* choseFigure, Pos& currentPosition)
 {
 	choseFigure->MakeMoveTo(currentPosition);
+}
+
+void Player::RunClearPossibleMoves(Map& map)
+{
+	for (int i = 0; i < 8; ++i)
+	{
+		for (int j = 0; j < 8; ++j)
+		{
+			if (map.GetFigureAt(Pos(i, j))->GetColor() == color)
+			{
+				map.GetFigureAt(Pos(i, j))->ClearPossibleMoves();
+			}
+		}
+	}
 }

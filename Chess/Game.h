@@ -2,12 +2,15 @@
 #include "Map.h"
 #include "Drawer.h"
 #include "Pos.h"
+#include "MoveInfo.h"
+#include <stack>
 
 class Game
 {
 protected:
 	Drawer drawer;
 	Map map;
+	std::stack<MoveInfo> movesHistory;
 public:
 	Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
 		: drawer(window, resource, properties)

@@ -4,6 +4,7 @@
 
 class Figure;
 class Pos;
+class Map;
 enum class Color;
 class Player
 {
@@ -22,7 +23,6 @@ public:
 	
 	void RunFindMoves(Figure* choseFigure);
 	void RunMakeMove(Figure* choseFigure, Pos& currentPosition);
+	void RunClearPossibleMoves(Map& map);
 	//int8_t CheckGameFinal();
 };
-
-

@@ -47,14 +47,11 @@ Figure* Map::GetFigureAt(int index) const
 void Map::Move(const Pos& from, const Pos& to)
 {
 	assert(from.IsValid() && to.IsValid());
-	if (map[to.ToIndex()]->GetType() == FigureType::Empty)
+	if (map[to.ToIndex()]->GetType() != FigureType::Empty)
 	{
-		delete map[to.ToIndex()];
+		// decrease numOfFigures
 	}
-	else
-	{
-		delete map[to.ToIndex()]; // decrease numOfFigures
-	}
+	//delete map[to.ToIndex()];
 	map[to.ToIndex()] = map[from.ToIndex()];
 	map[from.ToIndex()] = new Empty(Pos(from));
 }

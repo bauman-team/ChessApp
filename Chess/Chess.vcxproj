@@ -154,6 +154,7 @@
     <ClCompile Include="Figure.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MapProperties.cpp" />
+    <ClCompile Include="MoveInfo.cpp" />
     <ClCompile Include="Pos.cpp" />
     <ClCompile Include="TwoPlayersGame.cpp" />
     <ClCompile Include="Map.cpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MapProperties.h" />
+    <ClInclude Include="MoveInfo.h" />
     <ClInclude Include="Pos.h" />
     <ClInclude Include="Resources.h" />
     <ClInclude Include="TwoPlayersGame.h" />
