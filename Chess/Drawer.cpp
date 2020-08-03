@@ -6,12 +6,15 @@ Drawer::Drawer(sf::RenderWindow* _window, const Resources& resource, const MapPr
 {
 	SetResources(resource);
 	SetScale();
+	IsWhiteActive = true;
 }
 
 void Drawer::SetResources(const Resources& resource)
 {
 	mapTexture.loadFromFile(resource.GetPathToMapImage());
 	mapSprite.setTexture(mapTexture);	
+	mapSprite.setOrigin(mapSprite.getLocalBounds().width / 2, mapSprite.getLocalBounds().height / 2);
+	mapSprite.setPosition(mapSprite.getLocalBounds().width / 2, mapSprite.getLocalBounds().height / 2);
 
 	chosenCellTexture.loadFromFile(resource.GetPathToChosenCellImage());
 	chosenCellSprite.setTexture(chosenCellTexture);
@@ -49,7 +52,10 @@ void Drawer::ShowMap(const Map& map)
 			FigureType selectedFigure = map.GetFigureAt(Pos(i, j))->GetType();
 			if (selectedFigure != FigureType::Empty)
 			{
-				figuresSprites[to_underlying(selectedFigure)].setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + i * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + (7 - j) * mapProperties.GetSquareSize());
+				if (IsWhiteActive)
+					figuresSprites[to_underlying(selectedFigure)].setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + i * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + (7 - j) * mapProperties.GetSquareSize());
+				else
+					figuresSprites[to_underlying(selectedFigure)].setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + (7 - i) * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + j * mapProperties.GetSquareSize());
 				window->draw(figuresSprites[to_underlying(selectedFigure)]);
 				//figuresSprites[to_underlying(x)].move(mapProperties.GetSquareSize(), 0);
 			}
@@ -59,13 +65,25 @@ void Drawer::ShowMap(const Map& map)
 
 void Drawer::ShowActiveFigure(const Map& map, const Pos& chosenFigure)
 {
-	chosenCellSprite.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + chosenFigure.GetX() * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + (7 - chosenFigure.GetY()) * mapProperties.GetSquareSize());
+	if (IsWhiteActive)
+		chosenCellSprite.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + chosenFigure.GetX() * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + (7 - chosenFigure.GetY()) * mapProperties.GetSquareSize());
+	else
+		chosenCellSprite.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + (7 - chosenFigure.GetX()) * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + chosenFigure.GetY() * mapProperties.GetSquareSize());
 	window->draw(chosenCellSprite);
 	for (std::vector<Pos>::const_iterator it = map.GetFigureAt(chosenFigure)->GetPossibleMoves().begin(); it != map.GetFigureAt(chosenFigure)->GetPossibleMoves().end(); ++it)
 	{
-		possibleCellSprite.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + it->GetX() * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + (7 - it->GetY()) * mapProperties.GetSquareSize());
+		if (IsWhiteActive)
+			possibleCellSprite.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + it->GetX() * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + (7 - it->GetY()) * mapProperties.GetSquareSize());
+		else
+			possibleCellSprite.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + (7 - it->GetX()) * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + it->GetY() * mapProperties.GetSquareSize());
 		window->draw(possibleCellSprite);
 	}
+}
+
+void Drawer::RotateBoard()
+{
+	mapSprite.rotate(180);
+	IsWhiteActive = !IsWhiteActive;
 }
 
 Pos* Drawer::TransformMousePosition(int mouseX, int mouseY)

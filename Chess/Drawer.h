@@ -17,6 +17,8 @@ class Drawer
 	sf::Sprite figuresSprites[FIGURE_TYPES];
 	MapProperties mapProperties;
 
+	bool IsWhiteActive; // for correct calculation figures positions after gameboard rotation
+
 	void SetResources(const Resources& resource);
 	void SetScale();
 public:
@@ -24,6 +26,8 @@ public:
 
 	void ShowMap(const Map& map);
 	void ShowActiveFigure(const Map&, const Pos&);
+
+	void RotateBoard();
 
 	Pos* TransformMousePosition(int, int); // fix negative coords
 	//void ShowPossibleMoves();

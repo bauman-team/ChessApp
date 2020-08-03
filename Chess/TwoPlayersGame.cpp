@@ -21,11 +21,17 @@ void TwoPlayersGame::ChangeActivePlayer()
 	activePlayer->RunClearPossibleMoves(map);
 	activePlayer = (activePlayer == player2) ? player1 : player2;
 	activePlayer->SetChosenPosition(nullptr);
+	// TODO: rotate gameboard
+	drawer.Rotate();
 }
 
 void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 {
 	Pos* position = drawer.TransformMousePosition(mouseX, mouseY); // transform coords on window to position on map
+	if (activePlayer->GetColor() == Color::Black)
+	{
+		*position = Pos(7 - position->GetX(), 7 - position->GetY());
+	}
 	if (position->IsValid()) // if position is correct
 	{
 		bool chosenPositionIsPossible = false;

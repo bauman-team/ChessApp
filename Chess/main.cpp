@@ -30,6 +30,7 @@ int main()
 
 	while (window.isOpen())
 	{
+		window.clear(sf::Color::White);
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
@@ -47,7 +48,6 @@ int main()
 				break;
 			}
 		}
-		window.clear(sf::Color::White);
 		game->StartGame();
 		window.display();
 	}
