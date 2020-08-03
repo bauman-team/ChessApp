@@ -2,7 +2,6 @@
 #include "Game.h"
 #include "Player.h"
 #include "Resources.h"
-#include "Drawer.h"
 #include "Map.h"
 
 class TwoPlayersGame : public Game

@@ -13,7 +13,10 @@ void TwoPlayersGame::StartGame()
 {
 	drawer.ShowMap(map);
 	if (activePlayer->GetChosenPosition() != nullptr)
+	{
 		drawer.ShowActiveFigure(map, *activePlayer->GetChosenPosition());
+		drawer.ShowPossibleMoves(map, *activePlayer->GetChosenPosition());
+	}
 }
 
 void TwoPlayersGame::ChangeActivePlayer()
@@ -21,8 +24,7 @@ void TwoPlayersGame::ChangeActivePlayer()
 	activePlayer->RunClearPossibleMoves(map);
 	activePlayer = (activePlayer == player2) ? player1 : player2;
 	activePlayer->SetChosenPosition(nullptr);
-	// TODO: rotate gameboard
-	drawer.Rotate();
+	drawer.RotateBoard();
 }
 
 void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)

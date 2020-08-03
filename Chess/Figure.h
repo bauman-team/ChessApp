@@ -40,7 +40,7 @@ protected:
 	static Map* ptrMap;
 
 	Pos coords;
-	Color color;
+	const Color color;
 	FigureType type;
 	std::vector<Pos> possibleMoves;
 
