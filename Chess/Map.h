@@ -1,12 +1,18 @@
 #pragma once
 #include "Figure.h"
 #include "Pos.h"
+#include <vector>
+#include <stack>
+#include "MoveInfo.h"
 
 class Figure;
 class Rook;
+class MoveInfo;
+
 class Map
 {
 	Figure* map[64];
+	std::vector<MoveInfo> movesHistory;
 
 	friend void ChangeCoordsForCastling(Rook&, Pos newCoords);
 public:

@@ -47,13 +47,15 @@ Figure* Map::GetFigureAt(int index) const
 void Map::Move(const Pos& from, const Pos& to)
 {
 	assert(from.IsValid() && to.IsValid());
+	MoveInfo info(from, to, map[from.ToIndex()]);
 	if (map[to.ToIndex()]->GetType() != FigureType::Empty)
 	{
+		info.SetEatenFigure(map[to.ToIndex()]);
 		// decrease numOfFigures
 	}
-	//delete map[to.ToIndex()];
 	map[to.ToIndex()] = map[from.ToIndex()];
 	map[from.ToIndex()] = new Empty(Pos(from));
+	movesHistory.push_back(info);
 }
 
 void Map::SetToEmpty(const Pos& target)
@@ -75,32 +77,21 @@ void Map::Castling(const Pos& from, const Pos& to)
 {
 	//assert(from.IsValid() && to.IsValid());
 	Move(from, to);
-	if (map[to.ToIndex()]->GetColor() == Color::Black)
+	Pos rookFrom;
+	Pos rookTo;
+	int y = (map[to.ToIndex()]->GetColor() == Color::Black) ? 7 : 0;
+	if (from.GetX() > to.GetX())
 	{
-		if (from.GetX() > to.GetX())
-		{
-			ChangeCoordsForCastling(*(Rook*)map[Pos(0, 7).ToIndex()], Pos(3, 7));
-			Move(Pos(0, 7), Pos(3, 7));
-		}
-		else
-		{
-			ChangeCoordsForCastling(*(Rook*)map[Pos(7, 7).ToIndex()], Pos(5, 7));
-			Move(Pos(7, 7), Pos(5, 7));
-		}
+		rookFrom = Pos(0, y);
+		rookTo = Pos(3, y);
 	}
 	else
 	{
-		if (from.GetX() > to.GetX())
-		{
-			ChangeCoordsForCastling(*(Rook*)map[Pos(0, 0).ToIndex()], Pos(3, 0));
-			Move(Pos(0, 0), Pos(3, 0));
-		}
-		else
-		{
-			ChangeCoordsForCastling(*(Rook*)map[Pos(7, 0).ToIndex()], Pos(5, 0));
-			Move(Pos(7, 0), Pos(5, 0));
-		}
+		rookFrom = Pos(7, y);
+		rookTo = Pos(5, y);
 	}
+	ChangeCoordsForCastling(*(Rook*)map[rookFrom.ToIndex()], rookTo);
+	Move(rookFrom, rookTo);
 }
 
 bool Map::CheckingShah(const Pos& kingPos)
@@ -109,13 +100,20 @@ bool Map::CheckingShah(const Pos& kingPos)
 	{ // high // method FROM KING
 		Pos selectedPosition;
 		bool isChecked;
-		FigureType selectedFigure;
+		FigureType selectedFigureType;
 		for (int x, y, i = 0; i != 8; ++i)
 		{
 			x = 0; y = 0;
 			isChecked = false;
 			do 
 			{
+				/*
+					2 | 3 | 4
+					---------
+					1 | K | 5
+					---------
+					0 | 7 | 6
+				*/
 				if (i == 0 || i == 1 || i == 2)
 					--x;
 				if (i == 4 || i == 5 || i == 6)
@@ -127,16 +125,16 @@ bool Map::CheckingShah(const Pos& kingPos)
 				selectedPosition = kingPos.AddToX(x).AddToY(y);
 				if (selectedPosition.IsValid())
 				{
-					selectedFigure = GetFigureAt(selectedPosition)->GetType();
-					if (selectedFigure != FigureType::Empty)
+					selectedFigureType = GetFigureAt(selectedPosition)->GetType();
+					if (selectedFigureType != FigureType::Empty)
 					{
 						if (GetFigureAt(selectedPosition)->GetColor() != GetFigureAt(kingPos)->GetColor())
 						{
-							if (selectedFigure == FigureType::Queen_black || selectedFigure == FigureType::Queen_white)
+							if (selectedFigureType == FigureType::Queen_black || selectedFigureType == FigureType::Queen_white)
 								return true;
-							if (i % 2 && (selectedFigure == FigureType::Rook_black || selectedFigure == FigureType::Rook_white)) // 1, 3, 5, 7 
+							if (i % 2 && (selectedFigureType == FigureType::Rook_black || selectedFigureType == FigureType::Rook_white)) // 1, 3, 5, 7 
 								return true;
-							if (!(i % 2) && (selectedFigure == FigureType::Bishop_black || selectedFigure == FigureType::Bishop_white)) // 0, 2, 4, 6
+							if (!(i % 2) && (selectedFigureType == FigureType::Bishop_black || selectedFigureType == FigureType::Bishop_white)) // 0, 2, 4, 6
 								return true;								
 						}
 						isChecked = true;
