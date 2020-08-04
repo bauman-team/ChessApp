@@ -59,7 +59,7 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 					movesHistory.push(info);
 					activePlayer->RunMakeMove(map.GetFigureAt(*activePlayer->GetChosenPosition()), *position);
 					ChangeActivePlayer();
-					break;
+					break; // if it possible delete
 				}
 			}
 		}

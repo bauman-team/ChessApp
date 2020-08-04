@@ -59,6 +59,37 @@ std::vector<Pos> King::FindPossibleMoves()
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 	}
+	if (possibleCastling)
+	{
+		if (color == Color::White)
+		{
+			if (ptrMap->GetFigureAt(Pos(0, 0))->GetType() == FigureType::Rook_white 
+				&& ptrMap->CheckEmpty(coords, Pos(1, 0)) == 1
+				&& ptrMap->CheckEmpty(coords, Pos(2, 0)) == 1
+				&& ptrMap->CheckEmpty(coords, Pos(3, 0)) == 1)
+				if (((Rook*)ptrMap->GetFigureAt(Pos(0, 0)))->GetCastling())
+					possibleMoves.push_back(Pos(2, 0));
+			if (ptrMap->GetFigureAt(Pos(7, 0))->GetType() == FigureType::Rook_white
+				&& ptrMap->CheckEmpty(coords, Pos(6, 0)) == 1
+				&& ptrMap->CheckEmpty(coords, Pos(5, 0)) == 1)
+				if (((Rook*)ptrMap->GetFigureAt(Pos(7, 0)))->GetCastling())
+					possibleMoves.push_back(Pos(6, 0));
+		}
+		else
+		{
+			if (ptrMap->GetFigureAt(Pos(0, 7))->GetType() == FigureType::Rook_black
+				&& ptrMap->CheckEmpty(coords, Pos(1, 7)) == 1
+				&& ptrMap->CheckEmpty(coords, Pos(2, 7)) == 1
+				&& ptrMap->CheckEmpty(coords, Pos(3, 7)) == 1)
+				if (((Rook*)ptrMap->GetFigureAt(Pos(0, 7)))->GetCastling())
+					possibleMoves.push_back(Pos(2, 7));
+			if (ptrMap->GetFigureAt(Pos(7, 7))->GetType() == FigureType::Rook_black
+				&& ptrMap->CheckEmpty(coords, Pos(6, 7)) == 1
+				&& ptrMap->CheckEmpty(coords, Pos(5, 7)) == 1)
+				if (((Rook*)ptrMap->GetFigureAt(Pos(7, 7)))->GetCastling())
+					possibleMoves.push_back(Pos(6, 7));
+		}
+	}
 	movesFound = true;
 	return possibleMoves;
 }
@@ -239,17 +270,21 @@ bool King::MakeMoveTo(const Pos& nextPos)
 {
 	if (abs(nextPos.GetX() - coords.GetX()) == 2)
 	{
-		for (std::vector<Pos>::iterator it = possibleMoves.begin(); it != possibleMoves.end(); ++it)
-			if (*it == nextPos)
-			{
-				ptrMap->Castling(coords, nextPos);
-				coords = nextPos;
-				possibleMoves.clear();
-				return true;
-			}
+		if (possibleCastling)
+			for (std::vector<Pos>::iterator it = possibleMoves.begin(); it != possibleMoves.end(); ++it)
+				if (*it == nextPos)
+				{
+					possibleCastling = false;
+					ptrMap->Castling(coords, nextPos);
+					coords = nextPos;
+					possibleMoves.clear();
+					return true;
+				}
 		return false; // missclick or error
 	}
-	return Figure::MakeMoveTo(nextPos); // call base class method 
+	if (Figure::MakeMoveTo(nextPos)) // call base class method 
+		possibleCastling = false;
+	return nextPos == coords;
 }
 
 bool Rook::MakeMoveTo(const Pos& nextPos)

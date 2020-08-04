@@ -23,7 +23,7 @@ public:
 	Color GetColor() const { return color; }
 	
 	void RunFindMoves(Figure* choseFigure);
-	void RunMakeMove(Figure* choseFigure, Pos& currentPosition);
+	void RunMakeMove(Figure* choseFigure, Pos& nextPosition);
 	void RunClearPossibleMoves(Map& map);
 	//int8_t CheckGameFinal();
 };

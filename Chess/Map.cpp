@@ -82,13 +82,31 @@ void Map::Castling(const Pos& from, const Pos& to)
 {
 	//assert(from.IsValid() && to.IsValid());
 	Move(from, to);
-	if (map[from.ToIndex()]->GetType() == FigureType::King_black)
+	if (map[to.ToIndex()]->GetType() == FigureType::King_black)
 	{
-		(from.GetX() > to.GetX()) ? Move(Pos(0, 7), Pos(3, 7)) : Move(Pos(7, 7), Pos(5, 7));
+		if (from.GetX() > to.GetX())
+		{
+			ChangeCoordsForCastling(*(Rook*)map[Pos(0, 7).ToIndex()], Pos(3, 7));
+			Move(Pos(0, 7), Pos(3, 7));
+		}
+		else
+		{
+			ChangeCoordsForCastling(*(Rook*)map[Pos(7, 7).ToIndex()], Pos(5, 7));
+			Move(Pos(7, 7), Pos(5, 7));
+		}
 	}
 	else
 	{
-		(from.GetX() > to.GetX()) ? Move(Pos(0, 0), Pos(3, 0)) : Move(Pos(7, 0), Pos(5, 0));
+		if (from.GetX() > to.GetX())
+		{
+			ChangeCoordsForCastling(*(Rook*)map[Pos(0, 0).ToIndex()], Pos(3, 0));
+			Move(Pos(0, 0), Pos(3, 0));
+		}
+		else
+		{
+			ChangeCoordsForCastling(*(Rook*)map[Pos(7, 0).ToIndex()], Pos(5, 0));
+			Move(Pos(7, 0), Pos(5, 0));
+		}
 	}
 }
 
@@ -103,4 +121,9 @@ int8_t Map::CheckEmpty(const Pos& from, const Pos& to) const
 			return 2; // if Pos contains the figure with opposite color
 	}
 	return 0; // if Pos contains the figure with same color or output border
+}
+
+void ChangeCoordsForCastling(Rook& selectedRook, Pos newCoords)
+{
+	selectedRook.coords = newCoords;
 }

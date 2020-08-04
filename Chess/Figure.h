@@ -112,6 +112,8 @@ class Rook : public Figure
 
 	virtual bool MakeMoveTo(const Pos&) override;
 	virtual std::vector<Pos> FindPossibleMoves() override;
+
+	friend void ChangeCoordsForCastling(Rook&, Pos newCoords);
 public:
 	Rook(Pos _coords, Color _color);
 

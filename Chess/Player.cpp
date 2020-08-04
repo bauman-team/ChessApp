@@ -22,9 +22,9 @@ void Player::RunFindMoves(Figure* choseFigure)
 		choseFigure->FindPossibleMoves();
 }
 
-void Player::RunMakeMove(Figure* choseFigure, Pos& currentPosition)
+void Player::RunMakeMove(Figure* choseFigure, Pos& nextPosition)
 {
-	choseFigure->MakeMoveTo(currentPosition);
+	choseFigure->MakeMoveTo(nextPosition);
 }
 
 void Player::RunClearPossibleMoves(Map& map)

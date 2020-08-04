@@ -3,10 +3,12 @@
 #include "Pos.h"
 
 class Figure;
-
+class Rook;
 class Map
 {
 	Figure* map[64];
+
+	friend void ChangeCoordsForCastling(Rook&, Pos newCoords);
 public:
 	Map(); 
 
