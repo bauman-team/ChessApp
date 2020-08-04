@@ -75,7 +75,7 @@ void Map::Castling(const Pos& from, const Pos& to)
 {
 	//assert(from.IsValid() && to.IsValid());
 	Move(from, to);
-	if (map[to.ToIndex()]->GetType() == FigureType::King_black)
+	if (map[to.ToIndex()]->GetColor() == Color::Black)
 	{
 		if (from.GetX() > to.GetX())
 		{
@@ -103,6 +103,107 @@ void Map::Castling(const Pos& from, const Pos& to)
 	}
 }
 
+bool Map::CheckingShah(const Pos& kingPos)
+{
+	if (true) // numOfFigures
+	{ // high // method FROM KING
+		Pos selectedPosition;
+		bool isChecked;
+		FigureType selectedFigure;
+		for (int x, y, i = 0; i != 8; ++i)
+		{
+			x = 0; y = 0;
+			isChecked = false;
+			do 
+			{
+				if (i == 0 || i == 1 || i == 2)
+					--x;
+				if (i == 4 || i == 5 || i == 6)
+					++x;
+				if (i == 0 || i == 7 || i == 6)
+					++y;
+				if (i == 2 || i == 3 || i == 4)
+					--y;
+				selectedPosition = kingPos.AddToX(x).AddToY(y);
+				if (selectedPosition.IsValid())
+				{
+					selectedFigure = GetFigureAt(selectedPosition)->GetType();
+					if (selectedFigure != FigureType::Empty)
+					{
+						if (GetFigureAt(selectedPosition)->GetColor() != GetFigureAt(kingPos)->GetColor())
+						{
+							if (selectedFigure == FigureType::Queen_black || selectedFigure == FigureType::Queen_white)
+								return true;
+							if (i % 2 && (selectedFigure == FigureType::Rook_black || selectedFigure == FigureType::Rook_white)) // 1, 3, 5, 7 
+								return true;
+							if (!(i % 2) && (selectedFigure == FigureType::Bishop_black || selectedFigure == FigureType::Bishop_white)) // 0, 2, 4, 6
+								return true;								
+						}
+						isChecked = true;
+					}
+				}
+				else
+				{
+					isChecked = true;
+				}
+						
+			} while (!isChecked);
+		}
+		// pawn
+		if (GetFigureAt(kingPos)->GetColor() == Color::White)
+		{
+			selectedPosition = kingPos.AddToX(-1).AddToY(1);
+			if (selectedPosition.IsValid())
+				if (GetFigureAt(selectedPosition)->GetType() == FigureType::Pawn_black)
+					return true;
+			selectedPosition = kingPos.AddToX(1).AddToY(1);
+			if (selectedPosition.IsValid())
+				if (GetFigureAt(selectedPosition)->GetType() == FigureType::Pawn_black)
+					return true;
+		}
+		else
+		{
+			selectedPosition = kingPos.AddToX(-1).AddToY(-1);
+			if (selectedPosition.IsValid())
+				if (GetFigureAt(selectedPosition)->GetType() == FigureType::Pawn_white)
+					return true;
+			selectedPosition = kingPos.AddToX(1).AddToY(-1);
+			if (selectedPosition.IsValid())
+				if (GetFigureAt(selectedPosition)->GetType() == FigureType::Pawn_white)
+					return true;
+		}
+		// knight
+		for (int i = 0; i != 2; ++i)
+		{
+			selectedPosition = kingPos.AddToX(i % 2 + 1).AddToY((i + 1) % 2 + 1);
+			if (selectedPosition.IsValid())
+				if (GetFigureAt(kingPos)->GetColor() != GetFigureAt(selectedPosition)->GetColor())
+					if (GetFigureAt(selectedPosition)->GetType() == FigureType::Knight_black || GetFigureAt(selectedPosition)->GetType() == FigureType::Knight_white)
+						return true;
+			selectedPosition = kingPos.AddToX(-(i % 2 + 1)).AddToY((i + 1) % 2 + 1);
+			if (selectedPosition.IsValid())
+				if (GetFigureAt(kingPos)->GetColor() != GetFigureAt(selectedPosition)->GetColor())
+					if (GetFigureAt(selectedPosition)->GetType() == FigureType::Knight_black || GetFigureAt(selectedPosition)->GetType() == FigureType::Knight_white)
+						return true;
+			selectedPosition = kingPos.AddToX(i % 2 + 1).AddToY(-((i + 1) % 2 + 1));
+			if (selectedPosition.IsValid())
+				if (GetFigureAt(kingPos)->GetColor() != GetFigureAt(selectedPosition)->GetColor())
+					if (GetFigureAt(selectedPosition)->GetType() == FigureType::Knight_black || GetFigureAt(selectedPosition)->GetType() == FigureType::Knight_white)
+						return true;
+			selectedPosition = kingPos.AddToX(-(i % 2 + 1)).AddToY(-((i + 1) % 2 + 1));
+			if (selectedPosition.IsValid())
+				if (GetFigureAt(kingPos)->GetColor() != GetFigureAt(selectedPosition)->GetColor())
+					if (GetFigureAt(selectedPosition)->GetType() == FigureType::Knight_black || GetFigureAt(selectedPosition)->GetType() == FigureType::Knight_white)
+						return true;
+		}
+		return false;
+	}
+	else
+	{ // low // method TO KING
+
+	}
+}
+
 int8_t Map::CheckEmpty(const Pos& from, const Pos& to) const
 {
 	if (to.IsValid())
@@ -119,4 +220,5 @@ int8_t Map::CheckEmpty(const Pos& from, const Pos& to) const
 void ChangeCoordsForCastling(Rook& selectedRook, Pos newCoords)
 {
 	selectedRook.coords = newCoords;
+	selectedRook.possibleCastling = false;
 }

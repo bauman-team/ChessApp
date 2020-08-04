@@ -225,21 +225,21 @@ std::vector<Pos> Rook::FindPossibleMoves()
 std::vector<Pos> Pawn::FindPossibleMoves()
 {
 	Pos nextPosition = coords;
-	nextPosition = Pos(nextPosition.GetX(), nextPosition.GetY() + (type == FigureType::Pawn_black ? -1 : 1)); // black go down | white go up
+	nextPosition = Pos(nextPosition.GetX(), nextPosition.GetY() + (color == Color::Black ? -1 : 1)); // black go down | white go up
 	if (ptrMap->CheckEmpty(coords, nextPosition) == 1)
 	{
 		possibleMoves.push_back(nextPosition);
-		if (coords.GetY() == 1 && type == FigureType::Pawn_white || coords.GetY() == 6 && type == FigureType::Pawn_black) // check for double move check position
+		if (coords.GetY() == 1 && color == Color::White || coords.GetY() == 6 && color == Color::Black) // check for double move check position
 		{
-			nextPosition = Pos(nextPosition.GetX(), nextPosition.GetY() + (type == FigureType::Pawn_black ? -1 : 1));
+			nextPosition = Pos(nextPosition.GetX(), nextPosition.GetY() + (color == Color::Black ? -1 : 1));
 			if (ptrMap->CheckEmpty(coords, nextPosition) == 1)
 				possibleMoves.push_back(nextPosition);
 		}
 	}
-	nextPosition = Pos(coords.GetX() + 1, coords.GetY() + (type == FigureType::Pawn_black ? -1 : 1)); // if can eat
+	nextPosition = Pos(coords.GetX() + 1, coords.GetY() + (color == Color::Black ? -1 : 1)); // if can eat
 	if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
 		possibleMoves.push_back(nextPosition);
-	nextPosition = Pos(coords.GetX() - 1, coords.GetY() + (type == FigureType::Pawn_black ? -1 : 1));
+	nextPosition = Pos(coords.GetX() - 1, coords.GetY() + (color == Color::Black ? -1 : 1));
 	if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
 		possibleMoves.push_back(nextPosition);
 	movesFound = true;
@@ -301,7 +301,7 @@ bool Pawn::MakeMoveTo(const Pos& nextPos)
 {
 	if (Figure::MakeMoveTo(nextPos)) // call base class method 
 	{
-		if (type == FigureType::Pawn_black && coords.GetY() == 0 || type == FigureType::Pawn_white && coords.GetY() == 7)
+		if (color == Color::Black && coords.GetY() == 0 || color == Color::White && coords.GetY() == 7)
 			ptrMap->PawnToQueen(coords);
 		return true;
 	}

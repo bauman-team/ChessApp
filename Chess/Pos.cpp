@@ -28,3 +28,13 @@ bool Pos::operator==(const Pos& coords) const
 {
 	return x == coords.x && y == coords.y;
 }
+
+Pos& Pos::AddToX(int _x) const
+{
+	return *(new Pos(x + _x, y));
+}
+
+Pos& Pos::AddToY(int _y) const
+{
+	return *(new Pos(x, y + _y));
+}

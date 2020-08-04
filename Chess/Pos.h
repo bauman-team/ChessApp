@@ -15,4 +15,7 @@ public:
 	Pos& operator=(const Pos& coords);
 	Pos& operator*=(float value);
 	bool operator==(const Pos& coords) const;
+
+	Pos& AddToX(int) const;
+	Pos& AddToY(int) const;
 };
