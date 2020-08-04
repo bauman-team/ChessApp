@@ -22,6 +22,10 @@ void TwoPlayersGame::StartGame()
 void TwoPlayersGame::ChangeActivePlayer()
 {
 	activePlayer->RunClearPossibleMoves(map);
+	drawer.ShowMap(map);
+	drawer.DisplayWindow();
+	sf::sleep(sf::seconds(2));
+
 	activePlayer = (activePlayer == player2) ? player1 : player2;
 	activePlayer->SetChosenPosition(nullptr);
 	drawer.RotateBoard();

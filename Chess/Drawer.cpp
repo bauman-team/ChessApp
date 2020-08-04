@@ -94,3 +94,8 @@ void Drawer::ShowPossibleMoves(const Map& map, const Pos& chosenFigure)
 		window->draw(possibleCellSprite);
 	}
 }
+
+void Drawer::DisplayWindow()
+{
+	window->display();
+}
