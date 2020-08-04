@@ -27,7 +27,7 @@ public:
 	void ShowMap(const Map& map);
 	void ShowActiveFigure(const Map&, const Pos&);
 	void ShowPossibleMoves(const Map&, const Pos&);
-
+	void DisplayWindow();
 	void RotateBoard();
 
 	Pos* TransformMousePosition(int, int) const; // fix negative coords
