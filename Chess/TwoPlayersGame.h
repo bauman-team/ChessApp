@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Resources.h"
 #include "Map.h"
+#include <string>
 
 class TwoPlayersGame : public Game
 {
@@ -19,5 +20,5 @@ public:
 
 	void virtual SetPlayerChosenCell(int, int) override;
 
-	void SetPlayers(std::string name1 = "player1", std::string name2 = "player2", double timeOfGame = -1);
+	void SetPlayers(std::string name1 = "player1", std::string name2 = "player2", sf::Time timeLimit = sf::Time(sf::seconds(90)));
 };

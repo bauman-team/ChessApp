@@ -11,7 +11,7 @@ Pos* Player::chosenPos = nullptr;
 	return 0;
 }*/
 
-Player::Player(Color _color, std::string _name, double _timer) : color(_color), name(_name), timer(_timer)
+Player::Player(Color _color, std::string _name, sf::Time timeLimit) : color(_color), name(_name), remainingTime(timeLimit), timeIsUp(false)
 {
 	 numOfFigures = 16; // if need add SAVE MOD replace numOfFigures to params
 }
@@ -38,5 +38,22 @@ void Player::RunClearPossibleMoves(Map& map)
 				map.GetFigureAt(Pos(i, j))->ClearPossibleMoves();
 			}
 		}
+	}
+}
+
+void Player::StartTimer()
+{
+	clock.restart();
+}
+
+sf::Time Player::GetRemainingTime()
+{
+	remainingTime -= clock.restart();
+	if (remainingTime.asSeconds() > 0)
+		return remainingTime;
+	else
+	{
+		timeIsUp = true;
+		sf::seconds(0);
 	}
 }

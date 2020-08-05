@@ -13,15 +13,16 @@ void Drawer::SetResources(const Resources& resource)
 {
 	mapTexture.loadFromFile(resource.GetPathToMapImage());
 	mapSprite.setTexture(mapTexture);	
-	mapSprite.setOrigin(mapSprite.getLocalBounds().width / 2, mapSprite.getLocalBounds().height / 2);
-	mapSprite.setPosition(mapSprite.getLocalBounds().width / 2, mapSprite.getLocalBounds().height / 2);
 
 	chosenCellTexture.loadFromFile(resource.GetPathToChosenCellImage());
 	chosenCellSprite.setTexture(chosenCellTexture);
 
 	possibleCellTexture.loadFromFile(resource.GetPathToPossibleCellImage());
 	possibleCellSprite.setTexture(possibleCellTexture);
-	
+
+	font.loadFromFile(resource.GetPathToFont());
+	timeText.setFont(font);
+
 	for (int i = 0; i < FIGURE_TYPES; ++i)
 		figuresTextures[i].loadFromFile(resource.GetPathToFigure((FigureType)i));
 
@@ -34,7 +35,16 @@ void Drawer::SetScale()
 	float mapScale = (float)window->getSize().x / mapTexture.getSize().x;
 	float figureScale = mapScale * (float)mapProperties.GetSquareSize() / figuresTextures[0].getSize().x;
 	float cellScale = mapScale * (float)mapProperties.GetSquareSize() / possibleCellTexture.getSize().x;
+
 	mapSprite.setScale(mapScale, mapScale); // set the mapSprite size to the window size
+	mapSprite.setOrigin(mapSprite.getLocalBounds().width / 2, mapSprite.getLocalBounds().height / 2);
+	mapSprite.setPosition(mapSprite.getLocalBounds().width * mapScale / 2, mapSprite.getLocalBounds().height * mapScale / 2);
+	
+	// set text styles
+	timeText.setCharacterSize(28);
+	timeText.setPosition(5, 7);
+	timeText.setStyle(sf::Text::Bold);
+
 	mapProperties.SetScale(mapScale);
 	for (int i = 0; i < FIGURE_TYPES; ++i)
 		figuresSprites[i].setScale(figureScale, figureScale);
@@ -61,6 +71,34 @@ void Drawer::ShowMap(const Map& map)
 			}
 		}
 	}
+}
+
+void Drawer::ShowTimer(sf::Time time, Color activeColor)
+{
+	int seconds = time.asSeconds();
+	if (seconds > 60)
+	{
+		if (activeColor == Color::White)
+		{
+			timeText.setFillColor(sf::Color::White);
+			timeText.setOutlineThickness(1);
+		}
+		else
+		{
+			timeText.setFillColor(sf::Color::Black);
+			timeText.setOutlineThickness(0);
+		}
+	}
+	else
+		timeText.setFillColor(sf::Color::Red);
+
+	std::string timeString = std::to_string(seconds / 60) + ":";
+	if (seconds % 60 < 10)
+		timeString += "0";
+	timeString += std::to_string(seconds % 60);
+
+	timeText.setString(timeString);
+	window->draw(timeText);
 }
 
 void Drawer::ShowActiveFigure(const Map& map, const Pos& chosenPos)

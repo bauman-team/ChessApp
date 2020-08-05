@@ -15,8 +15,10 @@ class Drawer
 	sf::Sprite possibleCellSprite;
 	sf::Texture figuresTextures[FIGURE_TYPES];
 	sf::Sprite figuresSprites[FIGURE_TYPES];
+	sf::Font font;
+	sf::Text timeText;
 	MapProperties mapProperties;
-
+	
 	bool isWhiteActive; // for correct calculation figures positions after gameboard rotation
 
 	void SetResources(const Resources& resource);
@@ -25,6 +27,7 @@ public:
 	Drawer(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties);
 
 	void ShowMap(const Map& map);
+	void ShowTimer(sf::Time time, Color activeColor);
 	void ShowActiveFigure(const Map&, const Pos&);
 	void ShowPossibleMoves(const Map&, const Pos&);
 	void DisplayWindow();
