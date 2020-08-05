@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "Figure.h"
+#include <SFML/Window.hpp>
 
 class Figure;
 class Pos;
@@ -9,13 +10,15 @@ enum class Color;
 
 class Player
 {
+	sf::Clock clock;
 	const Color color;
 	const std::string name;
-	double timer;
+	sf::Time remainingTime;
 	static Pos* chosenPos;
 	int numOfFigures;
+	bool timeIsUp;
 public:
-	Player(Color _color, std::string _name, double _timer);
+	Player(Color _color, std::string _name, sf::Time timeLimit);
 
 	int DecreaseNumOfFigures() { return --numOfFigures; }
 	void SetChosenPosition(Pos* position) { chosenPos = position; }
@@ -25,5 +28,9 @@ public:
 	void RunFindMoves(Figure* choseFigure);
 	void RunMakeMove(Figure* choseFigure, Pos& nextPosition);
 	void RunClearPossibleMoves(Map& map);
+
+	void StartTimer();
+	sf::Time GetRemainingTime();
+	bool HasTime() const { return !timeIsUp; }
 	//int8_t CheckGameFinal();
 };

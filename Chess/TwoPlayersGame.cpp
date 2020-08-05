@@ -12,10 +12,14 @@ TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resour
 void TwoPlayersGame::StartGame()
 {
 	drawer.ShowMap(map);
-	if (activePlayer->GetChosenPosition() != nullptr)
+	drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
+	if (activePlayer->HasTime())
 	{
-		drawer.ShowActiveFigure(map, *activePlayer->GetChosenPosition());
-		drawer.ShowPossibleMoves(map, *activePlayer->GetChosenPosition());
+		if (activePlayer->GetChosenPosition() != nullptr)
+		{
+			drawer.ShowActiveFigure(map, *activePlayer->GetChosenPosition());
+			drawer.ShowPossibleMoves(map, *activePlayer->GetChosenPosition());
+		}
 	}
 }
 
@@ -23,12 +27,14 @@ void TwoPlayersGame::ChangeActivePlayer()
 {
 	activePlayer->RunClearPossibleMoves(map);
 	drawer.ShowMap(map);
+	drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
 	drawer.DisplayWindow();
 	sf::sleep(sf::seconds(2));
 
 	activePlayer = (activePlayer == player2) ? player1 : player2;
 	activePlayer->SetChosenPosition(nullptr);
 	drawer.RotateBoard();
+	activePlayer->StartTimer();
 }
 
 void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
@@ -69,8 +75,8 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 	}
 }
 
-void TwoPlayersGame::SetPlayers(std::string name1, std::string name2, double timeOfGame)
+void TwoPlayersGame::SetPlayers(std::string name1, std::string name2, sf::Time timeLimit)
 {
-	player1 = new Player(Color::White, name1, timeOfGame);
-	player2 = new Player(Color::Black, name2, timeOfGame);
+	player1 = new Player(Color::White, name1, timeLimit);
+	player2 = new Player(Color::Black, name2, timeLimit);
 }

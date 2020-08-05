@@ -116,11 +116,11 @@ bool Map::CheckingShah(const Pos& kingPos)
 				*/
 				if (i == 0 || i == 1 || i == 2) // 0 - up && left; 1 - left; 2 - down && left; ... (counter-clockwise)
 					--x;
-				if (i == 4 || i == 5 || i == 6)
+				else if (i == 4 || i == 5 || i == 6)
 					++x;
 				if (i == 0 || i == 7 || i == 6)
 					++y;
-				if (i == 2 || i == 3 || i == 4)
+				else if (i == 2 || i == 3 || i == 4)
 					--y;
 				selectedPosition = kingPos.AddToX(x).AddToY(y);
 				if (selectedPosition.IsValid()) // over the edge of the map
