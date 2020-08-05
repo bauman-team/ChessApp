@@ -100,7 +100,7 @@ bool Map::CheckingShah(const Pos& kingPos)
 	{ // high // method FROM KING
 		Pos selectedPosition;
 		bool isChecked;
-		FigureType selectedFigureType;
+		FigureType selectedFigureType; // 8 directions
 		for (int x, y, i = 0; i != 8; ++i)
 		{
 			x = 0; y = 0;
@@ -108,13 +108,13 @@ bool Map::CheckingShah(const Pos& kingPos)
 			do 
 			{
 				/*
-					2 | 3 | 4
+					0 | 7 | 6
 					---------
 					1 | K | 5
 					---------
-					0 | 7 | 6
+					2 | 3 | 4
 				*/
-				if (i == 0 || i == 1 || i == 2)
+				if (i == 0 || i == 1 || i == 2) // 0 - up && left; 1 - left; 2 - down && left; ... (counter-clockwise)
 					--x;
 				else if (i == 4 || i == 5 || i == 6)
 					++x;
@@ -123,14 +123,14 @@ bool Map::CheckingShah(const Pos& kingPos)
 				else if (i == 2 || i == 3 || i == 4)
 					--y;
 				selectedPosition = kingPos.AddToX(x).AddToY(y);
-				if (selectedPosition.IsValid())
+				if (selectedPosition.IsValid()) // over the edge of the map
 				{
 					selectedFigureType = GetFigureAt(selectedPosition)->GetType();
 					if (selectedFigureType != FigureType::Empty)
 					{
-						if (GetFigureAt(selectedPosition)->GetColor() != GetFigureAt(kingPos)->GetColor())
+						if (GetFigureAt(selectedPosition)->GetColor() != GetFigureAt(kingPos)->GetColor()) // opponent figure 
 						{
-							if (selectedFigureType == FigureType::Queen_black || selectedFigureType == FigureType::Queen_white)
+							if (selectedFigureType == FigureType::Queen_black || selectedFigureType == FigureType::Queen_white) // all
 								return true;
 							if (i % 2 && (selectedFigureType == FigureType::Rook_black || selectedFigureType == FigureType::Rook_white)) // 1, 3, 5, 7 
 								return true;
