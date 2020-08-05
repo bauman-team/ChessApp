@@ -43,36 +43,39 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 	if (activePlayer->HasTime())
 	{
 		Pos* position = drawer.TransformMousePosition(mouseX, mouseY); // transform coords on window to position on map
-		if (activePlayer->GetColor() == Color::Black)
+		if (position != nullptr)
 		{
-			*position = Pos(7 - position->GetX(), 7 - position->GetY());
-		}
-		if (position->IsValid()) // if position is correct
-		{
-			bool chosenPositionIsPossible = false;
-			if (activePlayer->GetChosenPosition() != nullptr && // if chosen position exists and
-				activePlayer->GetColor() != map.GetFigureAt(*position)->GetColor()) // position and activePlayer colors aren't same
+			if (activePlayer->GetColor() == Color::Black)
 			{
-				// compare this position with possible moves for last chosen figure
-				std::vector<Pos>::const_iterator begin = map.GetFigureAt(*activePlayer->GetChosenPosition())->GetPossibleMoves().begin();
-				std::vector<Pos>::const_iterator end = map.GetFigureAt(*activePlayer->GetChosenPosition())->GetPossibleMoves().end();
-				for (std::vector<Pos>::const_iterator it = begin; it != end; ++it)
+				*position = Pos(7 - position->GetX(), 7 - position->GetY());
+			}
+			if (position->IsValid()) // if position is correct
+			{
+				bool chosenPositionIsPossible = false;
+				if (activePlayer->GetChosenPosition() != nullptr && // if chosen position exists and
+					activePlayer->GetColor() != map.GetFigureAt(*position)->GetColor()) // position and activePlayer colors aren't same
 				{
-					if (*it == *position)
+					// compare this position with possible moves for last chosen figure
+					std::vector<Pos>::const_iterator begin = map.GetFigureAt(*activePlayer->GetChosenPosition())->GetPossibleMoves().begin();
+					std::vector<Pos>::const_iterator end = map.GetFigureAt(*activePlayer->GetChosenPosition())->GetPossibleMoves().end();
+					for (std::vector<Pos>::const_iterator it = begin; it != end; ++it)
 					{
-						chosenPositionIsPossible = true;
-						activePlayer->RunMakeMove(map.GetFigureAt(*activePlayer->GetChosenPosition()), *position);
-						ChangeActivePlayer();
-						break; // if it possible delete
+						if (*it == *position)
+						{
+							chosenPositionIsPossible = true;
+							activePlayer->RunMakeMove(map.GetFigureAt(*activePlayer->GetChosenPosition()), *position);
+							ChangeActivePlayer();
+							break; // if it possible delete
+						}
 					}
 				}
-			}
-			if (!chosenPositionIsPossible)
-			{
-				activePlayer->SetChosenPosition(position);
-				if (activePlayer->GetColor() == map.GetFigureAt(*position)->GetColor()) // if this figure is an active player
+				if (!chosenPositionIsPossible)
 				{
-					activePlayer->RunFindMoves(map.GetFigureAt(*position));
+					activePlayer->SetChosenPosition(position);
+					if (activePlayer->GetColor() == map.GetFigureAt(*position)->GetColor()) // if this figure is an active player
+					{
+						activePlayer->RunFindMoves(map.GetFigureAt(*position));
+					}
 				}
 			}
 		}

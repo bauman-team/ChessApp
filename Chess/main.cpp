@@ -28,9 +28,7 @@ int main()
 
 	Game* game = new TwoPlayersGame(&window, res, prop);
 
-	int8_t isWin = false;
-
-	while (window.isOpen() && !game->GetIsWin())
+	while (window.isOpen())
 	{
 		window.clear(sf::Color::White);
 		sf::Event event;
@@ -50,7 +48,7 @@ int main()
 				break;
 			}
 		}
-		game->StartGame();
+		(!game->GetIsWin()) ? game->StartGame() : window.close();
 		window.display();
 	}
 	return 0;

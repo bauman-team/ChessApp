@@ -121,7 +121,14 @@ void Drawer::RotateBoard()
 
 Pos* Drawer::TransformMousePosition(int mouseX, int mouseY) const
 {
-	return new Pos((mouseX - mapProperties.GetPlayAreaTopLeft().GetX()) / mapProperties.GetSquareSize(), 7 - (mouseY - mapProperties.GetPlayAreaTopLeft().GetY()) / mapProperties.GetSquareSize());
+	if (mouseX >= mapProperties.GetPlayAreaTopLeft().GetX() && mouseX <= mapProperties.GetPlayAreaTopLeft().GetX() + mapProperties.GetSquareSize() * 8 &&
+		mouseY >= mapProperties.GetPlayAreaTopLeft().GetY() && mouseY <= mapProperties.GetPlayAreaTopLeft().GetY() + mapProperties.GetSquareSize() * 8)
+	{
+		int coordX = (mouseX - mapProperties.GetPlayAreaTopLeft().GetX()) / mapProperties.GetSquareSize();
+		int coordY = 7 - (mouseY - mapProperties.GetPlayAreaTopLeft().GetY()) / mapProperties.GetSquareSize();
+		return new Pos(coordX, coordY);
+	}
+	return nullptr;
 }
 
 void Drawer::ShowPossibleMoves(const Map& map, const Pos& chosenFigure)

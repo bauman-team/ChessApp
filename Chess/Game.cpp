@@ -5,4 +5,4 @@ Game::Game(sf::RenderWindow* window, const Resources& resource, const MapPropert
 {
 	Figure::SetMapPtr(&map);
 	isWin = 0;
-};
+}

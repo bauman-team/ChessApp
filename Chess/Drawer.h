@@ -31,5 +31,5 @@ public:
 	void DisplayWindow();
 	void RotateBoard();
 
-	Pos* TransformMousePosition(int, int) const; // fix negative coords
+	Pos* TransformMousePosition(int, int) const; // if coords isn't valid, return nullptr
 };
