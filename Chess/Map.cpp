@@ -135,7 +135,9 @@ bool Map::CheckingShah(const Pos& kingPos)
 							if (i % 2 && (selectedFigureType == FigureType::Rook_black || selectedFigureType == FigureType::Rook_white)) // 1, 3, 5, 7 
 								return true;
 							if (!(i % 2) && (selectedFigureType == FigureType::Bishop_black || selectedFigureType == FigureType::Bishop_white)) // 0, 2, 4, 6
-								return true;								
+								return true;			
+							if (abs(x) < 2 && abs(y) < 2 && (selectedFigureType == FigureType::King_black || selectedFigureType == FigureType::King_white))
+								return true;
 						}
 						isChecked = true;
 					}

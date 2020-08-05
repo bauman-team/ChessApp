@@ -71,7 +71,6 @@ void Drawer::ShowMap(const Map& map)
 				else
 					figuresSprites[to_underlying(selectedFigure)].setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + (7 - i) * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + j * mapProperties.GetSquareSize());
 				window->draw(figuresSprites[to_underlying(selectedFigure)]);
-				//figuresSprites[to_underlying(x)].move(mapProperties.GetSquareSize(), 0);
 			}
 		}
 	}

@@ -29,7 +29,7 @@ void TwoPlayersGame::ChangeActivePlayer()
 	drawer.ShowMap(map);
 	drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
 	drawer.DisplayWindow();
-	sf::sleep(sf::seconds(2));
+	//sf::sleep(sf::seconds(2));
 
 	activePlayer = (activePlayer == player2) ? player1 : player2;
 	activePlayer->SetChosenPosition(nullptr);
