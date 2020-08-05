@@ -10,7 +10,6 @@ class Game
 protected:
 	Drawer drawer;
 	Map map;
-	std::stack<MoveInfo> movesHistory;
 public:
 	Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
 		: drawer(window, resource, properties)

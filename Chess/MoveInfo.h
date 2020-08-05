@@ -2,6 +2,8 @@
 #include "Pos.h"
 #include "Figure.h"
 
+class Figure;
+
 class MoveInfo
 {
 	Figure* activeFigure;

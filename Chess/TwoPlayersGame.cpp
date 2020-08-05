@@ -52,15 +52,6 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 				if (*it == *position)
 				{
 					chosenPositionIsPossible = true;
-
-					// adding info about move to log
-					Pos from = map.GetFigureAt(*activePlayer->GetChosenPosition())->GetPos();
-					MoveInfo info(from, *position, map.GetFigureAt(from.ToIndex()));
-					if (map.GetFigureAt(position->ToIndex())->GetType() != FigureType::Empty)
-					{
-						info.SetEatenFigure(map.GetFigureAt(position->ToIndex()));
-					}
-					movesHistory.push(info);
 					activePlayer->RunMakeMove(map.GetFigureAt(*activePlayer->GetChosenPosition()), *position);
 					ChangeActivePlayer();
 					break; // if it possible delete
