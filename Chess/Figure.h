@@ -81,6 +81,8 @@ class King : public Figure
 	virtual std::vector<Pos> FindPossibleMoves() override; //
 public:
 	King(Pos _coords, Color _color);
+
+	void SetCastling(bool changeTo) { possibleCastling = changeTo; } // for king castling
 };
 
 
