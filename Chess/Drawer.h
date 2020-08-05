@@ -9,14 +9,12 @@ class Drawer
 	sf::RenderWindow* window;
 	sf::Texture mapTexture;
 	sf::Sprite mapSprite;
-	sf::Texture chosenCellTexture;
-	sf::Sprite chosenCellSprite;
-	sf::Texture possibleCellTexture;
-	sf::Sprite possibleCellSprite;
 	sf::Texture figuresTextures[FIGURE_TYPES];
 	sf::Sprite figuresSprites[FIGURE_TYPES];
 	sf::Font font;
 	sf::Text timeText;
+	sf::CircleShape circle; // for showing possible moves
+	sf::RectangleShape square; // for showing active figure
 	MapProperties mapProperties;
 	
 	bool isWhiteActive; // for correct calculation figures positions after gameboard rotation

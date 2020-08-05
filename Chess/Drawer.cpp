@@ -7,18 +7,24 @@ Drawer::Drawer(sf::RenderWindow* _window, const Resources& resource, const MapPr
 	SetResources(resource);
 	SetScale();
 	isWhiteActive = true;
+
+	circle.setFillColor(sf::Color(100, 200, 10, 200)); // green
+
+	// timer text styles
+	timeText.setCharacterSize(28);
+	timeText.setPosition(5, 7);
+	timeText.setStyle(sf::Text::Bold);
+
+	// active rectangle styles
+	square.setFillColor(sf::Color(0, 0, 0, 50));
+	square.setOutlineThickness(4);
+	square.setOutlineColor(sf::Color::Yellow);
 }
 
 void Drawer::SetResources(const Resources& resource)
 {
 	mapTexture.loadFromFile(resource.GetPathToMapImage());
 	mapSprite.setTexture(mapTexture);	
-
-	chosenCellTexture.loadFromFile(resource.GetPathToChosenCellImage());
-	chosenCellSprite.setTexture(chosenCellTexture);
-
-	possibleCellTexture.loadFromFile(resource.GetPathToPossibleCellImage());
-	possibleCellSprite.setTexture(possibleCellTexture);
 
 	font.loadFromFile(resource.GetPathToFont());
 	timeText.setFont(font);
@@ -34,22 +40,20 @@ void Drawer::SetScale()
 {
 	float mapScale = (float)window->getSize().x / mapTexture.getSize().x;
 	float figureScale = mapScale * (float)mapProperties.GetSquareSize() / figuresTextures[0].getSize().x;
-	float cellScale = mapScale * (float)mapProperties.GetSquareSize() / possibleCellTexture.getSize().x;
 
 	mapSprite.setScale(mapScale, mapScale); // set the mapSprite size to the window size
 	mapSprite.setOrigin(mapSprite.getLocalBounds().width / 2, mapSprite.getLocalBounds().height / 2);
 	mapSprite.setPosition(mapSprite.getLocalBounds().width * mapScale / 2, mapSprite.getLocalBounds().height * mapScale / 2);
-	
-	// set text styles
-	timeText.setCharacterSize(28);
-	timeText.setPosition(5, 7);
-	timeText.setStyle(sf::Text::Bold);
+
+	circle.setRadius(mapScale * 0.2 * (float)mapProperties.GetSquareSize());
+	circle.setOrigin(circle.getRadius(), circle.getRadius());
+
+	square.setSize(sf::Vector2f(mapScale * mapProperties.GetSquareSize(), mapScale * mapProperties.GetSquareSize()));
 
 	mapProperties.SetScale(mapScale);
+
 	for (int i = 0; i < FIGURE_TYPES; ++i)
 		figuresSprites[i].setScale(figureScale, figureScale);
-	possibleCellSprite.setScale(cellScale, cellScale);
-	chosenCellSprite.setScale(cellScale, cellScale);
 }
 
 void Drawer::ShowMap(const Map& map)
@@ -104,10 +108,10 @@ void Drawer::ShowTimer(sf::Time time, Color activeColor)
 void Drawer::ShowActiveFigure(const Map& map, const Pos& chosenPos)
 {
 	if (isWhiteActive)
-		chosenCellSprite.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + chosenPos.GetX() * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + (7 - chosenPos.GetY()) * mapProperties.GetSquareSize());
+		square.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + chosenPos.GetX() * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + (7 - chosenPos.GetY()) * mapProperties.GetSquareSize());
 	else
-		chosenCellSprite.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + (7 - chosenPos.GetX()) * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + chosenPos.GetY() * mapProperties.GetSquareSize());
-	window->draw(chosenCellSprite);
+		square.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + (7 - chosenPos.GetX()) * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + chosenPos.GetY() * mapProperties.GetSquareSize());
+	window->draw(square);
 }
 
 void Drawer::RotateBoard()
@@ -126,10 +130,10 @@ void Drawer::ShowPossibleMoves(const Map& map, const Pos& chosenFigure)
 	for (std::vector<Pos>::const_iterator it = map.GetFigureAt(chosenFigure)->GetPossibleMoves().begin(); it != map.GetFigureAt(chosenFigure)->GetPossibleMoves().end(); ++it)
 	{
 		if (isWhiteActive)
-			possibleCellSprite.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + it->GetX() * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + (7 - it->GetY()) * mapProperties.GetSquareSize());
+			circle.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + (it->GetX() + 0.5) * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + (7.5 - it->GetY()) * mapProperties.GetSquareSize());
 		else
-			possibleCellSprite.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + (7 - it->GetX()) * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + it->GetY() * mapProperties.GetSquareSize());
-		window->draw(possibleCellSprite);
+			circle.setPosition(mapProperties.GetPlayAreaTopLeft().GetX() + (7.5 - it->GetX()) * mapProperties.GetSquareSize(), mapProperties.GetPlayAreaTopLeft().GetY() + (it->GetY() + 0.5) * mapProperties.GetSquareSize());
+		window->draw(circle);
 	}
 }
 

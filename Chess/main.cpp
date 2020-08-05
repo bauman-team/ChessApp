@@ -20,8 +20,6 @@ int main()
 	res.SetFigureImage(FigureType::Bishop_white, "images/Bishop_white.png");
 	res.SetFigureImage(FigureType::Knight_white, "images/Knight_white.png");
 	res.SetFigureImage(FigureType::Pawn_white, "images/Pawn_white.png");
-	res.SetChosenCellImage("images/chosen_cell.png");
-	res.SetPossibleCellImage("images/possible_cell.png");
 	res.SetFont("fonts/calibri.ttf");
 
 	MapProperties prop;
