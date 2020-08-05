@@ -35,6 +35,7 @@ void TwoPlayersGame::ChangeActivePlayer()
 	activePlayer->SetChosenPosition(nullptr);
 	drawer.RotateBoard();
 	activePlayer->StartTimer();
+	isWin = CheckGameFinal();
 }
 
 void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
@@ -75,6 +76,37 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 				}
 			}
 		}
+	}
+}
+
+int8_t TwoPlayersGame::CheckGameFinal()
+{
+	Pos* kingPos = nullptr;
+	for (int i = 0; i != 64 && !kingPos; ++i)
+		if (map.GetFigureAt(i)->GetColor() == activePlayer->GetColor() && (map.GetFigureAt(i)->GetType() == FigureType::King_black || map.GetFigureAt(i)->GetType() == FigureType::King_white))
+			kingPos = &map.GetFigureAt(i)->GetPos();
+	if (map.CheckingShah(*kingPos))
+	{
+		((King*)map.GetFigureAt(*kingPos))->SetCastling(false);
+		for (int i = 0; i != 64; ++i)
+			if (map.GetFigureAt(i)->GetColor() == activePlayer->GetColor())
+			{
+				activePlayer->RunFindMoves(map.GetFigureAt(i));
+				if (!map.GetFigureAt(i)->GetPossibleMoves().empty())
+					return 0;
+			}
+		return 1;
+	}
+	else
+	{
+		for (int i = 0; i != 64; ++i)
+			if (map.GetFigureAt(i)->GetColor() == activePlayer->GetColor())
+			{
+				activePlayer->RunFindMoves(map.GetFigureAt(i));
+				if (!map.GetFigureAt(i)->GetPossibleMoves().empty())
+					return 0;
+			}
+		return 2;
 	}
 }
 

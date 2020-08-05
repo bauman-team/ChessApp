@@ -16,6 +16,6 @@ public:
 	Pos& operator*=(float value);
 	bool operator==(const Pos& coords) const;
 
-	Pos& AddToX(int) const;
-	Pos& AddToY(int) const;
+	Pos& AddToX(int) const; // don't change count, only return
+	Pos& AddToY(int) const; // don't change count, only return
 };

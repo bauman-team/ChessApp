@@ -2,18 +2,9 @@
 
 Pos* Player::chosenPos = nullptr;
 
-/*int8_t Player::CheckGameFinal()
-{
-	if (Figure::ptrKing->CheckingShah())
-		return Figure::ptrMap->CheckingMate() ? 1 : 0;
-	else
-		return Figure::ptrMap->CheckingPat() ? 2 : 0;
-	return 0;
-}*/
-
 Player::Player(Color _color, std::string _name, sf::Time timeLimit) : color(_color), name(_name), remainingTime(timeLimit), timeIsUp(false)
 {
-	 numOfFigures = 16; // if need add SAVE MOD replace numOfFigures to params
+	 numOfFigures = 16;
 }
 
 void Player::RunFindMoves(Figure* choseFigure)

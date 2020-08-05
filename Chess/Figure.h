@@ -59,6 +59,8 @@ public:
 	Color GetColor() const { return color; }
 	const std::vector<Pos>& GetPossibleMoves() const { return possibleMoves; }
 	static void SetMapPtr(Map* _ptrMap) { ptrMap = _ptrMap; }
+
+	//Figure& operator=(const Figure&);
 };
 
 
@@ -79,6 +81,8 @@ class King : public Figure
 	virtual std::vector<Pos> FindPossibleMoves() override; //
 public:
 	King(Pos _coords, Color _color);
+
+	void SetCastling(bool changeTo) { possibleCastling = changeTo; } // for king castling
 };
 
 

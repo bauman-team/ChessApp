@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClCompile Include="Drawer.cpp" />
     <ClCompile Include="Figure.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MapProperties.cpp" />
     <ClCompile Include="MoveInfo.cpp" />
