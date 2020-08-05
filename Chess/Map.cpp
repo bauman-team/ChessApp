@@ -202,6 +202,62 @@ bool Map::CheckingShah(const Pos& kingPos)
 	}
 }
 
+std::vector<Pos> Map::CheckingPossibleMove(Pos figurePosition, const std::vector<Pos>& possibleMovesFind)
+{
+	std::vector<Pos>::const_iterator it = possibleMovesFind.begin();
+	Figure* ptrMainFigure = GetFigureAt(figurePosition), *ptrSecondaryFigure;
+	Pos* kingPos = nullptr;
+	std::vector<Pos> possibleMovesChecked;
+	if (GetFigureAt(figurePosition)->GetType() == FigureType::King_black || GetFigureAt(figurePosition)->GetType() == FigureType::King_white)
+	{
+		kingPos = &figurePosition;
+	}
+	else
+	{
+		for (int i = 0; i != 64 && !kingPos; ++i)
+			if (map[i]->GetColor() == GetFigureAt(figurePosition)->GetColor() && (map[i]->GetType() == FigureType::King_black || map[i]->GetType() == FigureType::King_white))
+				kingPos = &map[i]->GetPos();
+	}
+	for (it; it != possibleMovesFind.end(); ++it)
+	{
+		ptrSecondaryFigure = GetFigureAt(*it);
+		map[(*it).ToIndex()] = ptrMainFigure;
+		if (GetFigureAt(*it)->GetType() == FigureType::Empty) // for method TO KING need to change coords of Figures
+		{
+			// change
+			map[figurePosition.ToIndex()] = ptrSecondaryFigure;
+			if (*kingPos == figurePosition)
+			{
+				if (!CheckingShah(*it))
+					possibleMovesChecked.push_back(*it);
+			}
+			else
+			{
+				if (!CheckingShah(*kingPos))
+					possibleMovesChecked.push_back(*it);
+			}
+		}
+		else
+		{
+			map[figurePosition.ToIndex()] = new Empty(figurePosition);
+			if (*kingPos == figurePosition)
+			{
+				if (!CheckingShah(*it))
+					possibleMovesChecked.push_back(*it);
+			}
+			else
+			{
+				if (!CheckingShah(*kingPos))
+					possibleMovesChecked.push_back(*it);
+			}
+			delete map[figurePosition.ToIndex()];
+		}
+		map[figurePosition.ToIndex()] = ptrMainFigure;
+		map[(*it).ToIndex()] = ptrSecondaryFigure;
+	}
+	return possibleMovesChecked;
+}
+
 int8_t Map::CheckEmpty(const Pos& from, const Pos& to) const
 {
 	if (to.IsValid())

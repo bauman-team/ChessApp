@@ -30,6 +30,7 @@ public:
 	bool CheckingMate(); // Player need info about who makes the move
 	bool CheckingPat();
 	void CancelMove();
+	std::vector<Pos> CheckingPossibleMove(Pos, const std::vector<Pos>&);
 
 	int8_t CheckEmpty(const Pos& from, const Pos& to) const;
 };

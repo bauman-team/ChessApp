@@ -90,6 +90,7 @@ std::vector<Pos> King::FindPossibleMoves()
 					possibleMoves.push_back(Pos(6, 7));
 		}
 	}
+	possibleMoves = ptrMap->CheckingPossibleMove(coords, possibleMoves);
 	movesFound = true;
 	return possibleMoves;
 }
@@ -139,6 +140,7 @@ std::vector<Pos> Queen::FindPossibleMoves() // Rook + Bishop
 			}
 		}
 	}
+	possibleMoves = ptrMap->CheckingPossibleMove(coords, possibleMoves);
 	movesFound = true;
 	return possibleMoves;
 }
@@ -166,6 +168,7 @@ std::vector<Pos> Bishop::FindPossibleMoves()
 			}
 		}
 	}
+	possibleMoves = ptrMap->CheckingPossibleMove(coords, possibleMoves);
 	movesFound = true;
 	return possibleMoves;
 }
@@ -188,6 +191,7 @@ std::vector<Pos> Knight::FindPossibleMoves()
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 	}
+	possibleMoves = ptrMap->CheckingPossibleMove(coords, possibleMoves);
 	movesFound = true;
 	return possibleMoves;
 }
@@ -218,6 +222,7 @@ std::vector<Pos> Rook::FindPossibleMoves()
 			}
 		}
 	}
+	possibleMoves = ptrMap->CheckingPossibleMove(coords, possibleMoves);
 	movesFound = true;
 	return possibleMoves;
 }
@@ -242,6 +247,7 @@ std::vector<Pos> Pawn::FindPossibleMoves()
 	nextPosition = Pos(coords.GetX() - 1, coords.GetY() + (color == Color::Black ? -1 : 1));
 	if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
 		possibleMoves.push_back(nextPosition);
+	possibleMoves = ptrMap->CheckingPossibleMove(coords, possibleMoves);
 	movesFound = true;
 	return possibleMoves;
 }
@@ -259,6 +265,7 @@ bool Figure::MakeMoveTo(const Pos& nextPos)
 		}
 	return false; // missclick or error
 }
+
 
 void Figure::ClearPossibleMoves()
 {

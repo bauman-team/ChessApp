@@ -59,6 +59,8 @@ public:
 	Color GetColor() const { return color; }
 	const std::vector<Pos>& GetPossibleMoves() const { return possibleMoves; }
 	static void SetMapPtr(Map* _ptrMap) { ptrMap = _ptrMap; }
+
+	//Figure& operator=(const Figure&);
 };
 
 
