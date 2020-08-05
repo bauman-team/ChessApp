@@ -75,6 +75,29 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 	}
 }
 
+int8_t TwoPlayersGame::CheckGameFinal()
+{
+	Pos* kingPos = nullptr;
+	for (int i = 0; i != 64 && !kingPos; ++i)
+		if (map.GetFigureAt(i)->GetColor() == activePlayer->GetColor() && (map.GetFigureAt(i)->GetType() == FigureType::King_black || map.GetFigureAt(i)->GetType() == FigureType::King_white))
+			kingPos = &map.GetFigureAt(i)->GetPos();
+	if (map.CheckingShah(*kingPos))
+	{
+		for (int i = 0; i != 64; ++i)
+			if (map.GetFigureAt(i)->GetColor() == activePlayer->GetColor())
+			{
+				activePlayer->RunFindMoves(map.GetFigureAt(i));
+				if (!map.GetFigureAt(i)->GetPossibleMoves().empty())
+					return 0;
+			}
+		return 1;
+	}
+	//else
+		//return map.CheckingPat() ? 2 : 0;
+	return 0;
+
+}
+
 void TwoPlayersGame::SetPlayers(std::string name1, std::string name2, sf::Time timeLimit)
 {
 	player1 = new Player(Color::White, name1, timeLimit);

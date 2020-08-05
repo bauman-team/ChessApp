@@ -32,5 +32,4 @@ public:
 	void StartTimer();
 	sf::Time GetRemainingTime();
 	bool HasTime() const { return !timeIsUp; }
-	//int8_t CheckGameFinal();
 };
