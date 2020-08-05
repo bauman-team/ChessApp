@@ -35,6 +35,7 @@ void TwoPlayersGame::ChangeActivePlayer()
 	activePlayer->SetChosenPosition(nullptr);
 	drawer.RotateBoard();
 	activePlayer->StartTimer();
+	isWin = CheckGameFinal();
 }
 
 void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
@@ -92,10 +93,17 @@ int8_t TwoPlayersGame::CheckGameFinal()
 			}
 		return 1;
 	}
-	//else
-		//return map.CheckingPat() ? 2 : 0;
-	return 0;
-
+	else
+	{
+		for (int i = 0; i != 64; ++i)
+			if (map.GetFigureAt(i)->GetColor() == activePlayer->GetColor())
+			{
+				activePlayer->RunFindMoves(map.GetFigureAt(i));
+				if (!map.GetFigureAt(i)->GetPossibleMoves().empty())
+					return 0;
+			}
+		return 2;
+	}
 }
 
 void TwoPlayersGame::SetPlayers(std::string name1, std::string name2, sf::Time timeLimit)

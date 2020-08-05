@@ -32,7 +32,7 @@ int main()
 
 	int8_t isWin = false;
 
-	while (window.isOpen() && !isWin)
+	while (window.isOpen() && !game->GetIsWin())
 	{
 		window.clear(sf::Color::White);
 		sf::Event event;
@@ -48,7 +48,6 @@ int main()
 				{
 					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 					game->SetPlayerChosenCell(mousePos.x, mousePos.y);
-					isWin = game->CheckGameFinal();
 				}
 				break;
 			}
