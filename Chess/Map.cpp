@@ -61,7 +61,7 @@ void Map::Move(const Pos& from, const Pos& to)
 void Map::SetToEmpty(const Pos& target)
 {
 	assert(target.IsValid());
-	delete map[target.ToIndex()]; // TODO: don't delete figure, need to save it in log
+	movesHistory.back().SetEatenFigure(map[target.ToIndex()]);
 	map[target.ToIndex()] = new Empty(Pos(target));
 }
 
@@ -69,8 +69,10 @@ void Map::PawnToQueen(const Pos& target)
 {
 	assert(target.IsValid());
 	Color pawnColor = map[target.ToIndex()]->GetColor();
-	delete map[target.ToIndex()]; // TODO: don't delete figure, need to save it in log
-	map[target.ToIndex()] = new Queen(Pos(target), pawnColor);
+	Queen* newQueen = new Queen(Pos(target), pawnColor);
+	MoveInfo info(target, target, newQueen, map[target.ToIndex()]);
+	movesHistory.push_back(info);
+	map[target.ToIndex()] = newQueen;
 }
 
 void Map::Castling(const Pos& from, const Pos& to)
