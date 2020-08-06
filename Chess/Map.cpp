@@ -266,11 +266,17 @@ int8_t Map::CheckEmpty(const Pos& from, const Pos& to) const
 	{
 		if (map[to.ToIndex()]->GetType() == FigureType::Empty)
 			return 1; // if Pos to is Empty
-		if (to_underlying(map[from.ToIndex()]->GetType()) < 6 && to_underlying(map[to.ToIndex()]->GetType()) > 5 ||
-			to_underlying(map[from.ToIndex()]->GetType()) > 5 && to_underlying(map[to.ToIndex()]->GetType()) < 6)
+		if (map[from.ToIndex()]->GetColor() != map[to.ToIndex()]->GetColor())
 			return 2; // if Pos contains the figure with opposite color
 	}
 	return 0; // if Pos contains the figure with same color or output border
+}
+
+MoveInfo* Map::GetLastMoveInfo()
+{
+	if (!movesHistory.empty())
+		return &movesHistory.back();
+	return nullptr;
 }
 
 void ChangeCoordsForCastling(Rook& selectedRook, Pos newCoords)

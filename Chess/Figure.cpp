@@ -247,6 +247,12 @@ std::vector<Pos> Pawn::FindPossibleMoves()
 	nextPosition = Pos(coords.GetX() - 1, coords.GetY() + (color == Color::Black ? -1 : 1));
 	if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
 		possibleMoves.push_back(nextPosition);
+	MoveInfo* lastMove = ptrMap->GetLastMoveInfo();
+	if (lastMove)
+		if (lastMove->GetActiveFigure()->GetType() == FigureType::Pawn_black || lastMove->GetActiveFigure()->GetType() == FigureType::Pawn_white)
+			if (abs(lastMove->GetPosAfterMove().GetY() - lastMove->GetPosBeforeMove().GetY()) == 2)
+				if (lastMove->GetPosAfterMove().GetY() == coords.GetY() && abs(lastMove->GetPosAfterMove().GetX() - coords.GetX()) == 1)
+					possibleMoves.push_back(Pos(lastMove->GetPosAfterMove().GetX(), coords.GetY() + (lastMove->GetPosAfterMove().GetY() > lastMove->GetPosBeforeMove().GetY() ? -1 : 1)));
 	possibleMoves = ptrMap->CheckingPossibleMove(coords, possibleMoves);
 	movesFound = true;
 	return possibleMoves;
@@ -306,8 +312,15 @@ bool Rook::MakeMoveTo(const Pos& nextPos)
 
 bool Pawn::MakeMoveTo(const Pos& nextPos)
 {
+	bool isCaptureEnPassant = abs(coords.GetX() - nextPos.GetX()) == 1 && abs(coords.GetY() - nextPos.GetY()) == 1;
+	int lastCoordY = coords.GetY();
+	if (nextPos.IsValid())
+		if (ptrMap->GetFigureAt(nextPos)->GetType() != FigureType::Empty)
+			isCaptureEnPassant = false;
 	if (Figure::MakeMoveTo(nextPos)) // call base class method 
 	{
+		if (isCaptureEnPassant)
+			ptrMap->SetToEmpty(Pos(coords.GetX(), lastCoordY));
 		if (color == Color::Black && coords.GetY() == 0 || color == Color::White && coords.GetY() == 7)
 			ptrMap->PawnToQueen(coords);
 		return true;
