@@ -25,7 +25,7 @@ void TwoPlayersGame::StartGame()
 
 void TwoPlayersGame::ChangeActivePlayer()
 {
-	activePlayer->RunClearPossibleMoves(map);
+	map.RunClearPossibleMoves(activePlayer->GetColor());
 	drawer.ShowMap(map);
 	drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
 	drawer.DisplayWindow();
@@ -63,7 +63,7 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 						if (*it == *position)
 						{
 							chosenPositionIsPossible = true;
-							activePlayer->RunMakeMove(map.GetFigureAt(*activePlayer->GetChosenPosition()), *position);
+							map.RunMakeMove(map.GetFigureAt(*activePlayer->GetChosenPosition()), *position);
 							ChangeActivePlayer();
 							break; // if it possible delete
 						}
@@ -74,7 +74,7 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 					activePlayer->SetChosenPosition(position);
 					if (activePlayer->GetColor() == map.GetFigureAt(*position)->GetColor()) // if this figure is an active player
 					{
-						activePlayer->RunFindMoves(map.GetFigureAt(*position));
+						map.RunFindMoves(map.GetFigureAt(*position));
 					}
 				}
 			}
@@ -94,7 +94,7 @@ int8_t TwoPlayersGame::CheckGameFinal()
 		for (int i = 0; i != 64; ++i)
 			if (map.GetFigureAt(i)->GetColor() == activePlayer->GetColor())
 			{
-				activePlayer->RunFindMoves(map.GetFigureAt(i));
+				map.RunFindMoves(map.GetFigureAt(i));
 				if (!map.GetFigureAt(i)->GetPossibleMoves().empty())
 					return 0;
 			}
@@ -105,7 +105,7 @@ int8_t TwoPlayersGame::CheckGameFinal()
 		for (int i = 0; i != 64; ++i)
 			if (map.GetFigureAt(i)->GetColor() == activePlayer->GetColor())
 			{
-				activePlayer->RunFindMoves(map.GetFigureAt(i));
+				map.RunFindMoves(map.GetFigureAt(i));
 				if (!map.GetFigureAt(i)->GetPossibleMoves().empty())
 					return 0;
 			}

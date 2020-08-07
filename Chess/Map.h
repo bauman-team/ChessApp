@@ -8,6 +8,7 @@
 class Figure;
 class Rook;
 class MoveInfo;
+enum class Color;
 
 class Map
 {
@@ -20,6 +21,10 @@ public:
 
 	Figure* GetFigureAt(const Pos& pos) const;
 	Figure* GetFigureAt(int index) const;
+
+	void RunFindMoves(Figure* choseFigure);
+	void RunMakeMove(Figure* choseFigure, Pos& nextPosition);
+	void RunClearPossibleMoves(const Color& activeColor);
 
 	void Move(const Pos& from, const Pos& to);
 	void SetToEmpty(const Pos& target);

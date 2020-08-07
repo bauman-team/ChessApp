@@ -44,6 +44,26 @@ Figure* Map::GetFigureAt(int index) const
 	return map[index];
 }
 
+void Map::RunFindMoves(Figure* choseFigure)
+{
+	if (!choseFigure->IsMovesFound())
+		choseFigure->FindPossibleMoves();
+}
+
+void Map::RunMakeMove(Figure* choseFigure, Pos& nextPosition)
+{
+	choseFigure->MakeMoveTo(nextPosition);
+}
+
+void Map::RunClearPossibleMoves(const Color& activeColor)
+{
+	for (int i = 0; i < 64; ++i)
+	{
+		if (map[i]->GetColor() == activeColor)
+			map[i]->ClearPossibleMoves();
+	}
+}
+
 void Map::Move(const Pos& from, const Pos& to)
 {
 	assert(from.IsValid() && to.IsValid());
