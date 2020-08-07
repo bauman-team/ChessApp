@@ -24,10 +24,6 @@ public:
 	void SetChosenPosition(Pos* position) { chosenPos = position; }
 	Pos* GetChosenPosition() const { return chosenPos; }
 	Color GetColor() const { return color; }
-	
-	void RunFindMoves(Figure* choseFigure);
-	void RunMakeMove(Figure* choseFigure, Pos& nextPosition);
-	void RunClearPossibleMoves(Map& map);
 
 	void StartTimer();
 	sf::Time GetRemainingTime();

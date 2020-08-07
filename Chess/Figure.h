@@ -35,7 +35,7 @@ class Player;
 class Figure
 {
 protected:
-	friend class Player; // for acess to methods to find moves
+	friend class Map;
 
 	static Map* ptrMap;
 
@@ -45,9 +45,8 @@ protected:
 	std::vector<Pos> possibleMoves;
 
 	bool movesFound;
-
+	
 	void ClearPossibleMoves();
-
 	virtual bool MakeMoveTo(const Pos&);
 	virtual std::vector<Pos>& FindPossibleMoves() = 0;
 
