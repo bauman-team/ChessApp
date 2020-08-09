@@ -48,7 +48,7 @@ void Map::RunFindMoves(Figure* choseFigure)
 {
 	if (!choseFigure->IsMovesFound())
 	{
-		std::vector<Pos> &possibleMoves = choseFigure->FindPossibleMoves();
+		std::vector<Pos> &possibleMoves = choseFigure->FindPossibleMoves(); // for checking shah give numberOfFigures
 		possibleMoves = CheckingPossibleMove(choseFigure->coords, possibleMoves);
 	}
 }
