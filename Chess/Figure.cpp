@@ -90,7 +90,6 @@ std::vector<Pos>& King::FindPossibleMoves()
 					possibleMoves.push_back(Pos(6, 7));
 		}
 	}
-	//possibleMoves = ptrMap->CheckingPossibleMove(coords, possibleMoves);
 	movesFound = true;
 	return possibleMoves;
 }
@@ -140,7 +139,6 @@ std::vector<Pos>& Queen::FindPossibleMoves() // Rook + Bishop
 			}
 		}
 	}
-	//possibleMoves = ptrMap->CheckingPossibleMove(coords, possibleMoves);
 	movesFound = true;
 	return possibleMoves;
 }
@@ -168,7 +166,6 @@ std::vector<Pos>& Bishop::FindPossibleMoves()
 			}
 		}
 	}
-	//possibleMoves = ptrMap->CheckingPossibleMove(coords, possibleMoves);
 	movesFound = true;
 	return possibleMoves;
 }
@@ -191,7 +188,6 @@ std::vector<Pos>& Knight::FindPossibleMoves()
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 	}
-	//possibleMoves = ptrMap->CheckingPossibleMove(coords, possibleMoves);
 	movesFound = true;
 	return possibleMoves;
 }
@@ -222,7 +218,6 @@ std::vector<Pos>& Rook::FindPossibleMoves()
 			}
 		}
 	}
-	//possibleMoves = ptrMap->CheckingPossibleMove(coords, possibleMoves);
 	movesFound = true;
 	return possibleMoves;
 }
@@ -253,7 +248,6 @@ std::vector<Pos>& Pawn::FindPossibleMoves()
 			if (abs(lastMove->GetPosAfterMove().GetY() - lastMove->GetPosBeforeMove().GetY()) == 2)
 				if (lastMove->GetPosAfterMove().GetY() == coords.GetY() && abs(lastMove->GetPosAfterMove().GetX() - coords.GetX()) == 1)
 					possibleMoves.push_back(Pos(lastMove->GetPosAfterMove().GetX(), coords.GetY() + (lastMove->GetPosAfterMove().GetY() > lastMove->GetPosBeforeMove().GetY() ? -1 : 1)));
-	//possibleMoves = ptrMap->CheckingPossibleMove(coords, possibleMoves);
 	movesFound = true;
 	return possibleMoves;
 }
