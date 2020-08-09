@@ -23,7 +23,7 @@ public:
 	Figure* GetFigureAt(int index) const;
 
 	void RunFindMoves(Figure* choseFigure);
-	void RunMakeMove(Figure* choseFigure, Pos& nextPosition);
+	bool RunMakeMove(Figure* choseFigure, Pos& nextPosition);
 	void RunClearPossibleMoves(const Color& activeColor);
 
 	void Move(const Pos& from, const Pos& to);

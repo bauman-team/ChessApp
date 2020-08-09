@@ -53,9 +53,9 @@ void Map::RunFindMoves(Figure* choseFigure)
 	}
 }
 
-void Map::RunMakeMove(Figure* choseFigure, Pos& nextPosition)
+bool Map::RunMakeMove(Figure* choseFigure, Pos& nextPosition)
 {
-	choseFigure->MakeMoveTo(nextPosition);
+	return choseFigure->MakeMoveTo(nextPosition);
 }
 
 void Map::RunClearPossibleMoves(const Color& activeColor)

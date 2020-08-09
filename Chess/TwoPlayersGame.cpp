@@ -55,18 +55,10 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 				if (activePlayer->GetChosenPosition() != nullptr && // if chosen position exists and
 					activePlayer->GetColor() != map.GetFigureAt(*position)->GetColor()) // position and activePlayer colors aren't same
 				{
-					// compare this position with possible moves for last chosen figure
-					std::vector<Pos>::const_iterator begin = map.GetFigureAt(*activePlayer->GetChosenPosition())->GetPossibleMoves().begin();
-					std::vector<Pos>::const_iterator end = map.GetFigureAt(*activePlayer->GetChosenPosition())->GetPossibleMoves().end();
-					for (std::vector<Pos>::const_iterator it = begin; it != end; ++it)
+					if (map.RunMakeMove(map.GetFigureAt(*activePlayer->GetChosenPosition()), *position))
 					{
-						if (*it == *position)
-						{
-							chosenPositionIsPossible = true;
-							map.RunMakeMove(map.GetFigureAt(*activePlayer->GetChosenPosition()), *position);
-							ChangeActivePlayer();
-							break; // if it possible delete
-						}
+						chosenPositionIsPossible = true;
+						ChangeActivePlayer();
 					}
 				}
 				if (!chosenPositionIsPossible)
