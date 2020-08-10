@@ -15,7 +15,7 @@ class TwoPlayersGame : public Game
 public:
 	TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties);
 
-	void virtual StartGame() override;
+	void virtual Show() override;
 	void virtual ChangeActivePlayer() override;
 
 	void virtual SetPlayerChosenCell(int, int) override;

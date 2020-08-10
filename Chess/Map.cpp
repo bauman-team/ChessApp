@@ -74,7 +74,7 @@ void Map::Move(const Pos& from, const Pos& to)
 	if (map[to.ToIndex()]->GetType() != FigureType::Empty)
 	{
 		info.SetEatenFigure(map[to.ToIndex()]);
-		// decrease numOfFigures
+		// TODO: decrease numOfFigures
 	}
 	map[to.ToIndex()] = map[from.ToIndex()];
 	map[from.ToIndex()] = new Empty(Pos(from));
@@ -249,7 +249,7 @@ std::vector<Pos> Map::CheckingPossibleMove(Pos figurePosition, const std::vector
 	{
 		ptrSecondaryFigure = GetFigureAt(*it);
 		map[(*it).ToIndex()] = ptrMainFigure;
-		if (GetFigureAt(*it)->GetType() == FigureType::Empty) // for method TO KING need to change coords of Figures
+		if (ptrSecondaryFigure->GetType() == FigureType::Empty) // for method TO KING need to change coords of Figures
 		{
 			// change
 			map[figurePosition.ToIndex()] = ptrSecondaryFigure;

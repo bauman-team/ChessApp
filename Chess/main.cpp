@@ -48,7 +48,7 @@ int main()
 				break;
 			}
 		}
-		(!game->GetIsWin()) ? game->StartGame() : window.close();
+		(!game->GetIsWin()) ? game->Show() : window.close();
 		window.display();
 	}
 	return 0;

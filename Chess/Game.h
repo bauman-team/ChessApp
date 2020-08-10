@@ -14,7 +14,7 @@ protected:
 public:
 	Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties);
 
-	void virtual StartGame() = 0;
+	void virtual Show() = 0;
 	void virtual ChangeActivePlayer() = 0;
 	void virtual SetPlayerChosenCell(int, int) = 0;
 	int8_t virtual CheckGameFinal() = 0;

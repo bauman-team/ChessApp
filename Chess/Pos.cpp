@@ -17,6 +17,11 @@ Pos& Pos::operator=(const Pos& coords)
 	return *this;
 }
 
+Pos Pos::operator+(const Pos& coords)
+{
+	return Pos(x + coords.x, y + coords.y);
+}
+
 Pos& Pos::operator*=(float value)
 {
 	x *= value;

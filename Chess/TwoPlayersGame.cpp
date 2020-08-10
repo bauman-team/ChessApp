@@ -9,7 +9,7 @@ TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resour
 	activePlayer = player1;
 }
 
-void TwoPlayersGame::StartGame()
+void TwoPlayersGame::Show()
 {
 	drawer.ShowMap(map);
 	drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());

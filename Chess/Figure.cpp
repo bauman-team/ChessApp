@@ -40,54 +40,44 @@ Pawn::Pawn(Pos _coords, Color _color) : Figure(_coords, _color)
 	type = (color == Color::Black) ? FigureType::Pawn_black : FigureType::Pawn_white;
 }
 
-
 std::vector<Pos>& King::FindPossibleMoves()
 {
 	Pos nextPosition;
-	for (int i = 0; i != 2; ++i)
+	for (int i = -1; i != 3; i += 2)
 	{
-		nextPosition = Pos(coords.GetX(), coords.GetY() + 1 + i % 2 * -2);
+		nextPosition = coords + Pos(0, i);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
-		nextPosition = Pos(coords.GetX() - 1 + i % 2 * 2, coords.GetY() + 1 + i % 2 * -2);
+
+		nextPosition = coords + Pos(i, i);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
-		nextPosition = Pos(coords.GetX() + 1 + i % 2 * -2, coords.GetY() + 1 + i % 2 * -2);
+
+		nextPosition = coords + Pos(i, -i);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
-		nextPosition = Pos(coords.GetX() + 1 + i % 2 * -2, coords.GetY());
+
+		nextPosition = coords + Pos(i, 0);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 	}
 	if (possibleCastling)
 	{
+		int y = (color == Color::White) ? 0 : 7;
 		if (color == Color::White)
 		{
-			if (ptrMap->GetFigureAt(Pos(0, 0))->GetType() == FigureType::Rook_white 
-				&& ptrMap->CheckEmpty(coords, Pos(1, 0)) == 1
-				&& ptrMap->CheckEmpty(coords, Pos(2, 0)) == 1
-				&& ptrMap->CheckEmpty(coords, Pos(3, 0)) == 1)
-				if (((Rook*)ptrMap->GetFigureAt(Pos(0, 0)))->GetCastling())
-					possibleMoves.push_back(Pos(2, 0));
-			if (ptrMap->GetFigureAt(Pos(7, 0))->GetType() == FigureType::Rook_white
-				&& ptrMap->CheckEmpty(coords, Pos(6, 0)) == 1
-				&& ptrMap->CheckEmpty(coords, Pos(5, 0)) == 1)
-				if (((Rook*)ptrMap->GetFigureAt(Pos(7, 0)))->GetCastling())
-					possibleMoves.push_back(Pos(6, 0));
-		}
-		else
-		{
-			if (ptrMap->GetFigureAt(Pos(0, 7))->GetType() == FigureType::Rook_black
-				&& ptrMap->CheckEmpty(coords, Pos(1, 7)) == 1
-				&& ptrMap->CheckEmpty(coords, Pos(2, 7)) == 1
-				&& ptrMap->CheckEmpty(coords, Pos(3, 7)) == 1)
-				if (((Rook*)ptrMap->GetFigureAt(Pos(0, 7)))->GetCastling())
-					possibleMoves.push_back(Pos(2, 7));
-			if (ptrMap->GetFigureAt(Pos(7, 7))->GetType() == FigureType::Rook_black
-				&& ptrMap->CheckEmpty(coords, Pos(6, 7)) == 1
-				&& ptrMap->CheckEmpty(coords, Pos(5, 7)) == 1)
-				if (((Rook*)ptrMap->GetFigureAt(Pos(7, 7)))->GetCastling())
-					possibleMoves.push_back(Pos(6, 7));
+			if (ptrMap->GetFigureAt(Pos(0, y))->GetType() == FigureType::Rook_white
+				&& ptrMap->CheckEmpty(coords, Pos(1, y)) == 1
+				&& ptrMap->CheckEmpty(coords, Pos(2, y)) == 1
+				&& ptrMap->CheckEmpty(coords, Pos(3, y)) == 1)
+				if (((Rook*)ptrMap->GetFigureAt(Pos(0, y)))->GetCastling())
+					possibleMoves.push_back(Pos(2, y));
+
+			if (ptrMap->GetFigureAt(Pos(7, y))->GetType() == FigureType::Rook_white
+				&& ptrMap->CheckEmpty(coords, Pos(6, y)) == 1
+				&& ptrMap->CheckEmpty(coords, Pos(5, y)) == 1)
+				if (((Rook*)ptrMap->GetFigureAt(Pos(7, y)))->GetCastling())
+					possibleMoves.push_back(Pos(6, y));
 		}
 	}
 	movesFound = true;
@@ -96,55 +86,17 @@ std::vector<Pos>& King::FindPossibleMoves()
 
 std::vector<Pos>& Queen::FindPossibleMoves() // Rook + Bishop
 {
-	Pos nextPosition;
-	bool isChecking;
-	for (int i = 0; i != 4; ++i)
-	{
-		isChecking = true;
-		nextPosition = coords;
-		while (isChecking)
-		{
-			if (i < 2)
-				nextPosition = Pos(nextPosition.GetX() + (i == 0 ? 1 : -1), nextPosition.GetY());
-			else
-				nextPosition = Pos(nextPosition.GetX(), nextPosition.GetY() + (i == 2 ? 1 : -1));
-			if (ptrMap->CheckEmpty(coords, nextPosition))
-			{
-				possibleMoves.push_back(nextPosition);
-				if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
-					isChecking = false;
-			}
-			else
-			{
-				isChecking = false;
-			}
-		}
-	}
-	for (int i = 0; i != 4; ++i)
-	{
-		isChecking = true;
-		nextPosition = coords;
-		while (isChecking)
-		{
-			nextPosition = Pos(nextPosition.GetX() + (i == 0 || i == 1 ? 1 : -1), nextPosition.GetY() + (i == 0 || i == 2 ? 1 : -1));
-			if (ptrMap->CheckEmpty(coords, nextPosition))
-			{
-				possibleMoves.push_back(nextPosition);
-				if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
-					isChecking = false;
-			}
-			else
-			{
-				isChecking = false;
-			}
-		}
-	}
+	possibleMoves = Rook::FindStraightMoves(coords);
+	std::vector<Pos> moreMoves;
+	moreMoves = Bishop::FindDiagonalMoves(coords); // TODO: fix bug with empty vector exception
+	possibleMoves.insert(possibleMoves.end(), moreMoves.begin(), moreMoves.end());
 	movesFound = true;
 	return possibleMoves;
 }
 
-std::vector<Pos>& Bishop::FindPossibleMoves()
+std::vector<Pos> Bishop::FindDiagonalMoves(Pos coords)
 {
+	std::vector<Pos> moves;
 	Pos nextPosition;
 	bool isChecking;
 	for (int i = 0; i != 4; ++i)
@@ -156,7 +108,7 @@ std::vector<Pos>& Bishop::FindPossibleMoves()
 			nextPosition = Pos(nextPosition.GetX() + (i == 0 || i == 1 ? 1 : -1), nextPosition.GetY() + (i == 0 || i == 2 ? 1 : -1)); // diagonal
 			if (ptrMap->CheckEmpty(coords, nextPosition))
 			{
-				possibleMoves.push_back(nextPosition);
+				moves.push_back(nextPosition);
 				if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
 					isChecking = false;
 			}
@@ -166,6 +118,12 @@ std::vector<Pos>& Bishop::FindPossibleMoves()
 			}
 		}
 	}
+	return moves;
+}
+
+std::vector<Pos>& Bishop::FindPossibleMoves()
+{
+	possibleMoves = FindDiagonalMoves(coords);
 	movesFound = true;
 	return possibleMoves;
 }
@@ -173,18 +131,21 @@ std::vector<Pos>& Bishop::FindPossibleMoves()
 std::vector<Pos>& Knight::FindPossibleMoves()
 {
 	Pos nextPosition;
-	for (int i = 0; i != 2; ++i)
+	for (int i = -1, j = 2 * i; i != 3; i += 2)
 	{
-		nextPosition = Pos(coords.GetX() + i % 2 + 1, coords.GetY() + (i + 1) % 2 + 1);
+		nextPosition = coords + Pos(i, j);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
-		nextPosition = Pos(coords.GetX() - (i % 2 + 1), coords.GetY() + (i + 1) % 2 + 1);
+
+		nextPosition = coords + Pos(i, -j);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
-		nextPosition = Pos(coords.GetX() + i % 2 + 1, coords.GetY() - ((i + 1) % 2 + 1));
+
+		nextPosition = coords + Pos(j, i);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
-		nextPosition = Pos(coords.GetX() - (i % 2 + 1), coords.GetY() - ((i + 1) % 2 + 1));
+
+		nextPosition = coords + Pos(j, -i);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 	}
@@ -192,8 +153,9 @@ std::vector<Pos>& Knight::FindPossibleMoves()
 	return possibleMoves;
 }
 
-std::vector<Pos>& Rook::FindPossibleMoves()
+std::vector<Pos> Rook::FindStraightMoves(Pos coords)
 {
+	std::vector<Pos> moves;
 	Pos nextPosition;
 	bool isChecking;
 	for (int i = 0; i != 4; ++i)
@@ -208,7 +170,7 @@ std::vector<Pos>& Rook::FindPossibleMoves()
 				nextPosition = Pos(nextPosition.GetX(), nextPosition.GetY() + (i == 2 ? 1 : -1));
 			if (ptrMap->CheckEmpty(coords, nextPosition))
 			{
-				possibleMoves.push_back(nextPosition);
+				moves.push_back(nextPosition);
 				if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
 					isChecking = false;
 			}
@@ -218,6 +180,12 @@ std::vector<Pos>& Rook::FindPossibleMoves()
 			}
 		}
 	}
+	return moves;
+}
+
+std::vector<Pos>& Rook::FindPossibleMoves()
+{
+	possibleMoves = FindStraightMoves(coords);
 	movesFound = true;
 	return possibleMoves;
 }
@@ -236,22 +204,29 @@ std::vector<Pos>& Pawn::FindPossibleMoves()
 				possibleMoves.push_back(nextPosition);
 		}
 	}
+
 	nextPosition = Pos(coords.GetX() + 1, coords.GetY() + (color == Color::Black ? -1 : 1)); // if can eat
 	if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
 		possibleMoves.push_back(nextPosition);
 	nextPosition = Pos(coords.GetX() - 1, coords.GetY() + (color == Color::Black ? -1 : 1));
 	if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
 		possibleMoves.push_back(nextPosition);
+
 	MoveInfo* lastMove = ptrMap->GetLastMoveInfo();
 	if (lastMove)
-		if (lastMove->GetActiveFigure()->GetType() == FigureType::Pawn_black || lastMove->GetActiveFigure()->GetType() == FigureType::Pawn_white)
-			if (abs(lastMove->GetPosAfterMove().GetY() - lastMove->GetPosBeforeMove().GetY()) == 2)
-				if (lastMove->GetPosAfterMove().GetY() == coords.GetY() && abs(lastMove->GetPosAfterMove().GetX() - coords.GetX()) == 1)
-					possibleMoves.push_back(Pos(lastMove->GetPosAfterMove().GetX(), coords.GetY() + (lastMove->GetPosAfterMove().GetY() > lastMove->GetPosBeforeMove().GetY() ? -1 : 1)));
+	{
+		FigureType activeType = lastMove->GetActiveFigure()->GetType();
+		if (activeType == FigureType::Pawn_black || activeType == FigureType::Pawn_white)
+		{
+			Pos posBefore = lastMove->GetPosBeforeMove();
+			Pos posAfter = lastMove->GetPosAfterMove();
+			if (abs(posAfter.GetY() - posBefore.GetY()) == 2 && (posAfter.GetY() == coords.GetY()) && abs(posAfter.GetX() - coords.GetX()) == 1)
+				possibleMoves.push_back(Pos(posAfter.GetX(), coords.GetY() + (posAfter.GetY() > posBefore.GetY() ? -1 : 1)));
+		}
+	}
 	movesFound = true;
 	return possibleMoves;
 }
-
 
 bool Figure::MakeMoveTo(const Pos& nextPos)
 {

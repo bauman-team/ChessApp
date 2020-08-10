@@ -97,6 +97,7 @@ class Bishop : public Figure
 	virtual std::vector<Pos>& FindPossibleMoves() override;
 public:
 	Bishop(Pos _coords, Color _color);
+	static std::vector<Pos> FindDiagonalMoves(Pos coords);
 };
 
 
@@ -120,6 +121,7 @@ public:
 	Rook(Pos _coords, Color _color);
 
 	bool GetCastling() { return possibleCastling; } // for king castling
+	static std::vector<Pos> FindStraightMoves(Pos coords);
 };
 
 
