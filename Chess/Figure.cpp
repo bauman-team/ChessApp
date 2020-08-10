@@ -64,21 +64,22 @@ std::vector<Pos>& King::FindPossibleMoves()
 	if (possibleCastling)
 	{
 		int y = (color == Color::White) ? 0 : 7;
-		if (color == Color::White)
-		{
-			if (ptrMap->GetFigureAt(Pos(0, y))->GetType() == FigureType::Rook_white
-				&& ptrMap->CheckEmpty(coords, Pos(1, y)) == 1
-				&& ptrMap->CheckEmpty(coords, Pos(2, y)) == 1
-				&& ptrMap->CheckEmpty(coords, Pos(3, y)) == 1)
-				if (((Rook*)ptrMap->GetFigureAt(Pos(0, y)))->GetCastling())
-					possibleMoves.push_back(Pos(2, y));
+		if ((ptrMap->GetFigureAt(Pos(0, y))->GetType() == FigureType::Rook_white
+			|| ptrMap->GetFigureAt(Pos(0, y))->GetType() == FigureType::Rook_black)
+			&& ptrMap->GetFigureAt(Pos(0, y))->GetColor() == color
+			&& ptrMap->CheckEmpty(coords, Pos(1, y)) == 1
+			&& ptrMap->CheckEmpty(coords, Pos(2, y)) == 1
+			&& ptrMap->CheckEmpty(coords, Pos(3, y)) == 1)
+			if (((Rook*)ptrMap->GetFigureAt(Pos(0, y)))->GetCastling())
+				possibleMoves.push_back(Pos(2, y));
 
-			if (ptrMap->GetFigureAt(Pos(7, y))->GetType() == FigureType::Rook_white
-				&& ptrMap->CheckEmpty(coords, Pos(6, y)) == 1
-				&& ptrMap->CheckEmpty(coords, Pos(5, y)) == 1)
-				if (((Rook*)ptrMap->GetFigureAt(Pos(7, y)))->GetCastling())
-					possibleMoves.push_back(Pos(6, y));
-		}
+		if ((ptrMap->GetFigureAt(Pos(7, y))->GetType() == FigureType::Rook_white
+			|| ptrMap->GetFigureAt(Pos(7, y))->GetType() == FigureType::Rook_black)
+			&& ptrMap->GetFigureAt(Pos(7, y))->GetColor() == color
+			&& ptrMap->CheckEmpty(coords, Pos(6, y)) == 1
+			&& ptrMap->CheckEmpty(coords, Pos(5, y)) == 1)
+			if (((Rook*)ptrMap->GetFigureAt(Pos(7, y)))->GetCastling())
+				possibleMoves.push_back(Pos(6, y));
 	}
 	movesFound = true;
 	return possibleMoves;
