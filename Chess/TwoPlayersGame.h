@@ -22,5 +22,5 @@ public:
 
 	int8_t virtual CheckGameFinal() override; // return 1 if Mat if Pat 2 else 0
 
-	void SetPlayers(std::string name1 = "player1", std::string name2 = "player2", sf::Time timeLimit = sf::Time(sf::seconds(90)));
+	void SetPlayers(std::string name1 = "player1", std::string name2 = "player2", sf::Time timeLimit = sf::Time(sf::seconds(300)));
 };

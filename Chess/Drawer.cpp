@@ -4,6 +4,8 @@
 Drawer::Drawer(sf::RenderWindow* _window, const Resources& resource, const MapProperties& properties)
 	: window(_window), mapProperties(properties)
 {
+	window->setFramerateLimit(60);
+
 	SetResources(resource);
 	SetScale();
 	isWhiteActive = true;

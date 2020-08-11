@@ -20,4 +20,6 @@ public:
 	int8_t virtual CheckGameFinal() = 0;
 
 	int8_t GetIsWin() { return isWin; }
+
+	void Save();
 };
