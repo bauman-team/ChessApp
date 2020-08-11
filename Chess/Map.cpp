@@ -44,12 +44,19 @@ Figure* Map::GetFigureAt(int index) const
 	return map[index];
 }
 
-void Map::RunFindMoves(Figure* choseFigure)
+Pos Map::GetFigurePosition(Figure* selectedFigure) const
 {
-	if (!choseFigure->IsMovesFound())
+	for (int i = 0; i != 64; ++i)
+		if (map[i] == selectedFigure)
+			return Pos(i % 8, i / 8);
+}
+
+void Map::RunFindMoves(Figure* selectedFigure)
+{
+	if (!selectedFigure->IsMovesFound())
 	{
-		std::vector<Pos> &possibleMoves = choseFigure->FindPossibleMoves(); // for checking shah give numberOfFigures
-		possibleMoves = CheckingPossibleMove(choseFigure->coords, possibleMoves);
+		std::vector<Pos> &possibleMoves = selectedFigure->FindPossibleMoves(); // for checking shah give numberOfFigures
+		possibleMoves = CheckingPossibleMove(GetFigurePosition(selectedFigure), possibleMoves);
 	}
 }
 
@@ -243,7 +250,7 @@ std::vector<Pos> Map::CheckingPossibleMove(Pos figurePosition, const std::vector
 	{
 		for (int i = 0; i != 64 && !kingPos; ++i)
 			if (map[i]->GetColor() == GetFigureAt(figurePosition)->GetColor() && (map[i]->GetType() == FigureType::King_black || map[i]->GetType() == FigureType::King_white))
-				kingPos = &map[i]->GetPos();
+				kingPos = &GetFigurePosition(map[i]);
 	}
 	for (it; it != possibleMovesFind.end(); ++it)
 	{
@@ -311,6 +318,5 @@ std::vector<MoveInfo>& Map::GetMovesHistory()
 
 void ChangeCoordsForCastling(Rook& selectedRook, Pos newCoords)
 {
-	selectedRook.coords = newCoords;
 	selectedRook.possibleCastling = false;
 }

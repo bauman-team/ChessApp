@@ -15,12 +15,12 @@ class Map
 	Figure* map[64];
 	std::vector<MoveInfo> movesHistory;
 
-	friend void ChangeCoordsForCastling(Rook&, Pos newCoords);
 public:
 	Map(); 
 
 	Figure* GetFigureAt(const Pos& pos) const;
 	Figure* GetFigureAt(int index) const;
+	Pos GetFigurePosition(Figure*) const;
 
 	void RunFindMoves(Figure* choseFigure);
 	bool RunMakeMove(Figure* choseFigure, Pos& nextPosition);
