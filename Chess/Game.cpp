@@ -21,7 +21,7 @@ void Game::Save()
 		posBefore = movesHistory[i].GetPosBeforeMove();
 		posAfter = movesHistory[i].GetPosAfterMove();
 		if ((i == 0) || (movesHistory[i].GetActiveFigure()->GetColor() != movesHistory[i - 1].GetActiveFigure()->GetColor()))
-			out << posBefore.GetX() << " " << posBefore.GetY() << " -> " << posAfter.GetX() << " " << posAfter.GetY() << "\n";
+			out << (int)posBefore.GetX() << " " << (int)posBefore.GetY() << " -> " << (int)posAfter.GetX() << " " << (int)posAfter.GetY() << "\n";
 		else
 			--numberOfMoves;
 	}

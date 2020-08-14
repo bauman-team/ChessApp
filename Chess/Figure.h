@@ -39,21 +39,20 @@ protected:
 
 	static Map* ptrMap;
 
-	Pos coords;
 	const Color color;
 	FigureType type;
 	std::vector<Pos> possibleMoves;
 
 	bool movesFound;
-	
+
 	void ClearPossibleMoves();
 	virtual bool MakeMoveTo(const Pos&);
 	virtual std::vector<Pos>& FindPossibleMoves() = 0;
 
-public:
-	Figure(Pos _coords, Color _color) : coords(_coords), color(_color), movesFound(false) {}
 
-	Pos GetPos() const { return coords; }
+public:
+	Figure(Pos _coords, Color _color) : color(_color), movesFound(false) {} 
+
 	bool IsMovesFound() const { return movesFound; }
 	FigureType GetType() const { return type; }
 	Color GetColor() const { return color; }

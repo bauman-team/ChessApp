@@ -79,7 +79,7 @@ int8_t TwoPlayersGame::CheckGameFinal()
 	Pos* kingPos = nullptr;
 	for (int i = 0; i != 64 && !kingPos; ++i)
 		if (map.GetFigureAt(i)->GetColor() == activePlayer->GetColor() && (map.GetFigureAt(i)->GetType() == FigureType::King_black || map.GetFigureAt(i)->GetType() == FigureType::King_white))
-			kingPos = &map.GetFigureAt(i)->GetPos();
+			kingPos = &map.GetFigurePosition(map.GetFigureAt(i));
 	if (map.CheckingShah(*kingPos))
 	{
 		((King*)map.GetFigureAt(*kingPos))->SetCastling(false);

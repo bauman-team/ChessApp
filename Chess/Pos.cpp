@@ -1,6 +1,6 @@
 #include "Pos.h"
 
-int Pos::ToIndex() const
+int8_t Pos::ToIndex() const
 {
 	return x + 8 * y;
 }
@@ -34,12 +34,12 @@ bool Pos::operator==(const Pos& coords) const
 	return x == coords.x && y == coords.y;
 }
 
-Pos& Pos::AddToX(int _x) const
+Pos& Pos::AddToX(int8_t _x) const
 {
 	return *(new Pos(x + _x, y));
 }
 
-Pos& Pos::AddToY(int _y) const
+Pos& Pos::AddToY(int8_t _y) const
 {
 	return *(new Pos(x, y + _y));
 }
