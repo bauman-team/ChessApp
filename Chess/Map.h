@@ -17,6 +17,7 @@ class Map
 
 public:
 	Map(); 
+	Map(const Map&);
 
 	Figure* GetFigureAt(const Pos& pos) const;
 	Figure* GetFigureAt(int index) const;

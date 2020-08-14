@@ -32,6 +32,41 @@ Map::Map()
 	map[63] = new Rook(Pos(7, 7), Color::Black);
 }
 
+Map::Map(const Map& baseMap)
+{
+	for (int i = 0; i != 64; ++i)
+	{
+		if (baseMap.map[i]->GetType() == FigureType::Empty)
+		{
+			map[i] = new Empty(Pos(i % 8, i / 8));
+		}
+		else if (baseMap.map[i]->GetType() == FigureType::Pawn_black || baseMap.map[i]->GetType() == FigureType::Pawn_white)
+		{
+			map[i] = new Pawn(Pos(i % 8, i / 8), baseMap.map[i]->GetColor());
+		}
+		else if (baseMap.map[i]->GetType() == FigureType::Bishop_black || baseMap.map[i]->GetType() == FigureType::Bishop_white)
+		{
+			map[i] = new Bishop(Pos(i % 8, i / 8), baseMap.map[i]->GetColor());
+		} 
+		else if (baseMap.map[i]->GetType() == FigureType::Knight_black || baseMap.map[i]->GetType() == FigureType::Knight_white)
+		{
+			map[i] = new Knight(Pos(i % 8, i / 8), baseMap.map[i]->GetColor());
+		} 
+		else if (baseMap.map[i]->GetType() == FigureType::Rook_black || baseMap.map[i]->GetType() == FigureType::Rook_white)
+		{
+			map[i] = new Rook(Pos(i % 8, i / 8), baseMap.map[i]->GetColor());
+		} 
+		else if (baseMap.map[i]->GetType() == FigureType::Queen_black || baseMap.map[i]->GetType() == FigureType::Queen_white)
+		{
+			map[i] = new Queen(Pos(i % 8, i / 8), baseMap.map[i]->GetColor());
+		}
+		else
+		{
+			map[i] = new King(Pos(i % 8, i / 8), baseMap.map[i]->GetColor());
+		}
+	}
+}
+
 Figure* Map::GetFigureAt(const Pos& pos) const
 {
 	assert(pos.IsValid());
