@@ -101,7 +101,8 @@ void Drawer::ShowTimer(sf::Time time, Color activeColor)
 		timeString += "0";
 	timeString += std::to_string(seconds % 60);
 
-	timeText.setString(timeString);
+	if (timeText.getString() != timeString)
+		timeText.setString(timeString);
 	window->draw(timeText);
 }
 
@@ -133,7 +134,9 @@ Pos* Drawer::TransformMousePosition(int mouseX, int mouseY) const
 
 void Drawer::ShowPossibleMoves(const Map& map, const Pos& chosenFigure)
 {
-	for (std::vector<Pos>::const_iterator it = map.GetFigureAt(chosenFigure)->GetPossibleMoves().begin(); it != map.GetFigureAt(chosenFigure)->GetPossibleMoves().end(); ++it)
+	std::vector<Pos>::const_iterator it = map.GetFigureAt(chosenFigure)->GetPossibleMoves().begin();
+	std::vector<Pos>::const_iterator end = map.GetFigureAt(chosenFigure)->GetPossibleMoves().end();
+	for (; it != end; ++it)
 	{
 		Pos coeff = (isWhiteActive) ? Pos(it->GetX(), 7 - it->GetY()) : Pos(7 - it->GetX(), it->GetY());
 		circle.setPosition(mapProperties.GetPlayAreaTopLeftX() + (coeff.GetX() + 0.5) * mapProperties.GetSquareSize(),

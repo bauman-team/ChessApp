@@ -299,9 +299,7 @@ int8_t Map::CheckEmpty(const Pos& from, const Pos& to) const
 
 MoveInfo* Map::GetLastMoveInfo()
 {
-	if (!movesHistory.empty())
-		return &movesHistory.back();
-	return nullptr;
+	return (!movesHistory.empty()) ? &movesHistory.back() : nullptr;
 }
 
 std::vector<MoveInfo>& Map::GetMovesHistory()

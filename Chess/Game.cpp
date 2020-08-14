@@ -14,7 +14,7 @@ void Game::Save()
 	std::ofstream out("LastGame.txt");
 	Pos posBefore;
 	Pos posAfter;
-	out << "\n";
+	out << "   \n";
 	int numberOfMoves = movesHistory.size();
 	for (int i = 0; i != numberOfMoves; ++i)
 	{
