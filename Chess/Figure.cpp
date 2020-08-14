@@ -42,7 +42,7 @@ Pawn::Pawn(Pos _coords, Color _color) : Figure(_coords, _color)
 
 std::vector<Pos>& King::FindPossibleMoves()
 {
-	Pos nextPosition;
+	Pos coords = ptrMap->GetFigurePosition(this), nextPosition;
 	for (int i = -1; i != 3; i += 2)
 	{
 		nextPosition = coords + Pos(0, i);
@@ -103,6 +103,7 @@ std::vector<Pos>& King::FindPossibleMoves()
 
 std::vector<Pos>& Queen::FindPossibleMoves() // Rook + Bishop
 {
+	Pos coords = ptrMap->GetFigurePosition(this);
 	possibleMoves = Rook::FindStraightMoves(coords);
 	std::vector<Pos> moreMoves;
 	moreMoves = Bishop::FindDiagonalMoves(coords); // TODO: fix bug with empty vector exception
@@ -140,6 +141,7 @@ std::vector<Pos> Bishop::FindDiagonalMoves(Pos coords)
 
 std::vector<Pos>& Bishop::FindPossibleMoves()
 {
+	Pos coords = ptrMap->GetFigurePosition(this);
 	possibleMoves = FindDiagonalMoves(coords);
 	movesFound = true;
 	return possibleMoves;
@@ -147,7 +149,7 @@ std::vector<Pos>& Bishop::FindPossibleMoves()
 
 std::vector<Pos>& Knight::FindPossibleMoves()
 {
-	Pos nextPosition;
+	Pos coords = ptrMap->GetFigurePosition(this), nextPosition;
 	for (int i = -1, j = 2 * i; i != 3; i += 2)
 	{
 		nextPosition = coords + Pos(i, j);
@@ -202,6 +204,7 @@ std::vector<Pos> Rook::FindStraightMoves(Pos coords)
 
 std::vector<Pos>& Rook::FindPossibleMoves()
 {
+	Pos coords = ptrMap->GetFigurePosition(this);
 	possibleMoves = FindStraightMoves(coords);
 	movesFound = true;
 	return possibleMoves;
@@ -209,7 +212,7 @@ std::vector<Pos>& Rook::FindPossibleMoves()
 
 std::vector<Pos>& Pawn::FindPossibleMoves()
 {
-	Pos nextPosition = coords;
+	Pos coords = ptrMap->GetFigurePosition(this), nextPosition = coords;
 	nextPosition = Pos(nextPosition.GetX(), nextPosition.GetY() + (color == Color::Black ? -1 : 1)); // black go down | white go up
 	if (ptrMap->CheckEmpty(coords, nextPosition) == 1)
 	{
@@ -247,6 +250,7 @@ std::vector<Pos>& Pawn::FindPossibleMoves()
 
 bool Figure::MakeMoveTo(const Pos& nextPos)
 {
+	Pos coords = ptrMap->GetFigurePosition(this);
 	for (std::vector<Pos>::iterator it = possibleMoves.begin(); it != possibleMoves.end(); ++it)
 		if (*it == nextPos)
 		{
@@ -267,6 +271,7 @@ void Figure::ClearPossibleMoves()
 
 bool King::MakeMoveTo(const Pos& nextPos)
 {
+	Pos coords = ptrMap->GetFigurePosition(this);
 	if (abs(nextPos.GetX() - coords.GetX()) == 2)
 	{
 		if (possibleCastling)
@@ -298,6 +303,7 @@ bool Rook::MakeMoveTo(const Pos& nextPos)
 
 bool Pawn::MakeMoveTo(const Pos& nextPos)
 {
+	Pos coords = ptrMap->GetFigurePosition(this);
 	bool isCaptureEnPassant = abs(coords.GetX() - nextPos.GetX()) == 1 && abs(coords.GetY() - nextPos.GetY()) == 1;
 	int lastCoordY = coords.GetY();
 	if (nextPos.IsValid())
