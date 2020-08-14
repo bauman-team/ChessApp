@@ -37,6 +37,7 @@ int main()
 			switch(event.type)
 			{
 			case sf::Event::Closed:
+				game->Save();
 				window.close();
 				break;
 			case sf::Event::MouseButtonPressed:
@@ -48,7 +49,7 @@ int main()
 				break;
 			}
 		}
-		(!game->GetIsWin()) ? game->StartGame() : window.close();
+		game->Show();
 		window.display();
 	}
 	return 0;

@@ -9,7 +9,7 @@ TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resour
 	activePlayer = player1;
 }
 
-void TwoPlayersGame::StartGame()
+void TwoPlayersGame::Show()
 {
 	drawer.ShowMap(map);
 	drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
@@ -29,7 +29,7 @@ void TwoPlayersGame::ChangeActivePlayer()
 	drawer.ShowMap(map);
 	drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
 	drawer.DisplayWindow();
-	//sf::sleep(sf::seconds(2));
+	sf::sleep(sf::seconds(2));
 
 	activePlayer = (activePlayer == player2) ? player1 : player2;
 	activePlayer->SetChosenPosition(nullptr);
@@ -55,18 +55,10 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 				if (activePlayer->GetChosenPosition() != nullptr && // if chosen position exists and
 					activePlayer->GetColor() != map.GetFigureAt(*position)->GetColor()) // position and activePlayer colors aren't same
 				{
-					// compare this position with possible moves for last chosen figure
-					std::vector<Pos>::const_iterator begin = map.GetFigureAt(*activePlayer->GetChosenPosition())->GetPossibleMoves().begin();
-					std::vector<Pos>::const_iterator end = map.GetFigureAt(*activePlayer->GetChosenPosition())->GetPossibleMoves().end();
-					for (std::vector<Pos>::const_iterator it = begin; it != end; ++it)
+					if (map.RunMakeMove(map.GetFigureAt(*activePlayer->GetChosenPosition()), *position))
 					{
-						if (*it == *position)
-						{
-							chosenPositionIsPossible = true;
-							map.RunMakeMove(map.GetFigureAt(*activePlayer->GetChosenPosition()), *position);
-							ChangeActivePlayer();
-							break; // if it possible delete
-						}
+						chosenPositionIsPossible = true;
+						ChangeActivePlayer();
 					}
 				}
 				if (!chosenPositionIsPossible)

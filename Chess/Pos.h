@@ -12,6 +12,7 @@ public:
 	int ToIndex() const;
 	bool IsValid() const;
 
+	Pos operator+(const Pos& coords);
 	Pos& operator=(const Pos& coords);
 	Pos& operator*=(float value);
 	bool operator==(const Pos& coords) const;

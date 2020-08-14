@@ -47,12 +47,15 @@ Figure* Map::GetFigureAt(int index) const
 void Map::RunFindMoves(Figure* choseFigure)
 {
 	if (!choseFigure->IsMovesFound())
-		choseFigure->FindPossibleMoves();
+	{
+		std::vector<Pos> &possibleMoves = choseFigure->FindPossibleMoves(); // for checking shah give numberOfFigures
+		possibleMoves = CheckingPossibleMove(choseFigure->coords, possibleMoves);
+	}
 }
 
-void Map::RunMakeMove(Figure* choseFigure, Pos& nextPosition)
+bool Map::RunMakeMove(Figure* choseFigure, Pos& nextPosition)
 {
-	choseFigure->MakeMoveTo(nextPosition);
+	return choseFigure->MakeMoveTo(nextPosition);
 }
 
 void Map::RunClearPossibleMoves(const Color& activeColor)
@@ -71,7 +74,7 @@ void Map::Move(const Pos& from, const Pos& to)
 	if (map[to.ToIndex()]->GetType() != FigureType::Empty)
 	{
 		info.SetEatenFigure(map[to.ToIndex()]);
-		// decrease numOfFigures
+		// TODO: decrease numOfFigures
 	}
 	map[to.ToIndex()] = map[from.ToIndex()];
 	map[from.ToIndex()] = new Empty(Pos(from));
@@ -246,7 +249,7 @@ std::vector<Pos> Map::CheckingPossibleMove(Pos figurePosition, const std::vector
 	{
 		ptrSecondaryFigure = GetFigureAt(*it);
 		map[(*it).ToIndex()] = ptrMainFigure;
-		if (GetFigureAt(*it)->GetType() == FigureType::Empty) // for method TO KING need to change coords of Figures
+		if (ptrSecondaryFigure->GetType() == FigureType::Empty) // for method TO KING need to change coords of Figures
 		{
 			// change
 			map[figurePosition.ToIndex()] = ptrSecondaryFigure;
@@ -296,9 +299,12 @@ int8_t Map::CheckEmpty(const Pos& from, const Pos& to) const
 
 MoveInfo* Map::GetLastMoveInfo()
 {
-	if (!movesHistory.empty())
-		return &movesHistory.back();
-	return nullptr;
+	return (!movesHistory.empty()) ? &movesHistory.back() : nullptr;
+}
+
+std::vector<MoveInfo>& Map::GetMovesHistory()
+{
+	return movesHistory;
 }
 
 void ChangeCoordsForCastling(Rook& selectedRook, Pos newCoords)

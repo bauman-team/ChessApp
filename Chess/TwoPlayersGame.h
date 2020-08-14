@@ -15,12 +15,12 @@ class TwoPlayersGame : public Game
 public:
 	TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties);
 
-	void virtual StartGame() override;
+	void virtual Show() override;
 	void virtual ChangeActivePlayer() override;
 
 	void virtual SetPlayerChosenCell(int, int) override;
 
 	int8_t virtual CheckGameFinal() override; // return 1 if Mat if Pat 2 else 0
 
-	void SetPlayers(std::string name1 = "player1", std::string name2 = "player2", sf::Time timeLimit = sf::Time(sf::seconds(90)));
+	void SetPlayers(std::string name1 = "player1", std::string name2 = "player2", sf::Time timeLimit = sf::Time(sf::seconds(300)));
 };

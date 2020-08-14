@@ -11,7 +11,8 @@ public:
 	MapProperties(const MapProperties& copy);
 
 	int GetSquareSize() const { return squareSize; }
-	Pos GetPlayAreaTopLeft() const { return playAreaTopLeft; }
+	int GetPlayAreaTopLeftX() const { return playAreaTopLeft.GetX(); }
+	int GetPlayAreaTopLeftY() const { return playAreaTopLeft.GetY(); }
 
 	void SetSquareSize(int size) { squareSize = size; }
 	void SetPlayAreaTopLeft(Pos _playAreaTopLeft) { playAreaTopLeft = _playAreaTopLeft; }
