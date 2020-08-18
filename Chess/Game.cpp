@@ -14,14 +14,14 @@ void Game::Save()
 	std::ofstream out("LastGame.txt");
 	Pos posBefore;
 	Pos posAfter;
-	out << "\n";
+	out << "   \n";
 	int numberOfMoves = movesHistory.size();
 	for (int i = 0; i != numberOfMoves; ++i)
 	{
 		posBefore = movesHistory[i].GetPosBeforeMove();
 		posAfter = movesHistory[i].GetPosAfterMove();
 		if ((i == 0) || (movesHistory[i].GetActiveFigure()->GetColor() != movesHistory[i - 1].GetActiveFigure()->GetColor()))
-			out << posBefore.GetX() << " " << posBefore.GetY() << " -> " << posAfter.GetX() << " " << posAfter.GetY() << "\n";
+			out << (int)posBefore.GetX() << " " << (int)posBefore.GetY() << " -> " << (int)posAfter.GetX() << " " << (int)posAfter.GetY() << "\n";
 		else
 			--numberOfMoves;
 	}

@@ -3,7 +3,6 @@
 #include "Drawer.h"
 #include "Pos.h"
 #include "MoveInfo.h"
-#include <stack>
 
 class Game
 {
