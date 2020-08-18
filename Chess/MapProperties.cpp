@@ -2,12 +2,20 @@
 
 MapProperties::MapProperties(const MapProperties& copy)
 {
-	playAreaTopLeft = copy.playAreaTopLeft;
+	playAreaTopLeftX = copy.playAreaTopLeftX;
+	playAreaTopLeftY = copy.playAreaTopLeftY;
 	squareSize = copy.squareSize;
+}
+
+void MapProperties::SetPlayAreaTopLeft(uint8_t _playAreaTopLeftX, uint8_t _playAreaTopLeftY)
+{ 
+	playAreaTopLeftX = _playAreaTopLeftX; 
+	playAreaTopLeftY = _playAreaTopLeftY; 
 }
 
 void MapProperties::SetScale(float scale)
 {
-	playAreaTopLeft *= scale;
+	playAreaTopLeftX *= scale;
+	playAreaTopLeftY *= scale;
 	squareSize *= scale;
 }

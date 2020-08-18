@@ -1,14 +1,15 @@
 #pragma once
 #include <stdint.h>
+#include <cassert>
 
 class Pos
 {
-	int8_t x, y;
+	uint8_t xy;
 public:
-	Pos(int8_t _x = 0, int8_t _y = 0) : x(_x), y(_y) {}
+	Pos(uint8_t x = 0, uint8_t y = 0);
 
-	int8_t GetX() const { return x; }
-	int8_t GetY() const { return y; }
+	int8_t GetX() const { return xy >> 4; }
+	int8_t GetY() const { return xy & 15; }
 
 	int8_t ToIndex() const;
 	bool IsValid() const;

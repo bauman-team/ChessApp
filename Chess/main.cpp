@@ -23,7 +23,7 @@ int main()
 	res.SetFont("fonts/calibri.ttf");
 
 	MapProperties prop;
-	prop.SetPlayAreaTopLeft(Pos(60, 60));
+	prop.SetPlayAreaTopLeft(60, 60);
 	prop.SetSquareSize(100);
 
 	Game* game = new TwoPlayersGame(&window, res, prop);

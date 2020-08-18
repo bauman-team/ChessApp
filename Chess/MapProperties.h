@@ -1,20 +1,22 @@
 #pragma once
-#include "Pos.h"
+//#include "Pos.h"
+#include <stdint.h>
 
 class MapProperties
 {
-	Pos playAreaTopLeft;
-	int squareSize;
+	uint8_t playAreaTopLeftY;
+	uint8_t playAreaTopLeftX;
+	uint8_t squareSize;
 public:
 	MapProperties() {};
-	MapProperties(Pos _playAreaTopLeft, int _squareSize) : playAreaTopLeft(_playAreaTopLeft), squareSize(_squareSize) {}
+	MapProperties(uint8_t _playAreaTopLeftX, uint8_t _playAreaTopLeftY, uint8_t _squareSize) : playAreaTopLeftX(_playAreaTopLeftX), playAreaTopLeftY(_playAreaTopLeftY), squareSize(_squareSize) {}
 	MapProperties(const MapProperties& copy);
 
-	int GetSquareSize() const { return squareSize; }
-	int GetPlayAreaTopLeftX() const { return playAreaTopLeft.GetX(); }
-	int GetPlayAreaTopLeftY() const { return playAreaTopLeft.GetY(); }
+	uint8_t GetSquareSize() const { return squareSize; }
+	uint8_t GetPlayAreaTopLeftX() const { return playAreaTopLeftX; }
+	uint8_t GetPlayAreaTopLeftY() const { return playAreaTopLeftY; }
 
-	void SetSquareSize(int size) { squareSize = size; }
-	void SetPlayAreaTopLeft(Pos _playAreaTopLeft) { playAreaTopLeft = _playAreaTopLeft; }
+	void SetSquareSize(uint8_t size) { squareSize = size; }
+	void SetPlayAreaTopLeft(uint8_t _playAreaTopLeftX, uint8_t _playAreaTopLeftY);
 	void SetScale(float scale);
 };
