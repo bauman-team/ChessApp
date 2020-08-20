@@ -1,10 +1,10 @@
 #include <SFML/Graphics.hpp>
 #include "TwoPlayersGame.h"
+#include "Menu.h"
 
 int main()
 {
-	int windowSize = 920;
-	sf::RenderWindow window(sf::VideoMode(windowSize, windowSize), "Chess");
+	sf::RenderWindow window(sf::VideoMode(700, 550), "Chess");
 
 	Resources res;
 	res.SetMapImage("images/map.png");
@@ -25,8 +25,10 @@ int main()
 	MapProperties prop;
 	prop.SetPlayAreaTopLeft(Pos(60, 60));
 	prop.SetSquareSize(100);
+	prop.SetGameWindowSize(920);
 
 	Game* game = new TwoPlayersGame(&window, res, prop);
+	Menu menu(window, game, "form.txt");
 
 	while (window.isOpen())
 	{
@@ -41,16 +43,26 @@ int main()
 				window.close();
 				break;
 			case sf::Event::MouseButtonPressed:
-				if (event.mouseButton.button == sf::Mouse::Left)
+				if (game->GetStatus() == GameStatus::Play && event.mouseButton.button == sf::Mouse::Left)
 				{
 					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 					game->SetPlayerChosenCell(mousePos.x, mousePos.y);
 				}
 				break;
 			}
+			menu.HandleEvent(event);
 		}
-		game->Show();
+
+		switch (game->GetStatus())
+		{
+		case GameStatus::Menu:
+			menu.Show();
+			break;
+		case GameStatus::Play:
+			game->Show();
+			break;
+		}
 		window.display();
 	}
-	return 0;
+	return EXIT_SUCCESS;
 }

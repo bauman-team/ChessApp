@@ -4,12 +4,15 @@
 #include "Pos.h"
 #include "MoveInfo.h"
 
+enum class GameStatus { Menu, Play };
+
 class Game
 {
 protected:
 	Drawer drawer;
 	Map map;
 	int8_t isWin;
+	GameStatus status;
 public:
 	Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties);
 
@@ -18,7 +21,9 @@ public:
 	void virtual SetPlayerChosenCell(int, int) = 0;
 	int8_t virtual CheckGameFinal() = 0;
 
-	int8_t GetIsWin() { return isWin; }
+	int8_t GetIsWin() const { return isWin; }
+	GameStatus GetStatus() const { return status; }
 
+	void StartGame();
 	void Save();
 };

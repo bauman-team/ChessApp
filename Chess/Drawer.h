@@ -30,6 +30,7 @@ public:
 	void ShowPossibleMoves(const Map&, const Pos&);
 	void DisplayWindow();
 	void RotateBoard();
+	void ResizeWindowForGame();
 
 	Pos* TransformMousePosition(int, int) const; // if coords isn't valid, return nullptr
 };

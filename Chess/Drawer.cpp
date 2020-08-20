@@ -40,7 +40,7 @@ void Drawer::SetResources(const Resources& resource)
 
 void Drawer::SetScale()
 {
-	float mapScale = (float)window->getSize().x / mapTexture.getSize().x;
+	float mapScale = (float)mapProperties.GetGameWindowSize() / mapTexture.getSize().x;
 	float figureScale = mapScale * (float)mapProperties.GetSquareSize() / figuresTextures[0].getSize().x;
 
 	mapSprite.setScale(mapScale, mapScale); // set the mapSprite size to the window size
@@ -118,6 +118,12 @@ void Drawer::RotateBoard()
 {
 	mapSprite.rotate(180);
 	isWhiteActive = !isWhiteActive;
+}
+
+void Drawer::ResizeWindowForGame()
+{
+	// using create() because setSize() works incorrectly
+	window->create(sf::VideoMode(mapProperties.GetGameWindowSize(), mapProperties.GetGameWindowSize()), "Chess");
 }
 
 Pos* Drawer::TransformMousePosition(int mouseX, int mouseY) const
