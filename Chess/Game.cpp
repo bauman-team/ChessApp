@@ -6,6 +6,13 @@ Game::Game(sf::RenderWindow* window, const Resources& resource, const MapPropert
 {
 	Figure::SetMapPtr(&map);
 	isWin = 0;
+	status = GameStatus::Menu;
+}
+
+void Game::StartGame()
+{
+	status = GameStatus::Play;
+	drawer.ResizeWindowForGame();
 }
 
 void Game::Save()
