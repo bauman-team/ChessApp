@@ -50,7 +50,8 @@ int main()
 				}
 				break;
 			}
-			menu.HandleEvent(event);
+			if (game->GetStatus() == GameStatus::Menu)
+				menu.HandleEvent(event);
 		}
 
 		switch (game->GetStatus())
