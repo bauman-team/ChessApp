@@ -58,7 +58,8 @@ void Map::RunFindMoves(const Color& activeColor)
 					Moves.figurePosition = &Pos::BitboardToPosition(j);
 					Moves.possibleMoves = &Figure::FindPossibleMoves((FigureType)i, *Moves.figurePosition); // for checking shah give numberOfFigures
 					CheckingPossibleMove(Moves);
-					figureWithAccessMoves->push_back(Moves);
+					if (!Moves.possibleMoves->empty())
+						figureWithAccessMoves->push_back(Moves);
 				}
 				j <<= 1;
 			}
@@ -277,22 +278,22 @@ void Map::CheckingPossibleMove(PossibleMoves& figureMoves)
 	if (!figureMoves.possibleMoves->empty())
 	{
 		std::vector<Pos>::iterator it = figureMoves.possibleMoves->begin();
-		Pos* posMainFigure = figureMoves.figurePosition, posSecondaryFigure;
-		FigureType mainFigureType = GetFigureType(*posMainFigure);
+		Pos* posMainFigure = figureMoves.figurePosition;
+		FigureType mainFigureType = GetFigureType(*posMainFigure), secondaryFigureType;
 		uint64_t mainBitboard = posMainFigure->ToBitboard(), secondBitboard;
 		Pos* kingPos = nullptr;
-		std::vector<Pos> possibleMovesChecked;
+		std::vector<Pos> &possibleMovesChecked = *(new std::vector<Pos>);
 		if (mainFigureType == FigureType::King_black || mainFigureType == FigureType::King_white)
 			kingPos = posMainFigure;
 		else
 			kingPos = &Pos::BitboardToPosition(map[to_underlying(Figure::GetFigureTypeColor(mainFigureType) == Color::Black ? FigureType::King_black : FigureType::King_white)]);
 		for (it; it != figureMoves.possibleMoves->end(); ++it)
 		{
-			posSecondaryFigure = *it;
-			secondBitboard = posSecondaryFigure.ToBitboard();
+			secondaryFigureType = GetFigureType(*it);
+			secondBitboard = (*it).ToBitboard();
 			map[to_underlying(mainFigureType)] -= mainBitboard;
 			map[to_underlying(mainFigureType)] += secondBitboard;
-			if (GetFigureType(posSecondaryFigure) == FigureType::Empty)
+			if (secondaryFigureType == FigureType::Empty)
 			{
 				if (*kingPos == *posMainFigure)
 				{
@@ -307,7 +308,7 @@ void Map::CheckingPossibleMove(PossibleMoves& figureMoves)
 			}
 			else
 			{
-				map[to_underlying(GetFigureType(posSecondaryFigure))] -= secondBitboard;
+				map[to_underlying(secondaryFigureType)] -= secondBitboard;
 				if (*kingPos == *posMainFigure)
 				{
 					if (!CheckingShah(*it))
@@ -318,7 +319,7 @@ void Map::CheckingPossibleMove(PossibleMoves& figureMoves)
 					if (!CheckingShah(*kingPos))
 						possibleMovesChecked.push_back(*it);
 				}
-				map[to_underlying(GetFigureType(posSecondaryFigure))] += secondBitboard;
+				map[to_underlying(secondaryFigureType)] += secondBitboard;
 			}
 			map[to_underlying(mainFigureType)] += mainBitboard;
 			map[to_underlying(mainFigureType)] -= secondBitboard;
