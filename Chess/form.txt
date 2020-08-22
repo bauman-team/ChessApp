@@ -1,0 +1,293 @@
+Renderer.1 {
+    backgroundcolor = #F5F5F5;
+    backgroundcolordisabled = #E6E6E6;
+    backgroundcolorhover = white;
+    bordercolor = #3C3C3C;
+    bordercolordisabled = #7D7D7D;
+    bordercolorhover = black;
+    borders = (1, 1, 1, 1);
+    caretcolor = black;
+    caretwidth = 1;
+    defaulttextcolor = #A0A0A0;
+    padding = (0, 0, 0, 0);
+    selectedtextbackgroundcolor = #006EFF;
+    selectedtextcolor = white;
+    textcolor = #3C3C3C;
+    textcolordisabled = #7D7D7D;
+    texture = None;
+    texturedisabled = None;
+    texturefocused = None;
+    texturehover = None;
+}
+
+Renderer.2 {
+    backgroundcolor = transparent;
+    bordercolor = #3C3C3C;
+    borders = (0, 0, 0, 0);
+    textcolor = #3C3C3C;
+    texturebackground = None;
+}
+
+Renderer.3 {
+    backgroundcolor = #F5F5F5;
+    backgroundcolordisabled = #E6E6E6;
+    backgroundcolorhover = white;
+    bordercolor = #3C3C3C;
+    bordercolordisabled = #7D7D7D;
+    bordercolorfocused = #1E1EB4;
+    bordercolorhover = black;
+    borders = (1, 1, 1, 1);
+    checkcolor = #3C3C3C;
+    checkcolordisabled = #7D7D7D;
+    checkcolorhover = black;
+    textcolor = #3C3C3C;
+    textcolordisabled = #7D7D7D;
+    textcolorhover = black;
+    textdistanceratio = 0.2;
+    texturechecked = None;
+    texturecheckeddisabled = None;
+    texturecheckedfocused = None;
+    texturecheckedhover = None;
+    textureunchecked = None;
+    textureuncheckeddisabled = None;
+    textureuncheckedfocused = None;
+    textureuncheckedhover = None;
+}
+
+Button.StartButton {
+    Position = (290, 470);
+    Size = (113, 47);
+    Text = Start;
+    TextSize = 30;
+
+    Renderer {
+        backgroundcolor = #F5F5F5;
+        backgroundcolordisabled = #E6E6E6;
+        backgroundcolordown = #EBEBEB;
+        backgroundcolorhover = white;
+        bordercolor = #3C3C3C;
+        bordercolordisabled = #7D7D7D;
+        bordercolordown = black;
+        bordercolorfocused = #1E1EB4;
+        bordercolorhover = black;
+        borders = (1, 1, 1, 1);
+        textcolor = #3C3C3C;
+        textcolordisabled = #7D7D7D;
+        textcolordown = black;
+        textcolorhover = black;
+        texture = None;
+        texturedisabled = None;
+        texturedown = None;
+        texturefocused = None;
+        texturehover = None;
+    }
+}
+
+Label.Title {
+    HorizontalAlignment = Center;
+    MaximumTextWidth = 157.2;
+    Position = (270, 20);
+    ScrollbarPolicy = Never;
+    Size = (157.2, 50.258);
+    Text = CHESS;
+    TextSize = 40;
+    VerticalAlignment = Center;
+
+    Renderer {
+        backgroundcolor = transparent;
+        bordercolor = #3C3C3C;
+        borders = (0, 0, 0, 0);
+        textcolor = #3C3C3C;
+        textstyle = Bold;
+        texturebackground = None;
+    }
+}
+
+CheckBox.TimerCheckBox {
+    Position = (50, 140);
+    Size = (18, 18);
+    Text = "Limited time";
+    TextSize = 20;
+
+    Renderer {
+        backgroundcolor = #F5F5F5;
+        backgroundcolordisabled = #E6E6E6;
+        backgroundcolorhover = white;
+        bordercolor = #3C3C3C;
+        bordercolordisabled = #7D7D7D;
+        bordercolorfocused = #1E1EB4;
+        bordercolorhover = black;
+        borders = (1, 1, 1, 1);
+        checkcolor = #3C3C3C;
+        checkcolordisabled = #7D7D7D;
+        checkcolorhover = black;
+        textcolor = #3C3C3C;
+        textcolordisabled = #7D7D7D;
+        textcolorhover = black;
+        textdistanceratio = 0.2;
+        texturechecked = None;
+        texturecheckeddisabled = None;
+        texturecheckedfocused = None;
+        texturecheckedhover = None;
+        textureunchecked = None;
+        textureuncheckeddisabled = None;
+        textureuncheckedfocused = None;
+        textureuncheckedhover = None;
+    }
+}
+
+Label.ModeLabel {
+    HorizontalAlignment = Center;
+    Position = (50, 240);
+    ScrollbarPolicy = Never;
+    Size = (87.2, 30.6662);
+    Text = "Mode:";
+    TextSize = 20;
+    VerticalAlignment = Center;
+    renderer = &2;
+}
+
+RadioButton.TwoPlayersRB {
+    Position = (50, 290);
+    Size = (18, 18);
+    Text = "2 players";
+    TextSize = 15;
+    renderer = &3;
+}
+
+RadioButton.OnePlayerRB {
+    Position = (50, 330);
+    Size = (18, 18);
+    Text = Bot;
+    TextSize = 15;
+    renderer = &3;
+}
+
+Label.TimeLabel {
+    Position = (290, 130);
+    ScrollbarPolicy = Never;
+    Size = (137.2, 32.5161);
+    Text = "Minutes: 30";
+    TextSize = 20;
+    VerticalAlignment = Center;
+    Visible = false;
+    renderer = &2;
+}
+
+Slider.TimeSlider {
+    ChangeValueOnScroll = true;
+    InvertedDirection = false;
+    Maximum = 60;
+    Minimum = 1;
+    Position = (470, 140.8);
+    Size = (160, 15.2);
+    Step = 1;
+    Value = 30;
+    Visible = false;
+
+    Renderer {
+        bordercolor = #3C3C3C;
+        bordercolorhover = black;
+        borders = (1, 1, 1, 1);
+        texturethumb = None;
+        texturethumbhover = None;
+        texturetrack = None;
+        texturetrackhover = None;
+        thumbcolor = #F5F5F5;
+        thumbcolorhover = white;
+        trackcolor = #F5F5F5;
+        trackcolorhover = white;
+    }
+}
+
+Picture.FirstPlayerIcon {
+    Position = (320, 250);
+    Size = (40, 40);
+    Visible = false;
+
+    Renderer {
+        texture = None;
+        transparenttexture = false;
+    }
+}
+
+Picture.SecondPlayerIcon {
+    Position = (550, 250);
+    Size = (40, 40);
+    Visible = false;
+
+    Renderer {
+        texture = None;
+        transparenttexture = false;
+    }
+}
+
+EditBox.FirstPlayerName {
+    DefaultText = name;
+    MaximumCharacters = 15;
+    Position = (265, 330);
+    Size = (150, 22);
+    TextSize = 13;
+    TextWidthLimited = true;
+    Visible = false;
+    renderer = &1;
+}
+
+EditBox.SecondPlayerName {
+    DefaultText = name;
+    MaximumCharacters = 15;
+    Position = (500, 330);
+    Size = (140, 22);
+    TextSize = 13;
+    TextWidthLimited = true;
+    Visible = false;
+    renderer = &1;
+}
+
+Tabs.ColorsTab {
+    AutoSize = 0;
+    MaximumTabWidth = 1;
+    Position = (280, 300);
+    Selected = 0;
+    Size = (120, 22);
+    Tabs = [White, Black];
+    TextSize = 13;
+    Visible = false;
+
+    Renderer {
+        backgroundcolor = #F5F5F5;
+        backgroundcolordisabled = #E6E6E6;
+        backgroundcolorhover = white;
+        bordercolor = black;
+        borders = (1, 1, 1, 1);
+        selectedbackgroundcolor = #006EFF;
+        selectedbackgroundcolorhover = #1E96FF;
+        selectedtextcolor = white;
+        textcolor = #3C3C3C;
+        textcolordisabled = #7D7D7D;
+        textcolorhover = black;
+        texturedisabledtab = None;
+        textureselectedtab = None;
+        textureselectedtabhover = None;
+        texturetab = None;
+        texturetabhover = None;
+    }
+}
+
+Label.MessageLabel {
+    HorizontalAlignment = Center;
+    Position = (50, 400);
+    ScrollbarPolicy = Never;
+    Size = (597.2, 56.7097);
+    TextSize = 20;
+    VerticalAlignment = Center;
+
+    Renderer {
+        backgroundcolor = transparent;
+        bordercolor = #3C3C3C;
+        borders = (0, 0, 0, 0);
+        textcolor = red;
+        textstyle = Italic;
+        texturebackground = None;
+    }
+}
