@@ -21,7 +21,7 @@ class Map
 	uint64_t map[12]; // 12 type of figure
 	std::vector<MoveInfo> movesHistory;
 	std::vector<PossibleMoves> *figureWithAccessMoves;
-	bool possibleCastling[2];
+	bool possibleCastling[4];
 public:
 	Map(); 
 	Map(const Map&);
@@ -44,8 +44,10 @@ public:
 	Color GetColor(const Pos& pos) const;
 	FigureType GetFigureType(const Pos& pos) const;
 	bool GetCastling(const Color& selectedColor) const;
+	bool GetCastling(const Color& selectedColor, const Pos& selectedPos) const;
 
-	void SetCastling(const Color& selectedColor, bool value);
+	void SetCastling(const Color& selectedColor);
+	void SetCastling(const Color& selectedColor, const Pos& selectedPos);
 
 	int8_t CheckEmpty(const Pos& from, const Pos& to) const;
 

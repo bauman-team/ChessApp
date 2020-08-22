@@ -18,6 +18,8 @@ Map::Map()
 	map[to_underlying(FigureType::Pawn_black)] = 71'776'119'061'217'280;
 	possibleCastling[0] = true;
 	possibleCastling[1] = true;
+	possibleCastling[2] = true;
+	possibleCastling[3] = true;
 	figureWithAccessMoves = new std::vector<PossibleMoves>;
 }
 
@@ -105,12 +107,13 @@ void Map::Move(const Pos& from, const Pos& to)
 	map[to_underlying(movableFigure)] += to.ToBitboard();
 	if (movableFigure == FigureType::King_black || movableFigure == FigureType::King_white)
 	{
-		possibleCastling[to_underlying(Figure::GetFigureTypeColor(movableFigure))] = false;
+		SetCastling(Figure::GetFigureTypeColor(movableFigure));
 		if (abs(from.GetX() - to.GetX()) == 2)
 			Castling(from, to);
 	}
 	else if (movableFigure == FigureType::Rook_black || movableFigure == FigureType::Rook_white)
 	{
+		SetCastling(Figure::GetFigureTypeColor(movableFigure), from);
 		//possibleCastling[to_underlying(Figure::GetFigureTypeColor(movableFigure))] = false;
 	}
 	else if (movableFigure == FigureType::Pawn_black || movableFigure == FigureType::Pawn_white)
@@ -347,12 +350,40 @@ FigureType Map::GetFigureType(const Pos& pos) const
 
 bool Map::GetCastling(const Color& selectedColor) const
 {
-	return possibleCastling[to_underlying(selectedColor)];
+	return possibleCastling[to_underlying(selectedColor)] || possibleCastling[to_underlying(selectedColor) + 1];
 }
 
-void Map::SetCastling(const Color& selectedColor, bool value)
+bool Map::GetCastling(const Color& selectedColor, const Pos& selectedPos) const
 {
-	possibleCastling[to_underlying(selectedColor)] = value;
+	int kingCoeff = 2 * to_underlying(selectedColor);
+	if (selectedPos == Pos(0, 0))
+		return possibleCastling[kingCoeff];
+	if (selectedPos == Pos(7, 0))
+		return possibleCastling[kingCoeff + 1];
+	if (selectedPos == Pos(0, 7))
+		return possibleCastling[kingCoeff];
+	if (selectedPos == Pos(7, 7))
+		return possibleCastling[kingCoeff + 1];
+}
+
+void Map::SetCastling(const Color& selectedColor)
+{
+	int kingCoeff = 2 * to_underlying(selectedColor);
+	possibleCastling[kingCoeff] = false;
+	possibleCastling[kingCoeff + 1] = false;
+}
+
+void Map::SetCastling(const Color& selectedColor, const Pos& selectedPos)
+{
+	int kingCoeff = 2 * to_underlying(selectedColor);
+	if (selectedPos == Pos(0, 0))
+		possibleCastling[kingCoeff] = false;
+	if (selectedPos == Pos(7, 0))
+		possibleCastling[kingCoeff + 1] = false;
+	if (selectedPos == Pos(0, 7))
+		possibleCastling[kingCoeff] = false;
+	if (selectedPos == Pos(7, 7))
+		possibleCastling[kingCoeff + 1] = false;
 }
 
 int8_t Map::CheckEmpty(const Pos& from, const Pos& to) const

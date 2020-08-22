@@ -97,9 +97,10 @@ std::vector<Pos>& Figure::FindPossibleMovesKing(const Pos& coords)
 	{
 		int y = (ptrMap->GetColor(coords) == Color::White) ? 0 : 7;
 		std::vector<Pos> checkCastling;
-		if (ptrMap->CheckEmpty(coords, Pos(1, y)) == 1
-			&& ptrMap->CheckEmpty(coords, Pos(2, y)) == 1
-			&& ptrMap->CheckEmpty(coords, Pos(3, y)) == 1)
+		if (ptrMap->GetCastling(ptrMap->GetColor(coords), Pos(0, y)))
+			if (ptrMap->CheckEmpty(coords, Pos(1, y)) == 1
+				&& ptrMap->CheckEmpty(coords, Pos(2, y)) == 1
+				&& ptrMap->CheckEmpty(coords, Pos(3, y)) == 1)
 			{
 				checkCastling.push_back(Pos(3, y));
 				Map::PossibleMoves checkMoves;
@@ -112,8 +113,9 @@ std::vector<Pos>& Figure::FindPossibleMovesKing(const Pos& coords)
 					possibleMoves.push_back(Pos(2, y));
 				}
 			}
-		if (ptrMap->CheckEmpty(coords, Pos(6, y)) == 1
-			&& ptrMap->CheckEmpty(coords, Pos(5, y)) == 1)
+		if (ptrMap->GetCastling(ptrMap->GetColor(coords), Pos(7, y)))
+			if (ptrMap->CheckEmpty(coords, Pos(6, y)) == 1
+				&& ptrMap->CheckEmpty(coords, Pos(5, y)) == 1)
 			{
 				checkCastling.push_back(Pos(5, y));
 				Map::PossibleMoves checkMoves;
