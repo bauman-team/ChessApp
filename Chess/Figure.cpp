@@ -45,19 +45,19 @@ std::vector<Pos>& King::FindPossibleMoves()
 	Pos coords = ptrMap->GetFigurePosition(this), nextPosition;
 	for (int i = -1; i != 3; i += 2)
 	{
-		nextPosition = coords + Pos(0, i);
+		nextPosition = coords.AddToY(i);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords + Pos(i, i);
+		nextPosition = coords.AddToX(i).AddToY(i);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords + Pos(i, -i);
+		nextPosition = coords.AddToX(i).AddToY(-i);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords + Pos(i, 0);
+		nextPosition = coords.AddToX(i);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 	}
@@ -123,7 +123,7 @@ std::vector<Pos> Bishop::FindDiagonalMoves(Pos coords)
 		nextPosition = coords;
 		while (isChecking)
 		{
-			nextPosition = Pos(nextPosition.GetX() + (i == 0 || i == 1 ? 1 : -1), nextPosition.GetY() + (i == 0 || i == 2 ? 1 : -1)); // diagonal
+			nextPosition = nextPosition.AddToX(i == 0 || i == 1 ? 1 : -1).AddToY(i == 0 || i == 2 ? 1 : -1); // diagonal
 			if (ptrMap->CheckEmpty(coords, nextPosition))
 			{
 				moves.push_back(nextPosition);
@@ -152,19 +152,19 @@ std::vector<Pos>& Knight::FindPossibleMoves()
 	Pos coords = ptrMap->GetFigurePosition(this), nextPosition;
 	for (int i = -1, j = 2 * i; i != 3; i += 2)
 	{
-		nextPosition = coords + Pos(i, j);
+		nextPosition = coords.AddToX(i).AddToY(j);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords + Pos(i, -j);
+		nextPosition = coords.AddToX(i).AddToY(-j);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords + Pos(j, i);
+		nextPosition = coords.AddToX(j).AddToY(i);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords + Pos(j, -i);
+		nextPosition = coords.AddToX(-j).AddToY(i);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 	}
@@ -184,9 +184,9 @@ std::vector<Pos> Rook::FindStraightMoves(Pos coords)
 		while (isChecking)
 		{
 			if (i < 2) // at first along Ox
-				nextPosition = Pos(nextPosition.GetX() + (i == 0 ? 1 : -1), nextPosition.GetY());
+				nextPosition = nextPosition.AddToX(i == 0 ? 1 : -1);
 			else // Oy
-				nextPosition = Pos(nextPosition.GetX(), nextPosition.GetY() + (i == 2 ? 1 : -1));
+				nextPosition = nextPosition.AddToY(i == 2 ? 1 : -1);
 			if (ptrMap->CheckEmpty(coords, nextPosition))
 			{
 				moves.push_back(nextPosition);
@@ -213,22 +213,22 @@ std::vector<Pos>& Rook::FindPossibleMoves()
 std::vector<Pos>& Pawn::FindPossibleMoves()
 {
 	Pos coords = ptrMap->GetFigurePosition(this), nextPosition = coords;
-	nextPosition = Pos(nextPosition.GetX(), nextPosition.GetY() + (color == Color::Black ? -1 : 1)); // black go down | white go up
+	nextPosition = nextPosition.AddToY(color == Color::Black ? -1 : 1); // black go down | white go up
 	if (ptrMap->CheckEmpty(coords, nextPosition) == 1)
 	{
 		possibleMoves.push_back(nextPosition);
 		if (coords.GetY() == 1 && color == Color::White || coords.GetY() == 6 && color == Color::Black) // check for double move check position
 		{
-			nextPosition = Pos(nextPosition.GetX(), nextPosition.GetY() + (color == Color::Black ? -1 : 1));
+			nextPosition = nextPosition.AddToY(color == Color::Black ? -1 : 1);
 			if (ptrMap->CheckEmpty(coords, nextPosition) == 1)
 				possibleMoves.push_back(nextPosition);
 		}
 	}
 
-	nextPosition = Pos(coords.GetX() + 1, coords.GetY() + (color == Color::Black ? -1 : 1)); // if can eat
+	nextPosition = coords.AddToX(1).AddToY(color == Color::Black ? -1 : 1); // if can eat
 	if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
 		possibleMoves.push_back(nextPosition);
-	nextPosition = Pos(coords.GetX() - 1, coords.GetY() + (color == Color::Black ? -1 : 1));
+	nextPosition = coords.AddToX(-1).AddToY(color == Color::Black ? -1 : 1);
 	if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
 		possibleMoves.push_back(nextPosition);
 
