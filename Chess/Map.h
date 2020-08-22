@@ -6,26 +6,32 @@
 #include "MoveInfo.h"
 
 class Figure;
-class Rook;
+enum class FigureType;
 class MoveInfo;
 enum class Color;
 
 class Map
 {
-	Figure* map[64];
+	friend Figure; // delete this, King fuction need struct PossibleMoves
+	struct PossibleMoves
+	{
+		Pos *figurePosition;
+		std::vector<Pos> *possibleMoves;
+	};
+	uint64_t map[12]; // 12 type of figure
 	std::vector<MoveInfo> movesHistory;
-
+	std::vector<PossibleMoves> *figureWithAccessMoves;
+	bool possibleCastling[2];
 public:
 	Map(); 
 	Map(const Map&);
 
-	Figure* GetFigureAt(const Pos& pos) const;
-	Figure* GetFigureAt(int index) const;
-	Pos GetFigurePosition(Figure*) const;
+	std::vector<Pos>* GetPossibleMoves(const Pos&) const; // if moves is empty for selected position return nullptr
+	std::vector<PossibleMoves>& GetFigureWithAccessMoves() const { return *figureWithAccessMoves; }
 
-	void RunFindMoves(Figure* choseFigure);
-	bool RunMakeMove(Figure* choseFigure, Pos& nextPosition);
-	void RunClearPossibleMoves(const Color& activeColor);
+	void RunFindMoves(const Color& activeColor);
+	bool RunMakeMove(const Pos& previousPosition, const Pos& nextPosition);
+	void RunClearPossibleMoves();
 
 	void Move(const Pos& from, const Pos& to);
 	void SetToEmpty(const Pos& target);
@@ -33,7 +39,13 @@ public:
 	void Castling(const Pos& from, const Pos& to);
 
 	bool CheckingShah(const Pos& kingPos);
-	std::vector<Pos> CheckingPossibleMove(Pos, const std::vector<Pos>&);
+	void CheckingPossibleMove(PossibleMoves&);
+
+	Color GetColor(const Pos& pos) const;
+	FigureType GetFigureType(const Pos& pos) const;
+	bool GetCastling(const Color& selectedColor) const;
+
+	void SetCastling(const Color& selectedColor, bool value);
 
 	int8_t CheckEmpty(const Pos& from, const Pos& to) const;
 

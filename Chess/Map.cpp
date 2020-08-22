@@ -4,149 +4,150 @@
 
 Map::Map()
 {
-	map[0] = new Rook(Pos(0, 0), Color::White);
-	map[1] = new Knight(Pos(1, 0), Color::White);
-	map[2] = new Bishop(Pos(2, 0), Color::White);
-	map[3] = new Queen(Pos(3, 0), Color::White);
-	map[4] = new King(Pos(4, 0), Color::White);
-	map[5] = new Bishop(Pos(5, 0), Color::White);
-	map[6] = new Knight(Pos(6, 0), Color::White);
-	map[7] = new Rook(Pos(7, 0), Color::White);
-
-	for (int i = 8; i != 16; ++i)
-		map[i] = new Pawn(Pos(i % 8, 1), Color::White);
-
-	for (int i = 16; i != 48; ++i)
-		map[i] = new Empty(Pos(i % 8, i / 8));
-
-	for (int i = 48; i != 56; ++i)
-		map[i] = new Pawn(Pos(i % 8, 6), Color::Black);
-
-	map[56] = new Rook(Pos(0, 7), Color::Black);
-	map[57] = new Knight(Pos(1, 7), Color::Black);
-	map[58] = new Bishop(Pos(2, 7), Color::Black);
-	map[59] = new Queen(Pos(3, 7), Color::Black);
-	map[60] = new King(Pos(4, 7), Color::Black);
-	map[61] = new Bishop(Pos(5, 7), Color::Black);
-	map[62] = new Knight(Pos(6, 7), Color::Black);
-	map[63] = new Rook(Pos(7, 7), Color::Black);
+	map[to_underlying(FigureType::Rook_white)] = 129;
+	map[to_underlying(FigureType::Knight_white)] = 66;
+	map[to_underlying(FigureType::Bishop_white)] = 36;
+	map[to_underlying(FigureType::Queen_white)] = 8;
+	map[to_underlying(FigureType::King_white)] = 16;
+	map[to_underlying(FigureType::Pawn_white)] = 65'280;
+	map[to_underlying(FigureType::Rook_black)] = 9'295'429'630'892'703'744;
+	map[to_underlying(FigureType::Knight_black)] = 4'755'801'206'503'243'776;
+	map[to_underlying(FigureType::Bishop_black)] = 2'594'073'385'365'405'696;
+	map[to_underlying(FigureType::Queen_black)] = 576'460'752'303'423'488;
+	map[to_underlying(FigureType::King_black)] = 1'152'921'504'606'846'976;
+	map[to_underlying(FigureType::Pawn_black)] = 71'776'119'061'217'280;
+	possibleCastling[0] = true;
+	possibleCastling[1] = true;
+	figureWithAccessMoves = new std::vector<PossibleMoves>;
 }
 
 Map::Map(const Map& baseMap)
 {
-	for (int i = 0; i != 64; ++i)
+	for (int i = 0; i != 12; ++i)
+		map[i] = baseMap.map[i];
+	possibleCastling[0] = baseMap.possibleCastling[0];
+	possibleCastling[1] = baseMap.possibleCastling[1];
+	movesHistory = baseMap.movesHistory;
+	figureWithAccessMoves = baseMap.figureWithAccessMoves;
+}
+
+std::vector<Pos>* Map::GetPossibleMoves(const Pos& figurePosition) const
+{
+	if (!figureWithAccessMoves->empty())
 	{
-		if (baseMap.map[i]->GetType() == FigureType::Empty)
+		std::vector<PossibleMoves>::const_iterator it = figureWithAccessMoves->begin();
+		for (; it != figureWithAccessMoves->end(); ++it)
+			if (*(*it).figurePosition == figurePosition)
+				return (*it).possibleMoves;
+	}
+	return nullptr;
+}
+
+void Map::RunFindMoves(const Color& activeColor)
+{
+	PossibleMoves Moves;
+	for (int i = 0; i != 12; ++i)
+	{
+		if (Figure::GetFigureTypeColor((FigureType)i) == activeColor)
 		{
-			map[i] = new Empty(Pos(i % 8, i / 8));
-		}
-		else if (baseMap.map[i]->GetType() == FigureType::Pawn_black || baseMap.map[i]->GetType() == FigureType::Pawn_white)
-		{
-			map[i] = new Pawn(Pos(i % 8, i / 8), baseMap.map[i]->GetColor());
-		}
-		else if (baseMap.map[i]->GetType() == FigureType::Bishop_black || baseMap.map[i]->GetType() == FigureType::Bishop_white)
-		{
-			map[i] = new Bishop(Pos(i % 8, i / 8), baseMap.map[i]->GetColor());
-		} 
-		else if (baseMap.map[i]->GetType() == FigureType::Knight_black || baseMap.map[i]->GetType() == FigureType::Knight_white)
-		{
-			map[i] = new Knight(Pos(i % 8, i / 8), baseMap.map[i]->GetColor());
-		} 
-		else if (baseMap.map[i]->GetType() == FigureType::Rook_black || baseMap.map[i]->GetType() == FigureType::Rook_white)
-		{
-			map[i] = new Rook(Pos(i % 8, i / 8), baseMap.map[i]->GetColor());
-		} 
-		else if (baseMap.map[i]->GetType() == FigureType::Queen_black || baseMap.map[i]->GetType() == FigureType::Queen_white)
-		{
-			map[i] = new Queen(Pos(i % 8, i / 8), baseMap.map[i]->GetColor());
-		}
-		else
-		{
-			map[i] = new King(Pos(i % 8, i / 8), baseMap.map[i]->GetColor());
+			uint64_t j = 1;
+			while (j)
+			{
+				if (j & map[i])
+				{
+					Moves.figurePosition = &Pos::BitboardToPosition(j);
+					Moves.possibleMoves = &Figure::FindPossibleMoves((FigureType)i, *Moves.figurePosition); // for checking shah give numberOfFigures
+					CheckingPossibleMove(Moves);
+					figureWithAccessMoves->push_back(Moves);
+				}
+				j <<= 1;
+			}
 		}
 	}
+	int b;
 }
 
-Figure* Map::GetFigureAt(const Pos& pos) const
+bool Map::RunMakeMove(const Pos& previousPosition, const Pos& nextPosition)
 {
-	assert(pos.IsValid());
-	return map[pos.ToIndex()];
+	std::vector<PossibleMoves>::const_iterator it1 = figureWithAccessMoves->begin(), end1 = figureWithAccessMoves->end();
+	for (; it1 != end1; ++it1)
+		if (*(*it1).figurePosition == previousPosition)
+		{
+			std::vector<Pos>::const_iterator it2 = (*it1).possibleMoves->begin(), end2 = (*it1).possibleMoves->end();
+			for (; it2 != end2; ++it2)
+				if (*it2 == nextPosition)
+				{
+					Move(previousPosition, nextPosition);
+					return true;
+				}
+			return false;
+		}
+	return false;
 }
 
-Figure* Map::GetFigureAt(int index) const
+void Map::RunClearPossibleMoves()
 {
-	assert(index >= 0 && index <= 63);
-	return map[index];
-}
-
-Pos Map::GetFigurePosition(Figure* selectedFigure) const
-{
-	for (int i = 0; i != 64; ++i)
-		if (map[i] == selectedFigure)
-			return Pos(i % 8, i / 8);
-}
-
-void Map::RunFindMoves(Figure* selectedFigure)
-{
-	if (!selectedFigure->IsMovesFound())
-	{
-		std::vector<Pos> &possibleMoves = selectedFigure->FindPossibleMoves(); // for checking shah give numberOfFigures
-		possibleMoves = CheckingPossibleMove(GetFigurePosition(selectedFigure), possibleMoves);
-	}
-}
-
-bool Map::RunMakeMove(Figure* choseFigure, Pos& nextPosition)
-{
-	return choseFigure->MakeMoveTo(nextPosition);
-}
-
-void Map::RunClearPossibleMoves(const Color& activeColor)
-{
-	for (int i = 0; i < 64; ++i)
-	{
-		if (map[i]->GetColor() == activeColor)
-			map[i]->ClearPossibleMoves();
-	}
+	figureWithAccessMoves->clear();
 }
 
 void Map::Move(const Pos& from, const Pos& to)
 {
-	assert(from.IsValid() && to.IsValid());
-	MoveInfo info(from, to, map[from.ToIndex()]);
-	if (map[to.ToIndex()]->GetType() != FigureType::Empty)
+	FigureType movableFigure = GetFigureType(from), eatenFigure = GetFigureType(to);
+	MoveInfo info(from, to, movableFigure);
+	if (eatenFigure != FigureType::Empty)
 	{
-		info.SetEatenFigure(map[to.ToIndex()]);
+		info.SetEatenFigure(eatenFigure);
+		map[to_underlying(eatenFigure)] -= to.ToBitboard();
 		// TODO: decrease numOfFigures
 	}
-	map[to.ToIndex()] = map[from.ToIndex()];
-	map[from.ToIndex()] = new Empty(Pos(from));
+	map[to_underlying(movableFigure)] -= from.ToBitboard();
+	map[to_underlying(movableFigure)] += to.ToBitboard();
+	if (movableFigure == FigureType::King_black || movableFigure == FigureType::King_white)
+	{
+		possibleCastling[to_underlying(Figure::GetFigureTypeColor(movableFigure))] = false;
+		if (abs(from.GetX() - to.GetX()) == 2)
+			Castling(from, to);
+	}
+	else if (movableFigure == FigureType::Rook_black || movableFigure == FigureType::Rook_white)
+	{
+		//possibleCastling[to_underlying(Figure::GetFigureTypeColor(movableFigure))] = false;
+	}
+	else if (movableFigure == FigureType::Pawn_black || movableFigure == FigureType::Pawn_white)
+	{
+		bool isCaptureEnPassant = abs(from.GetX() - to.GetX()) == 1 && abs(from.GetY() - to.GetY()) == 1;
+		int lastCoordY = from.GetY();
+		if (eatenFigure == FigureType::Empty && isCaptureEnPassant)
+			SetToEmpty(Pos(from.GetX(), lastCoordY));
+		if (Figure::GetFigureTypeColor(movableFigure) == Color::Black && to.GetY() == 0 || Figure::GetFigureTypeColor(movableFigure) == Color::White && to.GetY() == 7)
+			PawnToQueen(to);
+	}
 	movesHistory.push_back(info);
 }
 
 void Map::SetToEmpty(const Pos& target)
 {
 	assert(target.IsValid());
-	movesHistory.back().SetEatenFigure(map[target.ToIndex()]);
-	map[target.ToIndex()] = new Empty(Pos(target));
+	FigureType eatenFigure = GetFigureType(target);
+	movesHistory.back().SetEatenFigure(eatenFigure);
+	map[to_underlying(eatenFigure)] -= target.ToBitboard();
 }
 
 void Map::PawnToQueen(const Pos& target)
 {
-	assert(target.IsValid());
-	Color pawnColor = map[target.ToIndex()]->GetColor();
-	Queen* newQueen = new Queen(Pos(target), pawnColor);
-	MoveInfo info(target, target, newQueen, map[target.ToIndex()]);
+	FigureType movableFigure = GetFigureType(target);
+	FigureType Queen = Figure::GetFigureTypeColor(movableFigure) == Color::White ? FigureType::Queen_white : FigureType::Queen_black;
+	MoveInfo info(target, target, Queen);
+	info.SetEatenFigure(movableFigure);
 	movesHistory.push_back(info);
-	map[target.ToIndex()] = newQueen;
+	map[to_underlying(movableFigure)] -= target.ToBitboard();
+	map[to_underlying(Queen)] += target.ToBitboard();
 }
 
 void Map::Castling(const Pos& from, const Pos& to)
 {
-	//assert(from.IsValid() && to.IsValid());
-	Move(from, to);
 	Pos rookFrom;
 	Pos rookTo;
-	int y = (map[to.ToIndex()]->GetColor() == Color::Black) ? 7 : 0;
+	int y = (GetColor(to) == Color::Black) ? 7 : 0;
 	if (from.GetX() > to.GetX())
 	{
 		rookFrom = Pos(0, y);
@@ -157,7 +158,7 @@ void Map::Castling(const Pos& from, const Pos& to)
 		rookFrom = Pos(7, y);
 		rookTo = Pos(5, y);
 	}
-	ChangeCoordsForCastling(*(Rook*)map[rookFrom.ToIndex()], rookTo);
+	//ChangeCoordsForCastling(*(Rook*)map[rookFrom.ToIndex()], rookTo);
 	Move(rookFrom, rookTo);
 }
 
@@ -192,10 +193,10 @@ bool Map::CheckingShah(const Pos& kingPos)
 				selectedPosition = kingPos.AddToX(x).AddToY(y);
 				if (selectedPosition.IsValid()) // over the edge of the map
 				{
-					selectedFigureType = GetFigureAt(selectedPosition)->GetType();
+					selectedFigureType = GetFigureType(selectedPosition);
 					if (selectedFigureType != FigureType::Empty)
 					{
-						if (GetFigureAt(selectedPosition)->GetColor() != GetFigureAt(kingPos)->GetColor()) // opponent figure 
+						if (GetColor(selectedPosition) != GetColor(kingPos)) // opponent figure 
 						{
 							if (selectedFigureType == FigureType::Queen_black || selectedFigureType == FigureType::Queen_white) // all
 								return true;
@@ -217,26 +218,26 @@ bool Map::CheckingShah(const Pos& kingPos)
 			} while (!isChecked);
 		}
 		// pawn
-		if (GetFigureAt(kingPos)->GetColor() == Color::White)
+		if (GetColor(kingPos) == Color::White)
 		{
 			selectedPosition = kingPos.AddToX(-1).AddToY(1);
 			if (selectedPosition.IsValid())
-				if (GetFigureAt(selectedPosition)->GetType() == FigureType::Pawn_black)
+				if (GetFigureType(selectedPosition) == FigureType::Pawn_black)
 					return true;
 			selectedPosition = kingPos.AddToX(1).AddToY(1);
 			if (selectedPosition.IsValid())
-				if (GetFigureAt(selectedPosition)->GetType() == FigureType::Pawn_black)
+				if (GetFigureType(selectedPosition) == FigureType::Pawn_black)
 					return true;
 		}
 		else
 		{
 			selectedPosition = kingPos.AddToX(-1).AddToY(-1);
 			if (selectedPosition.IsValid())
-				if (GetFigureAt(selectedPosition)->GetType() == FigureType::Pawn_white)
+				if (GetFigureType(selectedPosition) == FigureType::Pawn_white)
 					return true;
 			selectedPosition = kingPos.AddToX(1).AddToY(-1);
 			if (selectedPosition.IsValid())
-				if (GetFigureAt(selectedPosition)->GetType() == FigureType::Pawn_white)
+				if (GetFigureType(selectedPosition) == FigureType::Pawn_white)
 					return true;
 		}
 		// knight
@@ -244,23 +245,23 @@ bool Map::CheckingShah(const Pos& kingPos)
 		{
 			selectedPosition = kingPos.AddToX(i % 2 + 1).AddToY((i + 1) % 2 + 1);
 			if (selectedPosition.IsValid())
-				if (GetFigureAt(kingPos)->GetColor() != GetFigureAt(selectedPosition)->GetColor())
-					if (GetFigureAt(selectedPosition)->GetType() == FigureType::Knight_black || GetFigureAt(selectedPosition)->GetType() == FigureType::Knight_white)
+				if (GetColor(kingPos) != GetColor(selectedPosition))
+					if (GetFigureType(selectedPosition) == FigureType::Knight_black || GetFigureType(selectedPosition) == FigureType::Knight_white)
 						return true;
 			selectedPosition = kingPos.AddToX(-(i % 2 + 1)).AddToY((i + 1) % 2 + 1);
 			if (selectedPosition.IsValid())
-				if (GetFigureAt(kingPos)->GetColor() != GetFigureAt(selectedPosition)->GetColor())
-					if (GetFigureAt(selectedPosition)->GetType() == FigureType::Knight_black || GetFigureAt(selectedPosition)->GetType() == FigureType::Knight_white)
+				if (GetColor(kingPos) != GetColor(selectedPosition))
+					if (GetFigureType(selectedPosition) == FigureType::Knight_black || GetFigureType(selectedPosition) == FigureType::Knight_white)
 						return true;
 			selectedPosition = kingPos.AddToX(i % 2 + 1).AddToY(-((i + 1) % 2 + 1));
 			if (selectedPosition.IsValid())
-				if (GetFigureAt(kingPos)->GetColor() != GetFigureAt(selectedPosition)->GetColor())
-					if (GetFigureAt(selectedPosition)->GetType() == FigureType::Knight_black || GetFigureAt(selectedPosition)->GetType() == FigureType::Knight_white)
+				if (GetColor(kingPos) != GetColor(selectedPosition))
+					if (GetFigureType(selectedPosition) == FigureType::Knight_black || GetFigureType(selectedPosition) == FigureType::Knight_white)
 						return true;
 			selectedPosition = kingPos.AddToX(-(i % 2 + 1)).AddToY(-((i + 1) % 2 + 1));
 			if (selectedPosition.IsValid())
-				if (GetFigureAt(kingPos)->GetColor() != GetFigureAt(selectedPosition)->GetColor())
-					if (GetFigureAt(selectedPosition)->GetType() == FigureType::Knight_black || GetFigureAt(selectedPosition)->GetType() == FigureType::Knight_white)
+				if (GetColor(kingPos) != GetColor(selectedPosition))
+					if (GetFigureType(selectedPosition) == FigureType::Knight_black || GetFigureType(selectedPosition) == FigureType::Knight_white)
 						return true;
 		}
 		return false;
@@ -271,69 +272,95 @@ bool Map::CheckingShah(const Pos& kingPos)
 	}
 }
 
-std::vector<Pos> Map::CheckingPossibleMove(Pos figurePosition, const std::vector<Pos>& possibleMovesFind)
+void Map::CheckingPossibleMove(PossibleMoves& figureMoves)
 {
-	std::vector<Pos>::const_iterator it = possibleMovesFind.begin();
-	Figure* ptrMainFigure = GetFigureAt(figurePosition), *ptrSecondaryFigure;
-	Pos* kingPos = nullptr;
-	std::vector<Pos> possibleMovesChecked;
-	if (GetFigureAt(figurePosition)->GetType() == FigureType::King_black || GetFigureAt(figurePosition)->GetType() == FigureType::King_white)
+	if (!figureMoves.possibleMoves->empty())
 	{
-		kingPos = &figurePosition;
-	}
-	else
-	{
-		for (int i = 0; i != 64 && !kingPos; ++i)
-			if (map[i]->GetColor() == GetFigureAt(figurePosition)->GetColor() && (map[i]->GetType() == FigureType::King_black || map[i]->GetType() == FigureType::King_white))
-				kingPos = &GetFigurePosition(map[i]);
-	}
-	for (it; it != possibleMovesFind.end(); ++it)
-	{
-		ptrSecondaryFigure = GetFigureAt(*it);
-		map[(*it).ToIndex()] = ptrMainFigure;
-		if (ptrSecondaryFigure->GetType() == FigureType::Empty) // for method TO KING need to change coords of Figures
-		{
-			// change
-			map[figurePosition.ToIndex()] = ptrSecondaryFigure;
-			if (*kingPos == figurePosition)
-			{
-				if (!CheckingShah(*it))
-					possibleMovesChecked.push_back(*it);
-			}
-			else
-			{
-				if (!CheckingShah(*kingPos))
-					possibleMovesChecked.push_back(*it);
-			}
-		}
+		std::vector<Pos>::iterator it = figureMoves.possibleMoves->begin();
+		Pos* posMainFigure = figureMoves.figurePosition, posSecondaryFigure;
+		FigureType mainFigureType = GetFigureType(*posMainFigure);
+		uint64_t mainBitboard = posMainFigure->ToBitboard(), secondBitboard;
+		Pos* kingPos = nullptr;
+		std::vector<Pos> possibleMovesChecked;
+		if (mainFigureType == FigureType::King_black || mainFigureType == FigureType::King_white)
+			kingPos = posMainFigure;
 		else
+			kingPos = &Pos::BitboardToPosition(map[to_underlying(Figure::GetFigureTypeColor(mainFigureType) == Color::Black ? FigureType::King_black : FigureType::King_white)]);
+		for (it; it != figureMoves.possibleMoves->end(); ++it)
 		{
-			map[figurePosition.ToIndex()] = new Empty(figurePosition);
-			if (*kingPos == figurePosition)
+			posSecondaryFigure = *it;
+			secondBitboard = posSecondaryFigure.ToBitboard();
+			map[to_underlying(mainFigureType)] -= mainBitboard;
+			map[to_underlying(mainFigureType)] += secondBitboard;
+			if (GetFigureType(posSecondaryFigure) == FigureType::Empty)
 			{
-				if (!CheckingShah(*it))
-					possibleMovesChecked.push_back(*it);
+				if (*kingPos == *posMainFigure)
+				{
+					if (!CheckingShah(*it))
+						possibleMovesChecked.push_back(*it);
+				}
+				else
+				{
+					if (!CheckingShah(*kingPos))
+						possibleMovesChecked.push_back(*it);
+				}
 			}
 			else
 			{
-				if (!CheckingShah(*kingPos))
-					possibleMovesChecked.push_back(*it);
+				map[to_underlying(GetFigureType(posSecondaryFigure))] -= secondBitboard;
+				if (*kingPos == *posMainFigure)
+				{
+					if (!CheckingShah(*it))
+						possibleMovesChecked.push_back(*it);
+				}
+				else
+				{
+					if (!CheckingShah(*kingPos))
+						possibleMovesChecked.push_back(*it);
+				}
+				map[to_underlying(GetFigureType(posSecondaryFigure))] += secondBitboard;
 			}
-			delete map[figurePosition.ToIndex()];
+			map[to_underlying(mainFigureType)] += mainBitboard;
+			map[to_underlying(mainFigureType)] -= secondBitboard;
 		}
-		map[figurePosition.ToIndex()] = ptrMainFigure;
-		map[(*it).ToIndex()] = ptrSecondaryFigure;
+		figureMoves.possibleMoves = &possibleMovesChecked;
 	}
-	return possibleMovesChecked;
+}
+
+Color Map::GetColor(const Pos& pos) const
+{
+	FigureType selected = GetFigureType(pos);
+	if (selected != FigureType::Empty)
+		return Figure::GetFigureTypeColor(selected);
+	return Color::None;
+}
+
+FigureType Map::GetFigureType(const Pos& pos) const
+{
+	uint64_t bitboard = 1ULL << pos.ToIndex();
+	for (int i = 0; i != 12; ++i)
+		if (map[i] & bitboard)
+			return (FigureType)i;
+	return FigureType::Empty;
+}
+
+bool Map::GetCastling(const Color& selectedColor) const
+{
+	return possibleCastling[to_underlying(selectedColor)];
+}
+
+void Map::SetCastling(const Color& selectedColor, bool value)
+{
+	possibleCastling[to_underlying(selectedColor)] = value;
 }
 
 int8_t Map::CheckEmpty(const Pos& from, const Pos& to) const
 {
 	if (to.IsValid())
 	{
-		if (map[to.ToIndex()]->GetType() == FigureType::Empty)
+		if (GetFigureType(to) == FigureType::Empty)
 			return 1; // if Pos to is Empty
-		if (map[from.ToIndex()]->GetColor() != map[to.ToIndex()]->GetColor())
+		if (GetColor(from) != GetColor(to))
 			return 2; // if Pos contains the figure with opposite color
 	}
 	return 0; // if Pos contains the figure with same color or output border
@@ -349,7 +376,7 @@ std::vector<MoveInfo>& Map::GetMovesHistory()
 	return movesHistory;
 }
 
-void ChangeCoordsForCastling(Rook& selectedRook, Pos newCoords)
-{
-	selectedRook.possibleCastling = false;
-}
+//void ChangeCoordsForCastling(Rook& selectedRook, Pos newCoords)
+//{
+//	selectedRook.possibleCastling = false;
+//}

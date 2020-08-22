@@ -7,6 +7,7 @@ TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resour
 {
 	SetPlayers();
 	activePlayer = player1;
+	map.RunFindMoves(activePlayer->GetColor());
 }
 
 void TwoPlayersGame::Show()
@@ -25,14 +26,15 @@ void TwoPlayersGame::Show()
 
 void TwoPlayersGame::ChangeActivePlayer()
 {
-	map.RunClearPossibleMoves(activePlayer->GetColor());
+	map.RunClearPossibleMoves();
 	drawer.ShowMap(map);
 	drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
 	drawer.DisplayWindow();
-	sf::sleep(sf::seconds(2));
+	//sf::sleep(sf::seconds(2));
 
 	activePlayer = (activePlayer == player2) ? player1 : player2;
 	activePlayer->SetChosenPosition(nullptr);
+	map.RunFindMoves(activePlayer->GetColor());
 	drawer.RotateBoard();
 	activePlayer->StartTimer();
 	isWin = CheckGameFinal();
@@ -53,22 +55,16 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 			{
 				bool chosenPositionIsPossible = false;
 				if (activePlayer->GetChosenPosition() != nullptr && // if chosen position exists and
-					activePlayer->GetColor() != map.GetFigureAt(*position)->GetColor()) // position and activePlayer colors aren't same
+					activePlayer->GetColor() != map.GetColor(*position)) // position and activePlayer colors aren't same
 				{
-					if (map.RunMakeMove(map.GetFigureAt(*activePlayer->GetChosenPosition()), *position))
+					if (map.RunMakeMove(*activePlayer->GetChosenPosition(), *position))
 					{
 						chosenPositionIsPossible = true;
 						ChangeActivePlayer();
 					}
 				}
 				if (!chosenPositionIsPossible)
-				{
 					activePlayer->SetChosenPosition(position);
-					if (activePlayer->GetColor() == map.GetFigureAt(*position)->GetColor()) // if this figure is an active player
-					{
-						map.RunFindMoves(map.GetFigureAt(*position));
-					}
-				}
 			}
 		}
 	}
@@ -78,29 +74,21 @@ int8_t TwoPlayersGame::CheckGameFinal()
 {
 	Pos* kingPos = nullptr;
 	for (int i = 0; i != 64 && !kingPos; ++i)
-		if (map.GetFigureAt(i)->GetColor() == activePlayer->GetColor() && (map.GetFigureAt(i)->GetType() == FigureType::King_black || map.GetFigureAt(i)->GetType() == FigureType::King_white))
-			kingPos = &map.GetFigurePosition(map.GetFigureAt(i));
+		if (map.GetColor(Pos::IndexToPosition(i)) == activePlayer->GetColor() &&
+			(map.GetFigureType(Pos::IndexToPosition(i)) == FigureType::King_black ||
+			map.GetFigureType(Pos::IndexToPosition(i)) == FigureType::King_white))
+			kingPos = &Pos::IndexToPosition(i);
 	if (map.CheckingShah(*kingPos))
 	{
-		((King*)map.GetFigureAt(*kingPos))->SetCastling(false);
-		for (int i = 0; i != 64; ++i)
-			if (map.GetFigureAt(i)->GetColor() == activePlayer->GetColor())
-			{
-				map.RunFindMoves(map.GetFigureAt(i));
-				if (!map.GetFigureAt(i)->GetPossibleMoves().empty())
-					return 0;
-			}
+		map.SetCastling(activePlayer->GetColor(), false);
+		if (!map.GetFigureWithAccessMoves().empty())
+			return 0;
 		return 1;
 	}
 	else
 	{
-		for (int i = 0; i != 64; ++i)
-			if (map.GetFigureAt(i)->GetColor() == activePlayer->GetColor())
-			{
-				map.RunFindMoves(map.GetFigureAt(i));
-				if (!map.GetFigureAt(i)->GetPossibleMoves().empty())
-					return 0;
-			}
+		if (!map.GetFigureWithAccessMoves().empty())
+			return 0;
 		return 2;
 	}
 }

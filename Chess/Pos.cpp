@@ -15,10 +15,20 @@ Pos::Pos(uint8_t x, uint8_t y)
 	}
 }
 
-int8_t Pos::ToIndex() const
+uint8_t Pos::ToIndex() const
 {
 
 	return (xy & 15) * 8 + (xy >> 4);
+}
+
+uint64_t& Pos::ToBitboard() const
+{
+	uint64_t bitboard =  1;
+	for (int i = 0; i != GetY(); ++i)
+		bitboard <<= 8;
+	for (int i = 0; i != GetX(); ++i)
+		bitboard <<= 1;
+	return bitboard;
 }
 
 bool Pos::IsValid() const
@@ -32,7 +42,7 @@ Pos& Pos::operator=(const Pos& coords)
 	return *this;
 }
 
-Pos Pos::operator+(const Pos& coords)
+Pos Pos::operator+(const Pos& coords) const
 {
 	return Pos(xy + coords.xy);
 }
@@ -56,4 +66,25 @@ Pos& Pos::AddToX(int8_t x) const
 Pos& Pos::AddToY(int8_t y) const
 {
 	return *(new Pos((xy >> 4), (xy & 15) + y));
+}
+
+Pos& Pos::BitboardToPosition(uint64_t bitboard)
+{
+	uint8_t x = 0, y = 0;
+	while (bitboard > 128)
+	{
+		++y;
+		bitboard >>= 8;
+	}
+	while (bitboard > 1)
+	{
+		++x;
+		bitboard >>= 1;
+	}
+	return *(new Pos(x, y));
+}
+
+Pos& Pos::IndexToPosition(uint8_t index)
+{
+	return *(new Pos(index % 8, index / 8));
 }

@@ -34,100 +34,32 @@ class Player;
 
 class Figure
 {
-protected:
 	friend class Map;
-
 	static Map* ptrMap;
+	static std::vector<Pos>& FindPossibleMoves(const FigureType&, const Pos&);
+	static std::vector<Pos>& FindPossibleMovesKing(const Pos&);
+	static std::vector<Pos>& FindPossibleMovesQueen(const Pos&);
+	static std::vector<Pos>& FindPossibleMovesBishop(const Pos&);
+	static std::vector<Pos>& FindPossibleMovesKnight(const Pos&);
+	static std::vector<Pos>& FindPossibleMovesRook(const Pos&);
+	static std::vector<Pos>& FindPossibleMovesPawn(const Pos&);
 
-	const Color color;
-	FigureType type;
-	std::vector<Pos> possibleMoves;
-
-	bool movesFound;
-
-	void ClearPossibleMoves();
-	virtual bool MakeMoveTo(const Pos&);
-	virtual std::vector<Pos>& FindPossibleMoves() = 0;
-
-
+	static std::vector<Pos> FindStraightMoves(Pos coords);
+	static std::vector<Pos> FindDiagonalMoves(Pos coords);
 public:
+	static Color GetFigureTypeColor(const FigureType&);
+	/*
 	Figure(Pos _coords, Color _color) : color(_color), movesFound(false) {} 
-
 	bool IsMovesFound() const { return movesFound; }
 	FigureType GetType() const { return type; }
 	Color GetColor() const { return color; }
 	const std::vector<Pos>& GetPossibleMoves() const { return possibleMoves; }
+	*/
 	static void SetMapPtr(Map* _ptrMap) { ptrMap = _ptrMap; }
 };
 
 
-class Empty : public Figure
-{
-	virtual bool MakeMoveTo(const Pos&) override { return false; }
-	virtual std::vector<Pos>& FindPossibleMoves() override { return possibleMoves; }
-public:
-	Empty(Pos _coords);
-};
 
-
-class King : public Figure
-{
-	bool possibleCastling;
-
-	virtual bool MakeMoveTo(const Pos&) override;
-	virtual std::vector<Pos>& FindPossibleMoves() override; //
-public:
-	King(Pos _coords, Color _color);
-
-	void SetCastling(bool changeTo) { possibleCastling = changeTo; } // for king castling
-};
-
-
-class Queen : public Figure
-{
-	virtual std::vector<Pos>& FindPossibleMoves() override;
-public:
-	Queen(Pos _coords, Color _color);
-};
-
-
-class Bishop : public Figure
-{
-	virtual std::vector<Pos>& FindPossibleMoves() override;
-public:
-	Bishop(Pos _coords, Color _color);
-	static std::vector<Pos> FindDiagonalMoves(Pos coords);
-};
-
-
-class Knight : public Figure
-{
-	virtual std::vector<Pos>& FindPossibleMoves() override;
-public:
-	Knight(Pos _coords, Color _color);
-};
-
-
-class Rook : public Figure
-{
-	bool possibleCastling;
-
-	virtual bool MakeMoveTo(const Pos&) override;
-	virtual std::vector<Pos>& FindPossibleMoves() override;
-
-	friend void ChangeCoordsForCastling(Rook&, Pos newCoords);
-public:
-	Rook(Pos _coords, Color _color);
-
-	bool GetCastling() { return possibleCastling; } // for king castling
-	static std::vector<Pos> FindStraightMoves(Pos coords);
-};
-
-
-class Pawn : public Figure
-{
-	virtual bool MakeMoveTo(const Pos&) override;
-	virtual std::vector<Pos>& FindPossibleMoves() override;
-public:
-	Pawn(Pos _coords, Color _color);
-};
+// King setCastling, makemoveto
+// Rook getCastling, makemoveto, Change coords for castling
+// Pawn makemoveto

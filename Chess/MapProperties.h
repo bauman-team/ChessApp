@@ -1,5 +1,4 @@
 #pragma once
-//#include "Pos.h"
 #include <stdint.h>
 
 class MapProperties

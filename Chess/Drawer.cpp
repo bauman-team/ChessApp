@@ -65,7 +65,7 @@ void Drawer::ShowMap(const Map& map)
 	{
 		for (int i = 0; i != 8; ++i)
 		{
-			FigureType selectedFigure = map.GetFigureAt(Pos(i, j))->GetType();
+			FigureType selectedFigure = map.GetFigureType(Pos(i, j));
 			if (selectedFigure != FigureType::Empty)
 			{
 				Pos coeff = (isWhiteActive) ? Pos(i, 7 - j) : Pos(7 - i, j);
@@ -132,16 +132,20 @@ Pos* Drawer::TransformMousePosition(int mouseX, int mouseY) const
 	return nullptr;
 }
 
-void Drawer::ShowPossibleMoves(const Map& map, const Pos& chosenFigure)
+void Drawer::ShowPossibleMoves(const Map& map, const Pos& selectedFigure)
 {
-	std::vector<Pos>::const_iterator it = map.GetFigureAt(chosenFigure)->GetPossibleMoves().begin();
-	std::vector<Pos>::const_iterator end = map.GetFigureAt(chosenFigure)->GetPossibleMoves().end();
-	for (; it != end; ++it)
+	std::vector<Pos>* possiblePositions = map.GetPossibleMoves(selectedFigure);
+	if (possiblePositions)
 	{
-		Pos coeff = (isWhiteActive) ? Pos(it->GetX(), 7 - it->GetY()) : Pos(7 - it->GetX(), it->GetY());
-		circle.setPosition(mapProperties.GetPlayAreaTopLeftX() + (coeff.GetX() + 0.5) * mapProperties.GetSquareSize(),
-						   mapProperties.GetPlayAreaTopLeftY() + (coeff.GetY() + 0.5) * mapProperties.GetSquareSize());
-		window->draw(circle);
+		std::vector<Pos>::const_iterator it = possiblePositions->begin();
+		std::vector<Pos>::const_iterator end = possiblePositions->end();
+		for (; it != end; ++it)
+		{
+			Pos coeff = (isWhiteActive) ? Pos(it->GetX(), 7 - it->GetY()) : Pos(7 - it->GetX(), it->GetY());
+			circle.setPosition(mapProperties.GetPlayAreaTopLeftX() + (coeff.GetX() + 0.5) * mapProperties.GetSquareSize(),
+				mapProperties.GetPlayAreaTopLeftY() + (coeff.GetY() + 0.5) * mapProperties.GetSquareSize());
+			window->draw(circle);
+		}
 	}
 }
 
