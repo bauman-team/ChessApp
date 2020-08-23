@@ -29,8 +29,10 @@ Map::Map(const Map& baseMap)
 		map[i] = baseMap.map[i];
 	possibleCastling[0] = baseMap.possibleCastling[0];
 	possibleCastling[1] = baseMap.possibleCastling[1];
+	possibleCastling[2] = baseMap.possibleCastling[2];
+	possibleCastling[3] = baseMap.possibleCastling[3];
 	movesHistory = baseMap.movesHistory;
-	figureWithAccessMoves = baseMap.figureWithAccessMoves;
+	figureWithAccessMoves = new std::vector<PossibleMoves>;
 }
 
 std::vector<Pos>* Map::GetPossibleMoves(const Pos& figurePosition) const
