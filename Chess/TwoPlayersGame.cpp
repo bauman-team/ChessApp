@@ -16,10 +16,10 @@ void TwoPlayersGame::Show()
 	drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
 	if (activePlayer->HasTime())
 	{
-		if (activePlayer->GetChosenPosition() != nullptr)
+		if (activePlayer->GetChosenPosition() != Pos::NULL_POS)
 		{
-			drawer.ShowActiveFigure(map, *activePlayer->GetChosenPosition());
-			drawer.ShowPossibleMoves(map, *activePlayer->GetChosenPosition());
+			drawer.ShowActiveFigure(map, activePlayer->GetChosenPosition());
+			drawer.ShowPossibleMoves(map, activePlayer->GetChosenPosition());
 		}
 	}
 }
@@ -33,7 +33,7 @@ void TwoPlayersGame::ChangeActivePlayer()
 	//sf::sleep(sf::seconds(2));
 
 	activePlayer = (activePlayer == player2) ? player1 : player2;
-	activePlayer->SetChosenPosition(nullptr);
+	activePlayer->SetChosenPosition(Pos::NULL_POS);
 	map.RunFindMoves(activePlayer->GetColor());
 	drawer.RotateBoard();
 	activePlayer->StartTimer();
@@ -54,23 +54,24 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 			if (position->IsValid()) // if position is correct
 			{
 				bool chosenPositionIsPossible = false;
-				if (activePlayer->GetChosenPosition() != nullptr && // if chosen position exists and
+				if (activePlayer->GetChosenPosition() != Pos::NULL_POS && // if chosen position exists and
 					activePlayer->GetColor() != map.GetColor(*position)) // position and activePlayer colors aren't same
 				{
-					if (map.RunMakeMove(*activePlayer->GetChosenPosition(), *position))
+					if (map.RunMakeMove(activePlayer->GetChosenPosition(), *position))
 					{
 						chosenPositionIsPossible = true;
 						ChangeActivePlayer();
 					}
 				}
 				if (!chosenPositionIsPossible)
-					activePlayer->SetChosenPosition(position);
+					activePlayer->SetChosenPosition(*position);
 			}
+			delete position;
 		}
 	}
 }
 
-int8_t TwoPlayersGame::CheckGameFinal()
+int8_t TwoPlayersGame::CheckGameFinal() // TODO: add enum {shah, mate, pat, ...}
 {
 	Pos* kingPos = nullptr;
 	for (int i = 0; i != 64 && !kingPos; ++i)

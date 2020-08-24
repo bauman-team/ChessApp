@@ -15,14 +15,14 @@ public:
 	uint64_t& ToBitboard() const;
 	bool IsValid() const;
 
-	Pos operator+(const Pos& coords) const;
 	Pos& operator=(const Pos& coords);
-	Pos& operator*=(float value);
 	bool operator==(const Pos& coords) const;
+	bool operator!=(const Pos& coords) const;
 
-	Pos& AddToX(int8_t) const; // don't change count, only return
-	Pos& AddToY(int8_t) const; // don't change count, only return
+	Pos Add(int8_t x, int8_t y) const;
 
 	static Pos& BitboardToPosition(uint64_t);
-	static Pos& IndexToPosition(uint8_t);
+	static Pos IndexToPosition(uint8_t);
+
+	const static Pos NULL_POS;
 };

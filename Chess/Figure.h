@@ -36,6 +36,7 @@ class Figure
 {
 	friend class Map;
 	static Map* ptrMap;
+
 	static std::vector<Pos>& FindPossibleMoves(const FigureType&, const Pos&);
 	static std::vector<Pos>& FindPossibleMovesKing(const Pos&);
 	static std::vector<Pos>& FindPossibleMovesQueen(const Pos&);
@@ -44,8 +45,8 @@ class Figure
 	static std::vector<Pos>& FindPossibleMovesRook(const Pos&);
 	static std::vector<Pos>& FindPossibleMovesPawn(const Pos&);
 
-	static std::vector<Pos> FindStraightMoves(Pos coords);
-	static std::vector<Pos> FindDiagonalMoves(Pos coords);
+	static std::vector<Pos> FindStraightMoves(const Pos& coords);
+	static std::vector<Pos> FindDiagonalMoves(const Pos& coords);
 public:
 	static Color GetFigureTypeColor(const FigureType&);
 	/*

@@ -23,7 +23,7 @@ void Game::Save()
 	Pos posAfter;
 	out << "   \n";
 	int numberOfMoves = movesHistory.size();
-	for (int i = 0; i != numberOfMoves; ++i)
+	for (int i = 0; i < numberOfMoves; ++i)
 	{
 		posBefore = movesHistory[i].GetPosBeforeMove();
 		posAfter = movesHistory[i].GetPosAfterMove();

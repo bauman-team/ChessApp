@@ -2,7 +2,6 @@
 #include "Figure.h"
 #include "Pos.h"
 #include <vector>
-#include <stack>
 #include "MoveInfo.h"
 
 class Figure;
@@ -26,7 +25,7 @@ public:
 	Map(); 
 	Map(const Map&);
 
-	std::vector<Pos>* GetPossibleMoves(const Pos&) const; // if moves is empty for selected position return nullptr
+	const std::vector<Pos>* GetPossibleMoves(const Pos&) const; // if moves is empty for selected position return nullptr
 	std::vector<PossibleMoves>& GetFigureWithAccessMoves() const { return *figureWithAccessMoves; }
 
 	void RunFindMoves(const Color& activeColor);
@@ -54,4 +53,9 @@ public:
 	MoveInfo* GetLastMoveInfo();
 
 	std::vector<MoveInfo>& GetMovesHistory();
+
+	~Map()
+	{
+		delete figureWithAccessMoves;
+	}
 };

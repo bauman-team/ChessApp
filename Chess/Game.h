@@ -26,4 +26,6 @@ public:
 
 	void StartGame();
 	void Save();
+
+	virtual ~Game(){}
 };

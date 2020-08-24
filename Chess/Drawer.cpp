@@ -140,7 +140,7 @@ Pos* Drawer::TransformMousePosition(int mouseX, int mouseY) const
 
 void Drawer::ShowPossibleMoves(const Map& map, const Pos& selectedFigure)
 {
-	std::vector<Pos>* possiblePositions = map.GetPossibleMoves(selectedFigure);
+	const std::vector<Pos>* possiblePositions = map.GetPossibleMoves(selectedFigure);
 	if (possiblePositions)
 	{
 		std::vector<Pos>::const_iterator it = possiblePositions->begin();

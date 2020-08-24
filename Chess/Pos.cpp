@@ -1,29 +1,26 @@
 #include "Pos.h"
 
+const Pos Pos::NULL_POS(-1, -1);
+
 Pos::Pos(uint8_t x, uint8_t y)
 {
-	xy = 0;
+	xy = 255;
 	if (x < 16 && x >= 0 && y < 16 && y >= 0)
 	{
 		xy = x;
 		xy <<= 4;
 		xy |= y;
 	}
-	else
-	{
-		xy = 255;
-	}
 }
 
 uint8_t Pos::ToIndex() const
 {
-
 	return (xy & 15) * 8 + (xy >> 4);
 }
 
 uint64_t& Pos::ToBitboard() const
 {
-	uint64_t bitboard =  1;
+	uint64_t bitboard = 1;
 	for (int i = 0; i != GetY(); ++i)
 		bitboard <<= 8;
 	for (int i = 0; i != GetX(); ++i)
@@ -42,30 +39,19 @@ Pos& Pos::operator=(const Pos& coords)
 	return *this;
 }
 
-Pos Pos::operator+(const Pos& coords) const
-{
-	return Pos(xy + coords.xy);
-}
-
-Pos& Pos::operator*=(float value)
-{
-	*this = Pos((xy >> 4) * value, (xy & 15) * value);
-	return *this;
-}
-
 bool Pos::operator==(const Pos& coords) const
 {
 	return xy == coords.xy;
 }
 
-Pos& Pos::AddToX(int8_t x) const
+bool Pos::operator!=(const Pos& coords) const
 {
-	return *(new Pos((xy >> 4) + x, (xy & 15)));
+	return xy != coords.xy;
 }
 
-Pos& Pos::AddToY(int8_t y) const
+Pos Pos::Add(int8_t x, int8_t y) const
 {
-	return *(new Pos((xy >> 4), (xy & 15) + y));
+	return Pos((xy >> 4) + x, (xy & 15) + y);
 }
 
 Pos& Pos::BitboardToPosition(uint64_t bitboard)
@@ -84,7 +70,7 @@ Pos& Pos::BitboardToPosition(uint64_t bitboard)
 	return *(new Pos(x, y));
 }
 
-Pos& Pos::IndexToPosition(uint8_t index)
+Pos Pos::IndexToPosition(uint8_t index)
 {
-	return *(new Pos(index % 8, index / 8));
+	return Pos(index % 8, index / 8);
 }

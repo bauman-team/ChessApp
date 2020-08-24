@@ -2,7 +2,7 @@
 
 Map* Figure::ptrMap = nullptr;
 
-std::vector<Pos> Figure::FindDiagonalMoves(Pos coords)
+std::vector<Pos> Figure::FindDiagonalMoves(const Pos& coords)
 {
 	std::vector<Pos> moves;
 	Pos nextPosition;
@@ -13,7 +13,7 @@ std::vector<Pos> Figure::FindDiagonalMoves(Pos coords)
 		nextPosition = coords;
 		while (isChecking)
 		{
-			nextPosition = nextPosition.AddToX(i == 0 || i == 1 ? 1 : -1).AddToY(i == 0 || i == 2 ? 1 : -1); // diagonal 
+			nextPosition = nextPosition.Add((i == 0 || i == 1 ? 1 : -1), (i == 0 || i == 2 ? 1 : -1)); // diagonal 
 			if (ptrMap->CheckEmpty(coords, nextPosition))
 			{
 				moves.push_back(nextPosition);
@@ -77,19 +77,19 @@ std::vector<Pos>& Figure::FindPossibleMovesKing(const Pos& coords)
 	std::vector<Pos>& possibleMoves = *(new std::vector<Pos>);
 	for (int i = -1; i != 3; i += 2)
 	{
-		nextPosition = coords.AddToY(i);
+		nextPosition = coords.Add(0, i);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords.AddToX(i).AddToY(i);
+		nextPosition = coords.Add(i, i);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords.AddToX(i).AddToY(-i);
+		nextPosition = coords.Add(i, -i);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords.AddToX(i);
+		nextPosition = coords.Add(i, 0);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 	}
@@ -136,8 +136,7 @@ std::vector<Pos>& Figure::FindPossibleMovesQueen(const Pos& coords)
 {
 	std::vector<Pos>& possibleMoves = *(new std::vector<Pos>);
 	possibleMoves = FindStraightMoves(coords);
-	std::vector<Pos> moreMoves;
-	moreMoves = FindDiagonalMoves(coords); // TODO: fix bug with empty vector exception
+	std::vector<Pos> moreMoves = FindDiagonalMoves(coords); // TODO: fix bug with empty vector exception
 	possibleMoves.insert(possibleMoves.end(), moreMoves.begin(), moreMoves.end());
 	return possibleMoves;
 }
@@ -155,19 +154,19 @@ std::vector<Pos>& Figure::FindPossibleMovesKnight(const Pos& coords)
 	std::vector<Pos>& possibleMoves = *(new std::vector<Pos>);
 	for (int i = -1, j = 2 * i; i != 3; i += 2, j = 2 * i)
 	{
-		nextPosition = coords.AddToX(i).AddToY(j);
+		nextPosition = coords.Add(i, j);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords.AddToX(i).AddToY(-j);
+		nextPosition = coords.Add(i, -j);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords.AddToX(j).AddToY(i);
+		nextPosition = coords.Add(j, i);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords.AddToX(-j).AddToY(i);
+		nextPosition = coords.Add(-j, i);
 		if (ptrMap->CheckEmpty(coords, nextPosition))
 			possibleMoves.push_back(nextPosition);
 	}
@@ -186,22 +185,22 @@ std::vector<Pos>& Figure::FindPossibleMovesPawn(const Pos& coords)
 	Pos nextPosition = coords;
 	std::vector<Pos>& possibleMoves = *(new std::vector<Pos>);
 	Color color = ptrMap->GetColor(coords);
-	nextPosition = nextPosition.AddToY(color == Color::Black ? -1 : 1); // black go down | white go up
+	nextPosition = nextPosition.Add(0, color == Color::Black ? -1 : 1); // black go down | white go up
 	if (ptrMap->CheckEmpty(coords, nextPosition) == 1)
 	{
 		possibleMoves.push_back(nextPosition);
 		if (coords.GetY() == 1 && color == Color::White || coords.GetY() == 6 && color == Color::Black) // check for double move check position
 		{
-			nextPosition = nextPosition.AddToY(color == Color::Black ? -1 : 1);
+			nextPosition = nextPosition.Add(0, color == Color::Black ? -1 : 1);
 			if (ptrMap->CheckEmpty(coords, nextPosition) == 1)
 				possibleMoves.push_back(nextPosition);
 		}
 	}
 
-	nextPosition = coords.AddToX(1).AddToY(color == Color::Black ? -1 : 1); // if can eat
+	nextPosition = coords.Add(1, color == Color::Black ? -1 : 1); // if can eat
 	if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
 		possibleMoves.push_back(nextPosition);
-	nextPosition = coords.AddToX(-1).AddToY(color == Color::Black ? -1 : 1);
+	nextPosition = coords.Add(-1, color == Color::Black ? -1 : 1);
 	if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
 		possibleMoves.push_back(nextPosition);
 
@@ -220,7 +219,7 @@ std::vector<Pos>& Figure::FindPossibleMovesPawn(const Pos& coords)
 	return possibleMoves;
 }
 
-std::vector<Pos> Figure::FindStraightMoves(Pos coords)
+std::vector<Pos> Figure::FindStraightMoves(const Pos& coords)
 {
 	std::vector<Pos> moves;
 	Pos nextPosition;
@@ -232,9 +231,9 @@ std::vector<Pos> Figure::FindStraightMoves(Pos coords)
 		while (isChecking)
 		{
 			if (i < 2) // at first along Ox
-				nextPosition = nextPosition.AddToX(i == 0 ? 1 : -1);
+				nextPosition = nextPosition.Add((i == 0 ? 1 : -1), 0);
 			else // Oy
-				nextPosition = nextPosition.AddToY(i == 2 ? 1 : -1);
+				nextPosition = nextPosition.Add(0, (i == 2 ? 1 : -1));
 			if (ptrMap->CheckEmpty(coords, nextPosition))
 			{
 				moves.push_back(nextPosition);
@@ -249,4 +248,3 @@ std::vector<Pos> Figure::FindStraightMoves(Pos coords)
 	}
 	return moves;
 }
-

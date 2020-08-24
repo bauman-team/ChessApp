@@ -14,15 +14,15 @@ class Player
 	const Color color;
 	const std::string name;
 	sf::Time remainingTime;
-	static Pos* chosenPos;
+	Pos chosenPos;
 	int numOfFigures;
 	bool timeIsUp;
 public:
 	Player(Color _color, std::string _name, sf::Time timeLimit);
 
 	int DecreaseNumOfFigures() { return --numOfFigures; }
-	void SetChosenPosition(Pos* position) { chosenPos = position; }
-	Pos* GetChosenPosition() const { return chosenPos; }
+	void SetChosenPosition(Pos position) { chosenPos = position; }
+	const Pos& GetChosenPosition() const { return chosenPos; }
 	Color GetColor() const { return color; }
 
 	void StartTimer();

@@ -35,12 +35,12 @@ Map::Map(const Map& baseMap)
 	figureWithAccessMoves = new std::vector<PossibleMoves>;
 }
 
-std::vector<Pos>* Map::GetPossibleMoves(const Pos& figurePosition) const
+const std::vector<Pos>* Map::GetPossibleMoves(const Pos& figurePosition) const
 {
 	if (!figureWithAccessMoves->empty())
 	{
-		std::vector<PossibleMoves>::const_iterator it = figureWithAccessMoves->begin();
-		for (; it != figureWithAccessMoves->end(); ++it)
+		std::vector<PossibleMoves>::const_iterator it = figureWithAccessMoves->begin(), end = figureWithAccessMoves->end();
+		for (; it != end; ++it)
 			if (*(*it).figurePosition == figurePosition)
 				return (*it).possibleMoves;
 	}
@@ -49,7 +49,6 @@ std::vector<Pos>* Map::GetPossibleMoves(const Pos& figurePosition) const
 
 void Map::RunFindMoves(const Color& activeColor)
 {
-	PossibleMoves Moves;
 	for (int i = 0; i != 12; ++i)
 	{
 		if (Figure::GetFigureTypeColor((FigureType)i) == activeColor)
@@ -59,6 +58,7 @@ void Map::RunFindMoves(const Color& activeColor)
 			{
 				if (j & map[i])
 				{
+					PossibleMoves Moves;
 					Moves.figurePosition = &Pos::BitboardToPosition(j);
 					Moves.possibleMoves = &Figure::FindPossibleMoves((FigureType)i, *Moves.figurePosition); // for checking shah give numberOfFigures
 					CheckingPossibleMove(Moves);
@@ -69,7 +69,6 @@ void Map::RunFindMoves(const Color& activeColor)
 			}
 		}
 	}
-	int b;
 }
 
 bool Map::RunMakeMove(const Pos& previousPosition, const Pos& nextPosition)
@@ -92,6 +91,15 @@ bool Map::RunMakeMove(const Pos& previousPosition, const Pos& nextPosition)
 
 void Map::RunClearPossibleMoves()
 {
+	if (!figureWithAccessMoves->empty())
+	{
+		std::vector<PossibleMoves>::const_iterator it = figureWithAccessMoves->begin(), end = figureWithAccessMoves->end();
+		for (; it != end; ++it)
+		{
+			delete (*it).figurePosition;
+			delete (*it).possibleMoves;
+		}
+	}
 	figureWithAccessMoves->clear();
 }
 
@@ -196,7 +204,7 @@ bool Map::CheckingShah(const Pos& kingPos)
 					++y;
 				else if (i == 2 || i == 3 || i == 4)
 					--y;
-				selectedPosition = kingPos.AddToX(x).AddToY(y);
+				selectedPosition = kingPos.Add(x, y);
 				if (selectedPosition.IsValid()) // over the edge of the map
 				{
 					selectedFigureType = GetFigureType(selectedPosition);
@@ -226,22 +234,22 @@ bool Map::CheckingShah(const Pos& kingPos)
 		// pawn
 		if (GetColor(kingPos) == Color::White)
 		{
-			selectedPosition = kingPos.AddToX(-1).AddToY(1);
+			selectedPosition = kingPos.Add(-1, 1);
 			if (selectedPosition.IsValid())
 				if (GetFigureType(selectedPosition) == FigureType::Pawn_black)
 					return true;
-			selectedPosition = kingPos.AddToX(1).AddToY(1);
+			selectedPosition = kingPos.Add(1, 1);
 			if (selectedPosition.IsValid())
 				if (GetFigureType(selectedPosition) == FigureType::Pawn_black)
 					return true;
 		}
 		else
 		{
-			selectedPosition = kingPos.AddToX(-1).AddToY(-1);
+			selectedPosition = kingPos.Add(-1, -1);
 			if (selectedPosition.IsValid())
 				if (GetFigureType(selectedPosition) == FigureType::Pawn_white)
 					return true;
-			selectedPosition = kingPos.AddToX(1).AddToY(-1);
+			selectedPosition = kingPos.Add(1, -1);
 			if (selectedPosition.IsValid())
 				if (GetFigureType(selectedPosition) == FigureType::Pawn_white)
 					return true;
@@ -249,22 +257,22 @@ bool Map::CheckingShah(const Pos& kingPos)
 		// knight
 		for (int i = 0; i != 2; ++i)
 		{
-			selectedPosition = kingPos.AddToX(i % 2 + 1).AddToY((i + 1) % 2 + 1);
+			selectedPosition = kingPos.Add((i % 2 + 1), ((i + 1) % 2 + 1));
 			if (selectedPosition.IsValid())
 				if (GetColor(kingPos) != GetColor(selectedPosition))
 					if (GetFigureType(selectedPosition) == FigureType::Knight_black || GetFigureType(selectedPosition) == FigureType::Knight_white)
 						return true;
-			selectedPosition = kingPos.AddToX(-(i % 2 + 1)).AddToY((i + 1) % 2 + 1);
+			selectedPosition = kingPos.Add(-(i % 2 + 1), ((i + 1) % 2 + 1));
 			if (selectedPosition.IsValid())
 				if (GetColor(kingPos) != GetColor(selectedPosition))
 					if (GetFigureType(selectedPosition) == FigureType::Knight_black || GetFigureType(selectedPosition) == FigureType::Knight_white)
 						return true;
-			selectedPosition = kingPos.AddToX(i % 2 + 1).AddToY(-((i + 1) % 2 + 1));
+			selectedPosition = kingPos.Add((i % 2 + 1), -((i + 1) % 2 + 1));
 			if (selectedPosition.IsValid())
 				if (GetColor(kingPos) != GetColor(selectedPosition))
 					if (GetFigureType(selectedPosition) == FigureType::Knight_black || GetFigureType(selectedPosition) == FigureType::Knight_white)
 						return true;
-			selectedPosition = kingPos.AddToX(-(i % 2 + 1)).AddToY(-((i + 1) % 2 + 1));
+			selectedPosition = kingPos.Add(-(i % 2 + 1), -((i + 1) % 2 + 1));
 			if (selectedPosition.IsValid())
 				if (GetColor(kingPos) != GetColor(selectedPosition))
 					if (GetFigureType(selectedPosition) == FigureType::Knight_black || GetFigureType(selectedPosition) == FigureType::Knight_white)
@@ -352,19 +360,15 @@ FigureType Map::GetFigureType(const Pos& pos) const
 
 bool Map::GetCastling(const Color& selectedColor) const
 {
-	return possibleCastling[to_underlying(selectedColor)] || possibleCastling[to_underlying(selectedColor) + 1];
+	return possibleCastling[to_underlying(selectedColor)] || possibleCastling[to_underlying(selectedColor) + 1]; // why ||
 }
 
 bool Map::GetCastling(const Color& selectedColor, const Pos& selectedPos) const
 {
 	int kingCoeff = 2 * to_underlying(selectedColor);
-	if (selectedPos == Pos(0, 0))
+	if (selectedPos == Pos(0, 0) || selectedPos == Pos(0, 7))
 		return possibleCastling[kingCoeff];
-	if (selectedPos == Pos(7, 0))
-		return possibleCastling[kingCoeff + 1];
-	if (selectedPos == Pos(0, 7))
-		return possibleCastling[kingCoeff];
-	if (selectedPos == Pos(7, 7))
+	if (selectedPos == Pos(7, 0) || selectedPos == Pos(7, 7))
 		return possibleCastling[kingCoeff + 1];
 }
 
@@ -378,13 +382,9 @@ void Map::SetCastling(const Color& selectedColor)
 void Map::SetCastling(const Color& selectedColor, const Pos& selectedPos)
 {
 	int kingCoeff = 2 * to_underlying(selectedColor);
-	if (selectedPos == Pos(0, 0))
+	if (selectedPos == Pos(0, 0) || selectedPos == Pos(0, 7))
 		possibleCastling[kingCoeff] = false;
-	if (selectedPos == Pos(7, 0))
-		possibleCastling[kingCoeff + 1] = false;
-	if (selectedPos == Pos(0, 7))
-		possibleCastling[kingCoeff] = false;
-	if (selectedPos == Pos(7, 7))
+	if (selectedPos == Pos(7, 0) || selectedPos == Pos(7, 7))
 		possibleCastling[kingCoeff + 1] = false;
 }
 

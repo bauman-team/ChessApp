@@ -1,10 +1,11 @@
 #include "Player.h"
 
-Pos* Player::chosenPos = nullptr;
+//Pos* Player::chosenPos = nullptr;
 
 Player::Player(Color _color, std::string _name, sf::Time timeLimit) : color(_color), name(_name), remainingTime(timeLimit), timeIsUp(false)
 {
 	 numOfFigures = 16;
+	 chosenPos = Pos::NULL_POS;
 }
 
 void Player::StartTimer()

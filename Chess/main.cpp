@@ -65,5 +65,6 @@ int main()
 		}
 		window.display();
 	}
+	delete game;
 	return EXIT_SUCCESS;
 }
