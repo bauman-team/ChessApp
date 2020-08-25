@@ -43,7 +43,7 @@ int main()
 				window.close();
 				break;
 			case sf::Event::MouseButtonPressed:
-				if (game->GetStatus() == GameStatus::Play && event.mouseButton.button == sf::Mouse::Left)
+				if ((game->GetStatus() == GameStatus::Play || game->GetStatus() == GameStatus::Shah) && event.mouseButton.button == sf::Mouse::Left)
 				{
 					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 					game->SetPlayerChosenCell(mousePos.x, mousePos.y);
@@ -60,6 +60,9 @@ int main()
 			menu.Show();
 			break;
 		case GameStatus::Play:
+			game->Show();
+			break;
+		default:
 			game->Show();
 			break;
 		}
