@@ -35,6 +35,11 @@ void TwoPlayersGame::ChangeActivePlayer()
 
 	activePlayer = (activePlayer == player2) ? player1 : player2;
 	activePlayer->SetChosenPosition(Pos::NULL_POS);
+	/*for (int i = 0; i != 80000; ++i)
+	{
+		map.RunFindMoves(activePlayer->GetColor());
+		map.RunClearPossibleMoves();
+	}*/
 	map.RunFindMoves(activePlayer->GetColor());
 	drawer.RotateBoard();
 	if (isTimeLimited)
