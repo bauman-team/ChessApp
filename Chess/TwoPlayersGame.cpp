@@ -3,17 +3,13 @@
 #include <iostream>
 
 TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
-	: Game(window, resource, properties)
-{
-	SetPlayers();
-	activePlayer = player1;
-	map.RunFindMoves(activePlayer->GetColor());
-}
+	: Game(window, resource, properties), isTimeLimited(false) {}
 
 void TwoPlayersGame::Show()
 {
 	drawer.ShowMap(map);
-	drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
+	if (isTimeLimited)
+		drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
 	if (activePlayer->HasTime())
 	{
 		if (activePlayer->GetChosenPosition() != Pos::NULL_POS)
@@ -22,13 +18,18 @@ void TwoPlayersGame::Show()
 			drawer.ShowPossibleMoves(map, activePlayer->GetChosenPosition());
 		}
 	}
+	else
+	{
+		status = GameStatus::TimeIsOver;
+	}
 }
 
 void TwoPlayersGame::ChangeActivePlayer()
 {
 	map.RunClearPossibleMoves();
 	drawer.ShowMap(map);
-	drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
+	if (isTimeLimited)
+		drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
 	drawer.DisplayWindow();
 	//sf::sleep(sf::seconds(2));
 
@@ -36,8 +37,9 @@ void TwoPlayersGame::ChangeActivePlayer()
 	activePlayer->SetChosenPosition(Pos::NULL_POS);
 	map.RunFindMoves(activePlayer->GetColor());
 	drawer.RotateBoard();
-	activePlayer->StartTimer();
-	isWin = CheckGameFinal();
+	if (isTimeLimited)
+		activePlayer->StartTimer();
+	status = CheckGameFinal();
 }
 
 void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
@@ -71,7 +73,7 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 	}
 }
 
-int8_t TwoPlayersGame::CheckGameFinal() // TODO: add enum {shah, mate, pat, ...}
+GameStatus TwoPlayersGame::CheckGameFinal()
 {
 	Pos* kingPos = nullptr;
 	for (int i = 0; i != 64 && !kingPos; ++i)
@@ -83,19 +85,30 @@ int8_t TwoPlayersGame::CheckGameFinal() // TODO: add enum {shah, mate, pat, ...}
 	{
 		map.SetCastling(activePlayer->GetColor(), false);
 		if (!map.GetFigureWithAccessMoves().empty())
-			return 0;
-		return 1;
+			return GameStatus::Shah;
+		return GameStatus::Mat;
 	}
 	else
 	{
 		if (!map.GetFigureWithAccessMoves().empty())
-			return 0;
-		return 2;
+			return GameStatus::Play;
+		return GameStatus::Pat;
 	}
+}
+
+void TwoPlayersGame::StartGame()
+{
+	Game::StartGame();
+	map.RunFindMoves(activePlayer->GetColor());
+	if (isTimeLimited)
+		activePlayer->StartTimer();
 }
 
 void TwoPlayersGame::SetPlayers(std::string name1, std::string name2, sf::Time timeLimit)
 {
+	if (timeLimit != sf::seconds(0))
+		isTimeLimited = true;
 	player1 = new Player(Color::White, name1, timeLimit);
 	player2 = new Player(Color::Black, name2, timeLimit);
+	activePlayer = player1;
 }

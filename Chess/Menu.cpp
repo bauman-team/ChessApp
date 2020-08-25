@@ -33,8 +33,15 @@ void Menu::PrestartChecks()
 			errorMessage = "Enter different names for players!";
 		else
 		{
-			static_cast<TwoPlayersGame*>(game)->SetPlayers(firstName, secondName);
-			// TODO: set time if timer was activated, start timer only after call StartGame()
+			if (gui.get<tgui::CheckBox>("TimerCheckBox")->isChecked())
+			{
+				int timeLimit = gui.get<tgui::Slider>("TimeSlider")->getValue() * 60;
+				static_cast<TwoPlayersGame*>(game)->SetPlayers(firstName, secondName, sf::seconds(timeLimit));
+			}
+			else
+			{
+				static_cast<TwoPlayersGame*>(game)->SetPlayers(firstName, secondName);
+			}
 			game->StartGame();
 		}
 

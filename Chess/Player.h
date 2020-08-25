@@ -11,12 +11,15 @@ enum class Color;
 class Player
 {
 	sf::Clock clock;
-	const Color color;
-	const std::string name;
 	sf::Time remainingTime;
+	bool timeIsUp;
+
+	const Color color;
+	std::string name;
+
 	Pos chosenPos;
 	int numOfFigures;
-	bool timeIsUp;
+	
 public:
 	Player(Color _color, std::string _name, sf::Time timeLimit);
 
@@ -27,5 +30,5 @@ public:
 
 	void StartTimer();
 	sf::Time GetRemainingTime();
-	bool HasTime() const { return !timeIsUp; }
+	bool HasTime() const { return !timeIsUp; } // if time isn't limited, return true
 };

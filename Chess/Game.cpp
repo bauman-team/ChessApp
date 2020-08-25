@@ -5,7 +5,6 @@ Game::Game(sf::RenderWindow* window, const Resources& resource, const MapPropert
 	: drawer(window, resource, properties)
 {
 	Figure::SetMapPtr(&map);
-	isWin = 0;
 	status = GameStatus::Menu;
 }
 

@@ -4,27 +4,26 @@
 #include "Pos.h"
 #include "MoveInfo.h"
 
-enum class GameStatus { Menu, Play };
+enum class GameStatus { Menu, Play, Shah, Mat, Pat, TimeIsOver };
 
 class Game
 {
 protected:
 	Drawer drawer;
 	Map map;
-	int8_t isWin;
 	GameStatus status;
+
+	GameStatus virtual CheckGameFinal() = 0;
 public:
 	Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties);
 
+	void virtual StartGame();
 	void virtual Show() = 0;
 	void virtual ChangeActivePlayer() = 0;
 	void virtual SetPlayerChosenCell(int, int) = 0;
-	int8_t virtual CheckGameFinal() = 0;
 
-	int8_t GetIsWin() const { return isWin; }
 	GameStatus GetStatus() const { return status; }
 
-	void StartGame();
 	void Save();
 
 	virtual ~Game(){}
