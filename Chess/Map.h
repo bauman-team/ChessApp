@@ -41,6 +41,7 @@ public:
 	void CheckingPossibleMove(PossibleMoves&);
 
 	Color GetColor(const Pos& pos) const;
+	Color GetColor(const FigureType type) const;
 	FigureType GetFigureType(const Pos& pos) const;
 	bool GetCastling(const Color& selectedColor) const;
 	bool GetCastling(const Color& selectedColor, const Pos& selectedPos) const;

@@ -64,6 +64,11 @@ void Map::RunFindMoves(const Color& activeColor)
 					CheckingPossibleMove(Moves);
 					if (!Moves.possibleMoves->empty())
 						figureWithAccessMoves->push_back(Moves);
+					else
+					{
+						delete Moves.figurePosition;
+						delete Moves.possibleMoves;
+					}
 				}
 				j <<= 1;
 			}
@@ -91,14 +96,11 @@ bool Map::RunMakeMove(const Pos& previousPosition, const Pos& nextPosition)
 
 void Map::RunClearPossibleMoves()
 {
-	if (!figureWithAccessMoves->empty())
+	std::vector<PossibleMoves>::const_iterator it = figureWithAccessMoves->begin(), end = figureWithAccessMoves->end();
+	for (; it != end; ++it)
 	{
-		std::vector<PossibleMoves>::const_iterator it = figureWithAccessMoves->begin(), end = figureWithAccessMoves->end();
-		for (; it != end; ++it)
-		{
-			delete (*it).figurePosition;
-			delete (*it).possibleMoves;
-		}
+		delete (*it).figurePosition;
+		delete (*it).possibleMoves;
 	}
 	figureWithAccessMoves->clear();
 }
@@ -180,6 +182,7 @@ bool Map::CheckingShah(const Pos& kingPos)
 {
 	if (true) // numOfFigures
 	{ // high // method FROM KING
+		Color kingColor = GetColor(kingPos);
 		Pos selectedPosition;
 		bool isChecked;
 		FigureType selectedFigureType; // 8 directions
@@ -210,7 +213,7 @@ bool Map::CheckingShah(const Pos& kingPos)
 					selectedFigureType = GetFigureType(selectedPosition);
 					if (selectedFigureType != FigureType::Empty)
 					{
-						if (GetColor(selectedPosition) != GetColor(kingPos)) // opponent figure 
+						if (GetColor(selectedFigureType) != kingColor) // opponent figure 
 						{
 							if (selectedFigureType == FigureType::Queen_black || selectedFigureType == FigureType::Queen_white) // all
 								return true;
@@ -232,7 +235,7 @@ bool Map::CheckingShah(const Pos& kingPos)
 			} while (!isChecked);
 		}
 		// pawn
-		if (GetColor(kingPos) == Color::White)
+		if (kingColor == Color::White)
 		{
 			selectedPosition = kingPos.Add(-1, 1);
 			if (selectedPosition.IsValid())
@@ -255,28 +258,44 @@ bool Map::CheckingShah(const Pos& kingPos)
 					return true;
 		}
 		// knight
+		FigureType type;
 		for (int i = 0; i != 2; ++i)
 		{
 			selectedPosition = kingPos.Add((i % 2 + 1), ((i + 1) % 2 + 1));
 			if (selectedPosition.IsValid())
-				if (GetColor(kingPos) != GetColor(selectedPosition))
-					if (GetFigureType(selectedPosition) == FigureType::Knight_black || GetFigureType(selectedPosition) == FigureType::Knight_white)
+			{
+				type = GetFigureType(selectedPosition);
+				if (type == FigureType::Knight_black || type == FigureType::Knight_white)
+					if (kingColor != GetColor(type))
 						return true;
+			}
+
 			selectedPosition = kingPos.Add(-(i % 2 + 1), ((i + 1) % 2 + 1));
 			if (selectedPosition.IsValid())
-				if (GetColor(kingPos) != GetColor(selectedPosition))
-					if (GetFigureType(selectedPosition) == FigureType::Knight_black || GetFigureType(selectedPosition) == FigureType::Knight_white)
+			{
+				type = GetFigureType(selectedPosition);
+				if (type == FigureType::Knight_black || type == FigureType::Knight_white)
+					if (kingColor != GetColor(type))
 						return true;
+			}
+
 			selectedPosition = kingPos.Add((i % 2 + 1), -((i + 1) % 2 + 1));
 			if (selectedPosition.IsValid())
-				if (GetColor(kingPos) != GetColor(selectedPosition))
-					if (GetFigureType(selectedPosition) == FigureType::Knight_black || GetFigureType(selectedPosition) == FigureType::Knight_white)
+			{
+				type = GetFigureType(selectedPosition);
+				if (type == FigureType::Knight_black || type == FigureType::Knight_white)
+					if (kingColor != GetColor(type))
 						return true;
+			}
+
 			selectedPosition = kingPos.Add(-(i % 2 + 1), -((i + 1) % 2 + 1));
 			if (selectedPosition.IsValid())
-				if (GetColor(kingPos) != GetColor(selectedPosition))
-					if (GetFigureType(selectedPosition) == FigureType::Knight_black || GetFigureType(selectedPosition) == FigureType::Knight_white)
+			{
+				type = GetFigureType(selectedPosition);
+				if (type == FigureType::Knight_black || type == FigureType::Knight_white)
+					if (kingColor != GetColor(type))
 						return true;
+			}
 		}
 		return false;
 	}
@@ -290,33 +309,43 @@ void Map::CheckingPossibleMove(PossibleMoves& figureMoves)
 {
 	if (!figureMoves.possibleMoves->empty())
 	{
-		std::vector<Pos>::iterator it = figureMoves.possibleMoves->begin();
 		Pos* posMainFigure = figureMoves.figurePosition;
 		FigureType mainFigureType = GetFigureType(*posMainFigure), secondaryFigureType;
 		uint64_t mainBitboard = posMainFigure->ToBitboard(), secondBitboard;
+
 		Pos* kingPos = nullptr;
-		std::vector<Pos> &possibleMovesChecked = *(new std::vector<Pos>);
+		bool deleteKingPtr = false;
 		if (mainFigureType == FigureType::King_black || mainFigureType == FigureType::King_white)
 			kingPos = posMainFigure;
 		else
+		{
 			kingPos = &Pos::BitboardToPosition(map[to_underlying(Figure::GetFigureTypeColor(mainFigureType) == Color::Black ? FigureType::King_black : FigureType::King_white)]);
-		for (it; it != figureMoves.possibleMoves->end(); ++it)
+			deleteKingPtr = true;
+		}
+
+		std::vector<Pos>::iterator it = figureMoves.possibleMoves->begin();
+		uint8_t mainFigureIndex = to_underlying(mainFigureType);
+		for (; it != figureMoves.possibleMoves->end();)
 		{
 			secondaryFigureType = GetFigureType(*it);
 			secondBitboard = (*it).ToBitboard();
-			map[to_underlying(mainFigureType)] -= mainBitboard;
-			map[to_underlying(mainFigureType)] += secondBitboard;
+			map[mainFigureIndex] -= mainBitboard;
+			map[mainFigureIndex] += secondBitboard;
 			if (secondaryFigureType == FigureType::Empty)
 			{
 				if (*kingPos == *posMainFigure)
 				{
-					if (!CheckingShah(*it))
-						possibleMovesChecked.push_back(*it);
+					if (CheckingShah(*it))
+						it = figureMoves.possibleMoves->erase(it);
+					else
+						++it;
 				}
 				else
 				{
-					if (!CheckingShah(*kingPos))
-						possibleMovesChecked.push_back(*it);
+					if (CheckingShah(*kingPos))
+						it = figureMoves.possibleMoves->erase(it);
+					else
+						++it;
 				}
 			}
 			else
@@ -324,28 +353,40 @@ void Map::CheckingPossibleMove(PossibleMoves& figureMoves)
 				map[to_underlying(secondaryFigureType)] -= secondBitboard;
 				if (*kingPos == *posMainFigure)
 				{
-					if (!CheckingShah(*it))
-						possibleMovesChecked.push_back(*it);
+					if (CheckingShah(*it))
+						it = figureMoves.possibleMoves->erase(it);
+					else
+						++it;
 				}
 				else
 				{
-					if (!CheckingShah(*kingPos))
-						possibleMovesChecked.push_back(*it);
+					if (CheckingShah(*kingPos))
+						it = figureMoves.possibleMoves->erase(it);
+					else
+						++it;
 				}
 				map[to_underlying(secondaryFigureType)] += secondBitboard;
 			}
-			map[to_underlying(mainFigureType)] += mainBitboard;
-			map[to_underlying(mainFigureType)] -= secondBitboard;
+			map[mainFigureIndex] += mainBitboard;
+			map[mainFigureIndex] -= secondBitboard;
 		}
-		figureMoves.possibleMoves = &possibleMovesChecked;
+		if (deleteKingPtr)
+			delete kingPos;
 	}
 }
 
 Color Map::GetColor(const Pos& pos) const
 {
-	FigureType selected = GetFigureType(pos);
-	if (selected != FigureType::Empty)
-		return Figure::GetFigureTypeColor(selected);
+	FigureType type = GetFigureType(pos);
+	if (type != FigureType::Empty)
+		return Figure::GetFigureTypeColor(type);
+	return Color::None;
+}
+
+Color Map::GetColor(const FigureType type) const
+{
+	if (type != FigureType::Empty)
+		return Figure::GetFigureTypeColor(type);
 	return Color::None;
 }
 

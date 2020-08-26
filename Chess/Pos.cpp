@@ -5,11 +5,12 @@ const Pos Pos::NULL_POS(-1, -1);
 Pos::Pos(uint8_t x, uint8_t y)
 {
 	xy = 255;
-	if (x < 16 && x >= 0 && y < 16 && y >= 0)
+	if (x < 8 && x >= 0 && y < 8 && y >= 0) // 16???
 	{
-		xy = x;
+		xy = (x << 4) | y;
+		/*xy = x;
 		xy <<= 4;
-		xy |= y;
+		xy |= y;*/
 	}
 }
 
@@ -30,7 +31,8 @@ uint64_t& Pos::ToBitboard() const
 
 bool Pos::IsValid() const
 {
-	return ((xy >> 4) >= 0 && (xy >> 4) <= 7 && (xy & 15) >= 0 && (xy & 15) <= 7);
+	return (xy != 255);
+	//return ((xy >> 4) >= 0 && (xy >> 4) <= 7 && (xy & 15) >= 0 && (xy & 15) <= 7);
 }
 
 Pos& Pos::operator=(const Pos& coords)

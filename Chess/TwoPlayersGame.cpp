@@ -35,6 +35,15 @@ void TwoPlayersGame::ChangeActivePlayer()
 
 	activePlayer = (activePlayer == player2) ? player1 : player2;
 	activePlayer->SetChosenPosition(Pos::NULL_POS);
+
+	/*sf::Clock clock;
+	for (int i = 0; i < 90000; ++i)
+	{
+		map.RunFindMoves(activePlayer->GetColor());
+		map.RunClearPossibleMoves();
+	}
+	sf::Time time = clock.getElapsedTime();*/
+
 	map.RunFindMoves(activePlayer->GetColor());
 	drawer.RotateBoard();
 	if (isTimeLimited)
