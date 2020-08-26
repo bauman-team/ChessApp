@@ -126,14 +126,13 @@ void Map::Move(const Pos& from, const Pos& to)
 	else if (movableFigure == FigureType::Rook_black || movableFigure == FigureType::Rook_white)
 	{
 		SetCastling(Figure::GetFigureTypeColor(movableFigure), from);
-		//possibleCastling[to_underlying(Figure::GetFigureTypeColor(movableFigure))] = false;
 	}
 	else if (movableFigure == FigureType::Pawn_black || movableFigure == FigureType::Pawn_white)
 	{
 		bool isCaptureEnPassant = abs(from.GetX() - to.GetX()) == 1 && abs(from.GetY() - to.GetY()) == 1;
 		int lastCoordY = from.GetY();
 		if (eatenFigure == FigureType::Empty && isCaptureEnPassant)
-			SetToEmpty(Pos(from.GetX(), lastCoordY));
+			SetToEmpty(Pos(to.GetX(), lastCoordY));
 		if (Figure::GetFigureTypeColor(movableFigure) == Color::Black && to.GetY() == 0 || Figure::GetFigureTypeColor(movableFigure) == Color::White && to.GetY() == 7)
 			PawnToQueen(to);
 	}
@@ -174,7 +173,6 @@ void Map::Castling(const Pos& from, const Pos& to)
 		rookFrom = Pos(7, y);
 		rookTo = Pos(5, y);
 	}
-	//ChangeCoordsForCastling(*(Rook*)map[rookFrom.ToIndex()], rookTo);
 	Move(rookFrom, rookTo);
 }
 
