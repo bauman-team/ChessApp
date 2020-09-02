@@ -2,6 +2,7 @@
 #include "Figure.h"
 #include <iostream>
 
+
 TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
 	: Game(window, resource, properties), isTimeLimited(false) {}
 
@@ -37,10 +38,16 @@ void TwoPlayersGame::ChangeActivePlayer()
 	activePlayer->SetChosenPosition(Pos::NULL_POS);
 
 	/*sf::Clock clock;
-	for (int i = 0; i < 90000; ++i)
+	std::atomic<int> crucialCount = 0;
+	int countOfThreads = 50, i = 0;
+	while (crucialCount != countOfThreads)
 	{
-		map.RunFindMoves(activePlayer->GetColor());
-		map.RunClearPossibleMoves();
+		for (; i != countOfThreads; ++i)
+		{
+			Map *copy = new Map(map);
+			std::thread th(SpeedTestingOnProcessorThread, std::ref(*copy), activePlayer->GetColor(), 20000, std::ref(crucialCount));
+			th.detach();
+		}
 	}
 	sf::Time time = clock.getElapsedTime();*/
 
