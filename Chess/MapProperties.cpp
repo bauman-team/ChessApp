@@ -2,10 +2,11 @@
 
 MapProperties::MapProperties(const MapProperties& copy)
 {
-	gameWindowSize = copy.gameWindowSize;
+	gameWindowHeight = copy.gameWindowHeight;
 	playAreaTopLeftX = copy.playAreaTopLeftX;
 	playAreaTopLeftY = copy.playAreaTopLeftY;
 	squareSize = copy.squareSize;
+	sideMenuWidth = copy.sideMenuWidth;
 }
 
 void MapProperties::SetPlayAreaTopLeft(uint8_t _playAreaTopLeftX, uint8_t _playAreaTopLeftY)
@@ -14,9 +15,14 @@ void MapProperties::SetPlayAreaTopLeft(uint8_t _playAreaTopLeftX, uint8_t _playA
 	playAreaTopLeftY = _playAreaTopLeftY; 
 }
 
-void MapProperties::SetGameWindowSize(int windowSize)
+void MapProperties::SetGameWindowHeight(int windowHeight)
 {
-	gameWindowSize = windowSize;
+	gameWindowHeight = windowHeight;
+}
+
+void MapProperties::SetSideMenuWidth(int menuWidth)
+{
+	sideMenuWidth = menuWidth;
 }
 
 void MapProperties::SetScale(float scale)

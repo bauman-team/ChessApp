@@ -24,6 +24,9 @@ class Drawer
 public:
 	Drawer(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties);
 
+	sf::Vector2u GetSideMenuSize() const;
+	int GetSizeMenuTopLeftX() const;
+
 	void ShowMap(const Map& map);
 	void ShowTimer(sf::Time time, Color activeColor);
 	void ShowActiveFigure(const Map&, const Pos&);

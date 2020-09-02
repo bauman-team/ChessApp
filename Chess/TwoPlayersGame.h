@@ -1,4 +1,5 @@
 #pragma once
+#include <TGUI/TGUI.hpp>
 #include "Game.h"
 #include "Player.h"
 #include "Resources.h"

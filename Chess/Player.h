@@ -25,8 +25,10 @@ public:
 
 	int DecreaseNumOfFigures() { return --numOfFigures; }
 	void SetChosenPosition(Pos position) { chosenPos = position; }
+
 	const Pos& GetChosenPosition() const { return chosenPos; }
 	Color GetColor() const { return color; }
+	std::string GetName() const { return name; }
 
 	void StartTimer();
 	sf::Time GetRemainingTime();
