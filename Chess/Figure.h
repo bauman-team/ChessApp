@@ -49,18 +49,5 @@ class Figure
 	static std::vector<Pos> FindDiagonalMoves(const Pos& coords);
 public:
 	static Color GetFigureTypeColor(const FigureType&);
-	/*
-	Figure(Pos _coords, Color _color) : color(_color), movesFound(false) {} 
-	bool IsMovesFound() const { return movesFound; }
-	FigureType GetType() const { return type; }
-	Color GetColor() const { return color; }
-	const std::vector<Pos>& GetPossibleMoves() const { return possibleMoves; }
-	*/
 	static void SetMapPtr(Map* _ptrMap) { ptrMap = _ptrMap; }
 };
-
-
-
-// King setCastling, makemoveto
-// Rook getCastling, makemoveto, Change coords for castling
-// Pawn makemoveto

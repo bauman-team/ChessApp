@@ -448,8 +448,3 @@ std::vector<MoveInfo>& Map::GetMovesHistory()
 {
 	return movesHistory;
 }
-
-//void ChangeCoordsForCastling(Rook& selectedRook, Pos newCoords)
-//{
-//	selectedRook.possibleCastling = false;
-//}

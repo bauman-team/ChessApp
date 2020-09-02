@@ -5,6 +5,8 @@
 #include "Resources.h"
 #include "Map.h"
 #include <string>
+#include <thread>
+#include <atomic>
 
 class TwoPlayersGame : public Game
 {
@@ -36,4 +38,17 @@ public:
 		delete player1;
 		delete player2;
 	}
+
+	// Methods for testing
+	static void SpeedTestingOnProcessorThread(Map &map, Color activeColor, int count, std::atomic<int> &crucialCount);
 };
+
+inline void TwoPlayersGame::SpeedTestingOnProcessorThread(Map &map, Color activeColor, int count, std::atomic<int> &crucialCount)
+{
+	for (int i = 0; i < count; ++i)
+	{
+		map.RunFindMoves(activeColor);
+		map.RunClearPossibleMoves();
+	}
+	++crucialCount;
+}
