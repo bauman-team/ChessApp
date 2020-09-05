@@ -53,9 +53,9 @@ void TwoPlayersGame::ChangeActivePlayer()
 
 	map.RunFindMoves(activePlayer->GetColor());
 	drawer.RotateBoard();
+	status = CheckGameFinal();
 	if (isTimeLimited)
 		activePlayer->StartTimer();
-	status = CheckGameFinal();
 }
 
 void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)

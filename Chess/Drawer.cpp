@@ -23,6 +23,16 @@ Drawer::Drawer(sf::RenderWindow* _window, const Resources& resource, const MapPr
 	square.setOutlineColor(sf::Color::Yellow);
 }
 
+sf::Vector2u Drawer::GetSideMenuSize() const
+{
+	return sf::Vector2u(mapProperties.GetSideMenuWidth(), mapProperties.GetGameWindowHeight());
+}
+
+int Drawer::GetSizeMenuTopLeftX() const
+{
+	return mapProperties.GetGameWindowHeight(); // because board height = board width
+}
+
 void Drawer::SetResources(const Resources& resource)
 {
 	mapTexture.loadFromFile(resource.GetPathToMapImage());
@@ -40,7 +50,7 @@ void Drawer::SetResources(const Resources& resource)
 
 void Drawer::SetScale()
 {
-	float mapScale = (float)mapProperties.GetGameWindowSize() / mapTexture.getSize().x;
+	float mapScale = (float)mapProperties.GetGameWindowHeight() / mapTexture.getSize().x;
 	float figureScale = mapScale * (float)mapProperties.GetSquareSize() / figuresTextures[0].getSize().x;
 
 	mapSprite.setScale(mapScale, mapScale); // set the mapSprite size to the window size
@@ -123,7 +133,7 @@ void Drawer::RotateBoard()
 void Drawer::ResizeWindowForGame()
 {
 	// using create() because setSize() works incorrectly
-	window->create(sf::VideoMode(mapProperties.GetGameWindowSize(), mapProperties.GetGameWindowSize()), "Chess");
+	window->create(sf::VideoMode(mapProperties.GetGameWindowHeight() + mapProperties.GetSideMenuWidth(), mapProperties.GetGameWindowHeight()), "Chess");
 }
 
 Pos* Drawer::TransformMousePosition(int mouseX, int mouseY) const

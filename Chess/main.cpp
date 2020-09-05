@@ -26,7 +26,8 @@ int main()
 	MapProperties prop;
 	prop.SetPlayAreaTopLeft(60, 60);
 	prop.SetSquareSize(100);
-	prop.SetGameWindowSize(920);
+	prop.SetGameWindowHeight(920);
+	prop.SetSideMenuWidth(300);
 
 	//Game* game = new TwoPlayersGame(&window, res, prop);
 	Game* game = new PlayerWithAIGame(&window, res, prop);
@@ -50,6 +51,10 @@ int main()
 					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 					game->SetPlayerChosenCell(mousePos.x, mousePos.y);
 				}
+				break;
+			case sf::Event::KeyPressed:
+				if (game->GetStatus() == GameStatus::Menu && event.key.code == sf::Keyboard::Enter)
+					menu.PrestartChecks();
 				break;
 			}
 			if (game->GetStatus() == GameStatus::Menu)

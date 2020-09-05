@@ -7,7 +7,6 @@ class Menu
 	tgui::Gui gui;
 	Game* game;
 
-	void PrestartChecks();
 	void SetConnections();
 	void LoadIcons();
 
@@ -23,5 +22,6 @@ public:
 	Menu(sf::RenderWindow& window, Game* _game, std::string widgetsFile);
 
 	void Show();
+	void PrestartChecks();
 	void HandleEvent(sf::Event& event);
 };

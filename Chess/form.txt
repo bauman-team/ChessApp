@@ -227,6 +227,7 @@ EditBox.FirstPlayerName {
     MaximumCharacters = 15;
     Position = (265, 330);
     Size = (150, 22);
+    Text = Player1;
     TextSize = 13;
     TextWidthLimited = true;
     Visible = false;
@@ -238,6 +239,7 @@ EditBox.SecondPlayerName {
     MaximumCharacters = 15;
     Position = (500, 330);
     Size = (140, 22);
+    Text = Player2;
     TextSize = 13;
     TextWidthLimited = true;
     Visible = false;
