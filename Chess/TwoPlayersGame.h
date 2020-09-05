@@ -9,7 +9,7 @@
 
 class TwoPlayersGame : public Game
 {
-	
+protected:
 	Player* player1;
 	Player* player2;
 	Player* activePlayer;

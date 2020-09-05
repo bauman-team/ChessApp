@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "TwoPlayersGame.h"
+#include "PlayerWithAIGame.h"
 #include "Menu.h"
 
 int main()
@@ -27,7 +28,8 @@ int main()
 	prop.SetSquareSize(100);
 	prop.SetGameWindowSize(920);
 
-	Game* game = new TwoPlayersGame(&window, res, prop);
+	//Game* game = new TwoPlayersGame(&window, res, prop);
+	Game* game = new PlayerWithAIGame(&window, res, prop);
 	Menu menu(window, game, "form.txt");
 
 	while (window.isOpen())
