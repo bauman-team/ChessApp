@@ -7,6 +7,8 @@
 #include <string>
 #include <thread>
 #include <atomic>
+#include <ctime>
+#include <cstdlib>
 
 class TwoPlayersGame : public Game
 {
@@ -25,7 +27,7 @@ public:
 	void virtual Show() override;
 	void virtual ChangeActivePlayer() override;
 
-	void virtual SetPlayerChosenCell(int, int) override;
+	bool virtual SetPlayerChosenCell(int, int) override;
 
 	void virtual StartGame() override;
 

@@ -33,6 +33,10 @@ int main()
 	Game* game = new PlayerWithAIGame(&window, res, prop);
 	Menu menu(window, game, "form.txt");
 
+	std::thread *thSetCell = nullptr;
+	bool thSetCellIsFinished = true;
+	
+	//((PlayerWithAIGame*)game)->output();
 	while (window.isOpen())
 	{
 		window.clear(sf::Color::White);
@@ -49,7 +53,13 @@ int main()
 				if ((game->GetStatus() == GameStatus::Play || game->GetStatus() == GameStatus::Shah) && event.mouseButton.button == sf::Mouse::Left)
 				{
 					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-					game->SetPlayerChosenCell(mousePos.x, mousePos.y);
+					if (thSetCellIsFinished)
+					{
+						thSetCellIsFinished = false;
+						//thSetCell = new std::thread(&Game::SetPlayerChosenCell, *game, thSetCellIsFinished, mousePos.x, mousePos.y);
+						thSetCell = new std::thread([game, mousePos, &thSetCellIsFinished]() { thSetCellIsFinished = game->SetPlayerChosenCell(mousePos.x, mousePos.y); }); // (game->SetPlayerChosenCell), mousePos.x, mousePos.y)
+						thSetCell->detach();
+					}
 				}
 				break;
 			case sf::Event::KeyPressed:

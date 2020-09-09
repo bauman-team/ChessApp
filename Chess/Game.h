@@ -20,7 +20,7 @@ public:
 	void virtual StartGame();
 	void virtual Show() = 0;
 	void virtual ChangeActivePlayer() = 0;
-	void virtual SetPlayerChosenCell(int, int) = 0;
+	bool virtual SetPlayerChosenCell(int, int) = 0;
 
 	GameStatus GetStatus() const { return status; }
 

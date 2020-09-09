@@ -28,14 +28,14 @@ void TwoPlayersGame::Show()
 void TwoPlayersGame::ChangeActivePlayer()
 {
 	map.RunClearPossibleMoves();
-	drawer.ShowMap(map);
+	//drawer.ShowMap(map);
 	if (isTimeLimited)
 		drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
-	drawer.DisplayWindow();
-	//sf::sleep(sf::seconds(2));
+	activePlayer->SetChosenPosition(Pos::NULL_POS);
+	//drawer.DisplayWindow();
+	sf::sleep(sf::seconds(2));
 
 	activePlayer = (activePlayer == player2) ? player1 : player2;
-	activePlayer->SetChosenPosition(Pos::NULL_POS);
 
 	/*sf::Clock clock;
 	std::atomic<int> crucialCount = 0;
@@ -58,7 +58,7 @@ void TwoPlayersGame::ChangeActivePlayer()
 		activePlayer->StartTimer();
 }
 
-void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
+bool TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 {
 	if (activePlayer->HasTime())
 	{
@@ -87,6 +87,7 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 			delete position;
 		}
 	}
+	return 1;
 }
 
 GameStatus TwoPlayersGame::CheckGameFinal()
