@@ -4,7 +4,8 @@
 #include "Pos.h"
 #include "MoveInfo.h"
 
-enum class GameStatus { Menu, Play, Shah, Mat, Pat, TimeIsOver };
+enum class GameStatus { Play, Shah, Mat, Pat, TimeIsOver };
+enum class GameMode {TwoPlayers, PlayerAndBot};
 
 class Game
 {
@@ -21,6 +22,7 @@ public:
 	void virtual Show() = 0;
 	void virtual ChangeActivePlayer() = 0;
 	bool virtual SetPlayerChosenCell(int, int) = 0;
+	void virtual SetPlayers(std::string name1, std::string name2, sf::Time timeLimit = sf::seconds(0)) = 0;
 
 	GameStatus GetStatus() const { return status; }
 

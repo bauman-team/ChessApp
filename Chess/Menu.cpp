@@ -1,7 +1,9 @@
 #include "Menu.h"
 #include "TwoPlayersGame.h"
 
-Menu::Menu(sf::RenderWindow& window, Game* _game, std::string widgetsFile) : gui(window), game(_game)
+const std::string Menu::botName = "bot";
+
+Menu::Menu(sf::RenderWindow& window, std::string widgetsFile) : gui(window)
 {
 	gui.loadWidgetsFromFile(widgetsFile);
 	SetConnections();
@@ -13,12 +15,22 @@ void Menu::Show()
 	gui.draw();
 }
 
+InputValues Menu::GetInputValues() const
+{
+	return inputValues;
+}
+
 void Menu::HandleEvent(sf::Event& event)
 {
 	gui.handleEvent(event);
 }
 
-void Menu::PrestartChecks()
+std::string Menu::GetBotName()
+{
+	return botName;
+}
+
+bool Menu::CanStartGame()
 {
 	std::string errorMessage = "";
 	if (gui.get<tgui::RadioButton>("TwoPlayersRB")->isChecked())
@@ -33,16 +45,20 @@ void Menu::PrestartChecks()
 			errorMessage = "Enter different names for players!";
 		else
 		{
+			inputValues.mode = GameMode::TwoPlayers;
+			inputValues.firstName = firstName;
+			inputValues.secondName = secondName;
+			inputValues.time = sf::seconds(0);
 			if (gui.get<tgui::CheckBox>("TimerCheckBox")->isChecked())
 			{
-				int timeLimit = gui.get<tgui::Slider>("TimeSlider")->getValue() * 60;
-				static_cast<TwoPlayersGame*>(game)->SetPlayers(firstName, secondName, sf::seconds(timeLimit));
+				inputValues.time = sf::seconds(gui.get<tgui::Slider>("TimeSlider")->getValue() * 60);
+				//static_cast<TwoPlayersGame*>(game)->SetPlayers(firstName, secondName, sf::seconds(timeLimit));
 			}
-			else
+			/*else
 			{
 				static_cast<TwoPlayersGame*>(game)->SetPlayers(firstName, secondName);
 			}
-			game->StartGame();
+			game->StartGame();*/
 		}
 
 	}
@@ -53,13 +69,29 @@ void Menu::PrestartChecks()
 			errorMessage = "Enter the name!";
 		else
 		{
-			// TODO: start game with player&bot mode
+			inputValues.mode = GameMode::PlayerAndBot;
+			if (gui.get<tgui::Tabs>("ColorsTab")->getSelected() == "White")
+			{
+				inputValues.firstName = name;
+				inputValues.secondName = botName;
+			}
+			else
+			{
+				inputValues.firstName = botName;
+				inputValues.secondName = name;
+			}
+			inputValues.time = sf::seconds(0);
+			if (gui.get<tgui::CheckBox>("TimerCheckBox")->isChecked())
+			{
+				inputValues.time = sf::seconds(gui.get<tgui::Slider>("TimeSlider")->getValue() * 60);
+			}
 		}
 	}
 	else
 		errorMessage = "Select mode of the game!";
 
 	gui.get<tgui::Label>("MessageLabel")->setText(errorMessage);
+	return (errorMessage == "") ? true : false;
 }
 
 void Menu::SetConnections()
@@ -81,7 +113,7 @@ void Menu::SetConnections()
 	colorsTab->connect(tgui::Signals::Tabs::TabSelected, &Menu::ShowChoosenColor, this);
 
 	tgui::Button::Ptr startButton = gui.get<tgui::Button>("StartButton");
-	startButton->connect(tgui::Signals::Button::Pressed, &Menu::PrestartChecks, this);
+	startButton->connect(tgui::Signals::Button::Pressed, &Menu::CanStartGame, this);
 }
 
 void Menu::LoadIcons()

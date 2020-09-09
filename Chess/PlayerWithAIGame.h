@@ -137,7 +137,7 @@ public:
 	PlayerWithAIGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties) 
 		: TwoPlayersGame(window, resource, _mapProperties), isPlayerMoveFirst(true) {}
 
-	void SetPlayers(std::string name, bool _isPlayerMoveFirst, sf::Time timeLimit = sf::seconds(0));
+	void virtual SetPlayers(std::string name1, std::string name2, sf::Time timeLimit = sf::seconds(0));
 
 	bool virtual SetPlayerChosenCell(int, int) override;
 	void virtual ChangeActivePlayer() override;

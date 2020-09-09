@@ -1,22 +1,14 @@
 #include "PlayerWithAIGame.h"
+#include "Menu.h"
 
-void PlayerWithAIGame::SetPlayers(std::string name, bool _isPlayerMoveFirst, sf::Time timeLimit)
+void PlayerWithAIGame::SetPlayers(std::string name1, std::string name2, sf::Time timeLimit)
 {
-	/*if (timeLimit != sf::seconds(0))
-		isTimeLimited = true;*/
-	isPlayerMoveFirst = _isPlayerMoveFirst;
-	if (_isPlayerMoveFirst)
-	{
-		player1 = new Player(Color::White, name, timeLimit);
-		player2 = new Player(Color::Black, "bot", timeLimit);
-		activePlayer = player1;
-	}
-	else
-	{
-		player1 = new Player(Color::White, "bot", timeLimit);
-		player2 = new Player(Color::Black, name, timeLimit);
-		activePlayer = player2;
-	}
+	if (timeLimit != sf::seconds(0))
+		isTimeLimited = true;
+	isPlayerMoveFirst = (name2 == Menu::GetBotName());
+	player1 = new Player(Color::White, name1, timeLimit);
+	player2 = new Player(Color::Black, name2, timeLimit);
+	activePlayer = (isPlayerMoveFirst) ? player1 : player2;
 }
 
 bool PlayerWithAIGame::SetPlayerChosenCell(int mouseX, int mouseY)
@@ -33,8 +25,8 @@ void PlayerWithAIGame::ChangeActivePlayer()
 
 	map.RunClearPossibleMoves();
 	activePlayer = (activePlayer == player2) ? player1 : player2;
-	status = CheckGameFinal();
 	map.RunFindMoves(activePlayer->GetColor());
+	status = CheckGameFinal();
 	//
 	srand(std::time(NULL));
 	int rand1 = rand() % map.GetFigureWithAccessMoves().size();
@@ -43,8 +35,8 @@ void PlayerWithAIGame::ChangeActivePlayer()
 	//
 	map.RunClearPossibleMoves();
 	activePlayer = (activePlayer == player2) ? player1 : player2;
-	status = CheckGameFinal();
 	map.RunFindMoves(activePlayer->GetColor());
+	status = CheckGameFinal();
 
 	if (isTimeLimited)
 		activePlayer->StartTimer();
@@ -52,15 +44,10 @@ void PlayerWithAIGame::ChangeActivePlayer()
 
 void PlayerWithAIGame::StartGame()
 {
-	Game::StartGame();
 	if (!isPlayerMoveFirst)
 	{
+		drawer.RotateBoard();
 		ChangeActivePlayer();
 	}
-	else
-	{
-		map.RunFindMoves(activePlayer->GetColor());
-		if (isTimeLimited)
-			activePlayer->StartTimer();
-	}
+	TwoPlayersGame::StartGame();
 }

@@ -31,7 +31,7 @@ public:
 
 	void virtual StartGame() override;
 
-	void SetPlayers(std::string name1, std::string name2, sf::Time timeLimit = sf::seconds(0));
+	void virtual SetPlayers(std::string name1, std::string name2, sf::Time timeLimit = sf::seconds(0));
 
 	bool IsTimeLimited() const { return isTimeLimited; }
 

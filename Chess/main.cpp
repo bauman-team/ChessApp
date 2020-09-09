@@ -29,9 +29,9 @@ int main()
 	prop.SetGameWindowHeight(920);
 	prop.SetSideMenuWidth(300);
 
-	Game* game = new TwoPlayersGame(&window, res, prop);
+	Game* game = nullptr; // = new TwoPlayersGame(&window, res, prop);
 	//Game* game = new PlayerWithAIGame(&window, res, prop);
-	Menu menu(window, game, "form.txt");
+	Menu menu(window, "form.txt");
 
 	std::thread *thSetCell = nullptr;
 	bool thSetCellIsFinished = true;
@@ -46,11 +46,12 @@ int main()
 			switch(event.type)
 			{
 			case sf::Event::Closed:
-				game->Save();
+				if (game)
+					game->Save();
 				window.close();
 				break;
 			case sf::Event::MouseButtonPressed:
-				if ((game->GetStatus() == GameStatus::Play || game->GetStatus() == GameStatus::Shah) && event.mouseButton.button == sf::Mouse::Left)
+				if (game && (game->GetStatus() == GameStatus::Play || game->GetStatus() == GameStatus::Shah) && event.mouseButton.button == sf::Mouse::Left)
 				{
 					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 					if (thSetCellIsFinished)
@@ -62,26 +63,25 @@ int main()
 				}
 				break;
 			case sf::Event::KeyPressed:
-				if (game->GetStatus() == GameStatus::Menu && event.key.code == sf::Keyboard::Enter)
-					menu.PrestartChecks();
+				if (!game && (event.key.code == sf::Keyboard::Enter))
+				{
+					if (menu.CanStartGame())
+					{
+						InputValues inputValues = menu.GetInputValues();
+						if (inputValues.mode == GameMode::TwoPlayers)
+							game = new TwoPlayersGame(&window, res, prop);
+						else
+							game = new PlayerWithAIGame(&window, res, prop);
+						game->SetPlayers(inputValues.firstName, inputValues.secondName, inputValues.time);
+						game->StartGame();
+					}
+				}
 				break;
 			}
-			if (game->GetStatus() == GameStatus::Menu)
+			if (!game)
 				menu.HandleEvent(event);
 		}
-
-		switch (game->GetStatus())
-		{
-		case GameStatus::Menu:
-			menu.Show();
-			break;
-		case GameStatus::Play:
-			game->Show();
-			break;
-		default:
-			game->Show();
-			break;
-		}
+		(game) ? game->Show() : menu.Show();
 		window.display();
 	}
 	delete game;
