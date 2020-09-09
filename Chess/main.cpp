@@ -29,8 +29,8 @@ int main()
 	prop.SetGameWindowHeight(920);
 	prop.SetSideMenuWidth(300);
 
-	//Game* game = new TwoPlayersGame(&window, res, prop);
-	Game* game = new PlayerWithAIGame(&window, res, prop);
+	Game* game = new TwoPlayersGame(&window, res, prop);
+	//Game* game = new PlayerWithAIGame(&window, res, prop);
 	Menu menu(window, game, "form.txt");
 
 	std::thread *thSetCell = nullptr;

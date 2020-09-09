@@ -27,32 +27,25 @@ bool PlayerWithAIGame::SetPlayerChosenCell(int mouseX, int mouseY)
 
 void PlayerWithAIGame::ChangeActivePlayer()
 {
-	//TwoPlayersGame::ChangeActivePlayer(); // change
-	map.RunClearPossibleMoves();
-	//drawer.ShowMap(map);
 	if (isTimeLimited)
 		drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
 	activePlayer->SetChosenPosition(Pos::NULL_POS);
-	//drawer.DisplayWindow();
-	
-
-	activePlayer = (activePlayer == player2) ? player1 : player2;
-	status = CheckGameFinal();
-
-	map.RunFindMoves(activePlayer->GetColor());
-
-	srand(std::time(NULL));
-
-	int rand1 = rand() % map.GetFigureWithAccessMoves().size();
-	//sf::sleep(sf::seconds(2));
-	map.RunMakeMove(*map.GetFigureWithAccessMoves().at(rand1).figurePosition, map.GetFigureWithAccessMoves().at(rand1).possibleMoves->at(rand() % map.GetFigureWithAccessMoves().at(rand1).possibleMoves->size()));
 
 	map.RunClearPossibleMoves();
 	activePlayer = (activePlayer == player2) ? player1 : player2;
-	map.RunFindMoves(activePlayer->GetColor());
-	
-
 	status = CheckGameFinal();
+	map.RunFindMoves(activePlayer->GetColor());
+	//
+	srand(std::time(NULL));
+	int rand1 = rand() % map.GetFigureWithAccessMoves().size();
+	//sf::sleep(sf::seconds(2));
+	map.RunMakeMove(*map.GetFigureWithAccessMoves().at(rand1).figurePosition, map.GetFigureWithAccessMoves().at(rand1).possibleMoves->at(rand() % map.GetFigureWithAccessMoves().at(rand1).possibleMoves->size()));
+	//
+	map.RunClearPossibleMoves();
+	activePlayer = (activePlayer == player2) ? player1 : player2;
+	status = CheckGameFinal();
+	map.RunFindMoves(activePlayer->GetColor());
+
 	if (isTimeLimited)
 		activePlayer->StartTimer();
 }
