@@ -4,21 +4,19 @@ void PlayerWithAIGame::SetPlayers(std::string name, bool _isPlayerMoveFirst, sf:
 {
 	/*if (timeLimit != sf::seconds(0))
 		isTimeLimited = true;*/
-	std::string name1, name2;
 	isPlayerMoveFirst = _isPlayerMoveFirst;
 	if (_isPlayerMoveFirst)
 	{
-		name1 = name;
-		name2 = "bot";
+		player1 = new Player(Color::White, name, timeLimit);
+		player2 = new Player(Color::Black, "bot", timeLimit);
+		activePlayer = player1;
 	}
 	else
 	{
-		name1 = "bot";
-		name2 = name;
+		player1 = new Player(Color::White, "bot", timeLimit);
+		player2 = new Player(Color::Black, name, timeLimit);
+		activePlayer = player2;
 	}
-	player1 = new Player(Color::White, name1, timeLimit);
-	player2 = new Player(Color::Black, name2, timeLimit);
-	activePlayer = player1;
 }
 
 bool PlayerWithAIGame::SetPlayerChosenCell(int mouseX, int mouseY)
@@ -62,7 +60,14 @@ void PlayerWithAIGame::ChangeActivePlayer()
 void PlayerWithAIGame::StartGame()
 {
 	Game::StartGame();
-	map.RunFindMoves(activePlayer->GetColor());
-	if (isTimeLimited)
-		activePlayer->StartTimer();
+	if (!isPlayerMoveFirst)
+	{
+		ChangeActivePlayer();
+	}
+	else
+	{
+		map.RunFindMoves(activePlayer->GetColor());
+		if (isTimeLimited)
+			activePlayer->StartTimer();
+	}
 }

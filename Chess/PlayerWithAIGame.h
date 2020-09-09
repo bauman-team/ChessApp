@@ -142,6 +142,7 @@ public:
 	bool virtual SetPlayerChosenCell(int, int) override;
 	void virtual ChangeActivePlayer() override;
 	void virtual StartGame() override;
+	void virtual StartGame() override;
 
 	/*void output()
 	{
