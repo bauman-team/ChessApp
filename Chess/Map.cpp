@@ -37,6 +37,7 @@ Map::Map(const Map& baseMap)
 
 const std::vector<Pos>* Map::GetPossibleMoves(const Pos& figurePosition) const
 {
+	assert(figurePosition != Pos::NULL_POS); // TODO: fix bug with invalid figurePosition
 	if (!figureWithAccessMoves->empty())
 	{
 		std::vector<PossibleMoves>::const_iterator it = figureWithAccessMoves->begin(), end = figureWithAccessMoves->end();

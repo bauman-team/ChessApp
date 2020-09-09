@@ -17,6 +17,7 @@ class Menu
 	InputValues inputValues;
 
 	const static std::string botName;
+	bool needStartGame; // true if the start button was pressed and the game can be started
 
 	void SetConnections();
 	void LoadIcons();
@@ -35,7 +36,7 @@ public:
 	void Show();
 	InputValues GetInputValues() const;
 	bool CanStartGame(); // returns true if game can be started
+	bool NeedStartGame() const;
 	void HandleEvent(sf::Event& event);
 	static std::string GetBotName();
-
 };

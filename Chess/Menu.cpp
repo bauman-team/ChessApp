@@ -8,6 +8,7 @@ Menu::Menu(sf::RenderWindow& window, std::string widgetsFile) : gui(window)
 	gui.loadWidgetsFromFile(widgetsFile);
 	SetConnections();
 	LoadIcons();
+	needStartGame = false;
 }
 
 void Menu::Show()
@@ -52,13 +53,7 @@ bool Menu::CanStartGame()
 			if (gui.get<tgui::CheckBox>("TimerCheckBox")->isChecked())
 			{
 				inputValues.time = sf::seconds(gui.get<tgui::Slider>("TimeSlider")->getValue() * 60);
-				//static_cast<TwoPlayersGame*>(game)->SetPlayers(firstName, secondName, sf::seconds(timeLimit));
 			}
-			/*else
-			{
-				static_cast<TwoPlayersGame*>(game)->SetPlayers(firstName, secondName);
-			}
-			game->StartGame();*/
 		}
 
 	}
@@ -91,7 +86,13 @@ bool Menu::CanStartGame()
 		errorMessage = "Select mode of the game!";
 
 	gui.get<tgui::Label>("MessageLabel")->setText(errorMessage);
-	return (errorMessage == "") ? true : false;
+	needStartGame = (errorMessage == "") ? true : false;
+	return needStartGame;
+}
+
+bool Menu::NeedStartGame() const
+{
+	return needStartGame;
 }
 
 void Menu::SetConnections()

@@ -29,8 +29,7 @@ int main()
 	prop.SetGameWindowHeight(920);
 	prop.SetSideMenuWidth(300);
 
-	Game* game = nullptr; // = new TwoPlayersGame(&window, res, prop);
-	//Game* game = new PlayerWithAIGame(&window, res, prop);
+	Game* game = nullptr;
 	Menu menu(window, "form.txt");
 
 	std::thread *thSetCell = nullptr;
@@ -80,6 +79,16 @@ int main()
 			}
 			if (!game)
 				menu.HandleEvent(event);
+		}
+		if (!game && menu.NeedStartGame())
+		{
+			InputValues inputValues = menu.GetInputValues();
+			if (inputValues.mode == GameMode::TwoPlayers)
+				game = new TwoPlayersGame(&window, res, prop);
+			else
+				game = new PlayerWithAIGame(&window, res, prop);
+			game->SetPlayers(inputValues.firstName, inputValues.secondName, inputValues.time);
+			game->StartGame();
 		}
 		(game) ? game->Show() : menu.Show();
 		window.display();
