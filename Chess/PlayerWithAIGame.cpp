@@ -34,7 +34,7 @@ void PlayerWithAIGame::ChangeActivePlayer()
 	//
 	srand(std::time(NULL));
 	int rand1 = rand() % map.GetFigureWithAccessMoves().size();
-	//sf::sleep(sf::seconds(2));
+	sf::sleep(sf::seconds(2));
 	map.RunMakeMove(*map.GetFigureWithAccessMoves().at(rand1).figurePosition, map.GetFigureWithAccessMoves().at(rand1).possibleMoves->at(rand() % map.GetFigureWithAccessMoves().at(rand1).possibleMoves->size()));
 	//
 	map.RunClearPossibleMoves();
@@ -48,10 +48,18 @@ void PlayerWithAIGame::ChangeActivePlayer()
 
 void PlayerWithAIGame::StartGame()
 {
+	Game::StartGame();
 	if (!isPlayerMoveFirst)
 	{
 		drawer.RotateBoard();
 		ChangeActivePlayer();
+		/*std::thread th(&PlayerWithAIGame::ChangeActivePlayer, *this);
+		th.detach();*/
 	}
-	TwoPlayersGame::StartGame();
+	else
+	{
+		map.RunFindMoves(activePlayer->GetColor());
+		if (isTimeLimited)
+			activePlayer->StartTimer();
+	}
 }
