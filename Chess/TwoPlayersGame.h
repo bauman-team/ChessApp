@@ -9,6 +9,7 @@
 #include <atomic>
 #include <ctime>
 #include <cstdlib>
+#include <mutex>
 
 class TwoPlayersGame : public Game
 {

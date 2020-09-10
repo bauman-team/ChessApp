@@ -2,6 +2,7 @@
 #include "Figure.h"
 #include <iostream>
 
+std::mutex mu;
 
 TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
 	: Game(window, resource, properties), isTimeLimited(false) {}
@@ -13,11 +14,14 @@ void TwoPlayersGame::Show()
 		drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
 	if (activePlayer->HasTime())
 	{
-		if (activePlayer->GetChosenPosition() != Pos::NULL_POS)
+		mu.lock();
+		Pos chosenPos = activePlayer->GetChosenPosition();
+		if (chosenPos != Pos::NULL_POS)
 		{
-			drawer.ShowActiveFigure(map, activePlayer->GetChosenPosition());
-			drawer.ShowPossibleMoves(map, activePlayer->GetChosenPosition());
+			drawer.ShowActiveFigure(map, chosenPos);
+			drawer.ShowPossibleMoves(map, chosenPos);
 		}
+		mu.unlock();
 	}
 	else
 	{
@@ -27,13 +31,13 @@ void TwoPlayersGame::Show()
 
 void TwoPlayersGame::ChangeActivePlayer()
 {
+	mu.lock();
 	map.RunClearPossibleMoves();
-	//drawer.ShowMap(map);
 	if (isTimeLimited)
 		drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
 	activePlayer->SetChosenPosition(Pos::NULL_POS);
-	//drawer.DisplayWindow();
-	sf::sleep(sf::seconds(2));
+	mu.unlock();
+	//sf::sleep(sf::seconds(2));
 
 	activePlayer = (activePlayer == player2) ? player1 : player2;
 

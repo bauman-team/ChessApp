@@ -1,6 +1,8 @@
 #include "PlayerWithAIGame.h"
 #include "Menu.h"
 
+extern std::mutex mu;
+
 void PlayerWithAIGame::SetPlayers(std::string name1, std::string name2, sf::Time timeLimit)
 {
 	if (timeLimit != sf::seconds(0))
@@ -19,9 +21,11 @@ bool PlayerWithAIGame::SetPlayerChosenCell(int mouseX, int mouseY)
 
 void PlayerWithAIGame::ChangeActivePlayer()
 {
+	mu.lock();
 	if (isTimeLimited)
 		drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
 	activePlayer->SetChosenPosition(Pos::NULL_POS);
+	mu.unlock();
 
 	map.RunClearPossibleMoves();
 	activePlayer = (activePlayer == player2) ? player1 : player2;
