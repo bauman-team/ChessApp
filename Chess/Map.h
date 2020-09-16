@@ -8,10 +8,12 @@ class Figure;
 enum class FigureType;
 class MoveInfo;
 enum class Color;
+class PlayerWithAIGame;
 
 class Map
 {
 	friend Figure; // delete this, King fuction need struct PossibleMoves
+	friend PlayerWithAIGame;
 	struct PossibleMoves
 	{
 		Pos *figurePosition;

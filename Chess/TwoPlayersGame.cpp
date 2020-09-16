@@ -1,7 +1,7 @@
 #include "TwoPlayersGame.h"
 #include "Figure.h"
 #include <iostream>
-
+std::mutex mut;
 std::mutex mu;
 
 TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
