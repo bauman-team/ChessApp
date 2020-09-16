@@ -1,3 +1,5 @@
+//#pragma comment(linker, "/HEAP:2000000")
+//#pragma comment(linker, "/STACK:100000000")
 #include <SFML/Graphics.hpp>
 #include "TwoPlayersGame.h"
 #include "PlayerWithAIGame.h"

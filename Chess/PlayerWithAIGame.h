@@ -44,10 +44,14 @@ protected:
 			countOfThread = _countOfThread;
 			score = _score;
 		}
+		/*~Element() 
+		{
+			std::cout << "error!!!!";
+		}*/
 	};
 	void StartAI(); //first call to SecondCalc
-	static void CalculateFirstPartOfMove(int indexOfMove, Map map, Move current, volatile Element** startedMoves, int depth, const Color); //indexOfMove, map, struct MOVE(current), **array, depth
-	static void CalculateSecondPartOfMove(int indexOfMove, Map map, Move current, volatile Element** startedMoves, int depth, const Color);
+	static void CalculateFirstPartOfMove(int indexOfMove, Map map, Move current, volatile Element** const startedMoves, int depth, const Color); //indexOfMove, map, struct MOVE(current), **array, depth
+	static void CalculateSecondPartOfMove(int indexOfMove, Map map, Move current, volatile Element** const startedMoves, int depth, const Color);
 	static int CalculatePositionScore(const Map&, const Color); //&map
 	bool IsAllCalculated(volatile Element** elems, int range) const;
 public:
