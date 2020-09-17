@@ -31,7 +31,13 @@ Map::Map(const Map& baseMap)
 	possibleCastling[1] = baseMap.possibleCastling[1];
 	possibleCastling[2] = baseMap.possibleCastling[2];
 	possibleCastling[3] = baseMap.possibleCastling[3];
-	movesHistory = baseMap.movesHistory;
+	if (baseMap.movesHistory.size() > 7)
+	{
+		int x = 5;
+		x += 2;
+	}
+	for (int i = 0; i != baseMap.movesHistory.size(); ++i)
+		movesHistory.push_back(MoveInfo(baseMap.movesHistory[i]));
 	figureWithAccessMoves = new std::vector<PossibleMoves>;
 }
 
@@ -137,7 +143,7 @@ void Map::Move(const Pos& from, const Pos& to)
 		if (Figure::GetFigureTypeColor(movableFigure) == Color::Black && to.GetY() == 0 || Figure::GetFigureTypeColor(movableFigure) == Color::White && to.GetY() == 7)
 			PawnToQueen(to);
 	}
-	movesHistory.push_back(info);
+	movesHistory.push_back(MoveInfo(info));
 }
 
 void Map::SetToEmpty(const Pos& target)
@@ -154,7 +160,7 @@ void Map::PawnToQueen(const Pos& target)
 	FigureType Queen = Figure::GetFigureTypeColor(movableFigure) == Color::White ? FigureType::Queen_white : FigureType::Queen_black;
 	MoveInfo info(target, target, Queen);
 	info.SetEatenFigure(movableFigure);
-	movesHistory.push_back(info);
+	movesHistory.push_back(MoveInfo(info));
 	map[to_underlying(movableFigure)] -= target.ToBitboard();
 	map[to_underlying(Queen)] += target.ToBitboard();
 }

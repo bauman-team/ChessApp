@@ -200,7 +200,7 @@ std::vector<Pos>& Figure::FindPossibleMovesPawn(const Pos& coords)
 	if (ptrMap->CheckEmpty(coords, nextPosition) == 2)
 		possibleMoves.push_back(nextPosition);
 
-	MoveInfo* lastMove = ptrMap->GetLastMoveInfo();
+	const MoveInfo* lastMove = ptrMap->GetLastMoveInfo();
 	if (lastMove)
 	{
 		FigureType activeType = lastMove->GetTypeActiveFigure();

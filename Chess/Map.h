@@ -57,8 +57,8 @@ public:
 
 	std::vector<MoveInfo>& GetMovesHistory();
 
-	~Map()
+	/*~Map()
 	{
 		delete figureWithAccessMoves;
-	}
+	}*/
 };

@@ -4,7 +4,7 @@
 extern std::mutex mu;
 extern std::mutex mut;
 
-const int PlayerWithAIGame::figureWeight[12] = { 900, 90, 30, 30, 50, 10, 900, 90, 30, 30, 50, 10 };
+const int PlayerWithAIGame::figureWeight[12] = { 900, 90, 30, 30, 50, 30, 900, 90, 30, 30, 50, 10 };
 
 const float PlayerWithAIGame::bitboards[12][8][8] = {
 		{{-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0}, //King_black
@@ -127,7 +127,7 @@ const float PlayerWithAIGame::bitboards[12][8][8] = {
 		 {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}
 };
 
-const int PlayerWithAIGame::DEPTH = 2;
+const int PlayerWithAIGame::DEPTH = 3; //13
 
 void PlayerWithAIGame::StartAI()
 {
@@ -136,16 +136,15 @@ void PlayerWithAIGame::StartAI()
 		for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
 			startedMovesPositions.push_back(Move(*(*it1).figurePosition, *it2));
 	volatile Element** const startedMoves = new volatile Element*[startedMovesPositions.size()];
+	Color activeColor = activePlayer->GetColor() == Color::Black ? Color::White : Color::Black;
 	for (int i = 0; i != startedMovesPositions.size(); ++i)
 	{
 		mut.lock();
 		startedMoves[i] = new volatile Element[DEPTH];
 		startedMoves[i][0].countOfThread = 1;
 		mut.unlock();
-		Map a = map;
-		Color activeColor = activePlayer->GetColor();
-		std::thread th([i, startedMoves, a, startedMovesPositions, activeColor]() { PlayerWithAIGame::CalculateSecondPartOfMove(i, a, startedMovesPositions.at(i), startedMoves, 0, activeColor); });
-		//std::thread th(PlayerWithAIGame::CalculateSecondPartOfMove, i, map, startedMovesPositions.at(i), std::cref(startedMoves), 0, activePlayer->GetColor());
+		Map *copyMap = new Map(map);
+		std::thread th([i, startedMoves, copyMap, startedMovesPositions, activeColor]() { PlayerWithAIGame::CalculateSecondPartOfMove(i, copyMap, startedMovesPositions.at(i), startedMoves, 0, activeColor); });
 		th.detach();
 	}
 	//sf::sleep(sf::seconds(10));
@@ -174,85 +173,111 @@ void PlayerWithAIGame::StartAI()
 	map.RunMakeMove(*map.GetFigureWithAccessMoves().at(rand1).figurePosition, map.GetFigureWithAccessMoves().at(rand1).possibleMoves->at(rand() % map.GetFigureWithAccessMoves().at(rand1).possibleMoves->size()));*/
 }
 
-void PlayerWithAIGame::CalculateFirstPartOfMove(int indexOfMove, Map map, Move current, volatile Element** const startedMoves, int depth, const Color activeColor)
+void PlayerWithAIGame::CalculateFirstPartOfMove(int indexOfMove, Map *map, Move current, volatile Element** const startedMoves, int depth, Color activeColor)
 {
-	map.Move(current.from, current.to);
-	map.RunFindMoves(activeColor);
-	std::vector<int> movesScores;
-	for (auto it1 = map.GetFigureWithAccessMoves().begin(); it1 != map.GetFigureWithAccessMoves().end(); ++it1)
-		for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
-		{
-			FigureType movableFigure = map.GetFigureType(*(*it1).figurePosition), eatenFigure = map.GetFigureType((*it2));
-			if (eatenFigure != FigureType::Empty)
-				map.map[to_underlying(eatenFigure)] -= (*it2).ToBitboard();
-			map.map[to_underlying(movableFigure)] -= (*it1).figurePosition->ToBitboard();
-			map.map[to_underlying(movableFigure)] += (*it2).ToBitboard();
-			movesScores.push_back(CalculatePositionScore(map, activeColor));
-			map.map[to_underlying(movableFigure)] += (*it1).figurePosition->ToBitboard();
-			map.map[to_underlying(movableFigure)] -= (*it2).ToBitboard();
-			if (eatenFigure != FigureType::Empty)
-				map.map[to_underlying(eatenFigure)] += (*it2).ToBitboard();
-		}
-	std::sort(movesScores.begin(), movesScores.end());
-	//int k = 0;
-	for (auto it1 = map.GetFigureWithAccessMoves().begin(); it1 != map.GetFigureWithAccessMoves().end(); ++it1)
-		for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
-		{
-			//if (movesScores[k] == movesScores.back())
-			//{
-				mut.lock();
-				++startedMoves[indexOfMove][depth].countOfThread;
-				mut.unlock();
-				Move nextMove(*(*it1).figurePosition, *it2);
-				std::thread th([indexOfMove, map, nextMove, startedMoves, depth, activeColor]() { PlayerWithAIGame::CalculateSecondPartOfMove(indexOfMove, map, nextMove, startedMoves, depth, activeColor); });
-				th.detach();
-			//}
-			//++k;
-		}
-}
-
-void PlayerWithAIGame::CalculateSecondPartOfMove(int indexOfMove, Map map, Move current, volatile Element** const startedMoves, int depth, const Color activeColor)
-{
-	map.Move(current.from, current.to);
-	map.RunFindMoves((activeColor == Color::Black) ? Color::White : Color::Black);
-	std::vector<int> movesScores;
-	for (auto it1 = map.GetFigureWithAccessMoves().begin(); it1 != map.GetFigureWithAccessMoves().end(); ++it1)
-		for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
-		{
-			FigureType movableFigure = map.GetFigureType(*(*it1).figurePosition), eatenFigure = map.GetFigureType((*it2));
-			if (eatenFigure != FigureType::Empty)
-				map.map[to_underlying(eatenFigure)] -= (*it2).ToBitboard();
-			map.map[to_underlying(movableFigure)] -= (*it1).figurePosition->ToBitboard();
-			map.map[to_underlying(movableFigure)] += (*it2).ToBitboard();
-			movesScores.push_back(CalculatePositionScore(map, activeColor));
-			map.map[to_underlying(movableFigure)] += (*it1).figurePosition->ToBitboard();
-			map.map[to_underlying(movableFigure)] -= (*it2).ToBitboard();
-			if (eatenFigure != FigureType::Empty)
-				map.map[to_underlying(eatenFigure)] += (*it2).ToBitboard();
-		}
-	std::sort(movesScores.begin(), movesScores.end());
-	
-	mut.lock();
-	if (startedMoves[indexOfMove][depth].score > movesScores[0] || !startedMoves[indexOfMove][depth].isStarted)
-		startedMoves[indexOfMove][depth].score = movesScores[0];
-	startedMoves[indexOfMove][depth].isStarted = true;
-	--startedMoves[indexOfMove][depth].countOfThread;
-	mut.unlock();
-
-	//int k = 0;
-	if (depth + 1 < DEPTH)
-		for (auto it1 = map.GetFigureWithAccessMoves().begin(); it1 != map.GetFigureWithAccessMoves().end(); ++it1)
+	map->Move(current.from, current.to);
+	map->RunFindMoves(activeColor);
+	if (!map->GetFigureWithAccessMoves().empty())
+	{
+		std::vector<int> movesScores;
+		for (auto it1 = map->GetFigureWithAccessMoves().begin(); it1 != map->GetFigureWithAccessMoves().end(); ++it1)
 			for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
 			{
-				//if (movesScores[k] == movesScores[0])
-				//{
-					Move nextMove(*(*it1).figurePosition, *it2);
-					std::thread th([indexOfMove, map, nextMove, startedMoves, depth, activeColor]() { PlayerWithAIGame::CalculateSecondPartOfMove(indexOfMove, map, nextMove, startedMoves, depth + 1, activeColor); });
-					//std::thread th(PlayerWithAIGame::CalculateFirstPartOfMove, indexOfMove, map, nextMove, std::ref(startedMoves), depth + 1, activeColor);
-					th.detach();
-				//}
-				//++k;
+				FigureType movableFigure = map->GetFigureType(*(*it1).figurePosition), eatenFigure = map->GetFigureType((*it2));
+				if (eatenFigure != FigureType::Empty)
+					map->map[to_underlying(eatenFigure)] -= (*it2).ToBitboard();
+				map->map[to_underlying(movableFigure)] -= (*it1).figurePosition->ToBitboard();
+				map->map[to_underlying(movableFigure)] += (*it2).ToBitboard();
+				movesScores.push_back(CalculatePositionScore(*map, activeColor));
+				map->map[to_underlying(movableFigure)] += (*it1).figurePosition->ToBitboard();
+				map->map[to_underlying(movableFigure)] -= (*it2).ToBitboard();
+				if (eatenFigure != FigureType::Empty)
+					map->map[to_underlying(eatenFigure)] += (*it2).ToBitboard();
 			}
+
+		int maxScore = movesScores[0];
+		int k = 0;
+		for (int i = 1; i != movesScores.size(); ++i)
+			if (movesScores[i] > maxScore)
+				maxScore = movesScores[i];
+
+		activeColor = activeColor == Color::Black ? Color::White : Color::Black;
+		for (auto it1 = map->GetFigureWithAccessMoves().begin(); it1 != map->GetFigureWithAccessMoves().end(); ++it1)
+			for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
+				if (movesScores[k++] > maxScore - 30)
+				{
+					mut.lock();
+					++startedMoves[indexOfMove][depth].countOfThread;
+					mut.unlock();
+					Map* copyMap = new Map(*map);
+					Move nextMove(*(*it1).figurePosition, *it2);
+					std::thread th([indexOfMove, copyMap, nextMove, startedMoves, depth, activeColor]() { PlayerWithAIGame::CalculateSecondPartOfMove(indexOfMove, copyMap, nextMove, startedMoves, depth, activeColor); });
+					th.detach();
+				}
+		delete map;
+	}
+}
+
+void PlayerWithAIGame::CalculateSecondPartOfMove(int indexOfMove, Map *map, Move current, volatile Element** const startedMoves, int depth, Color activeColor)
+{
+	map->Move(current.from, current.to);
+	map->RunFindMoves(activeColor);
+	if (!map->GetFigureWithAccessMoves().empty())
+	{
+		std::vector<int> movesScores;
+		for (auto it1 = map->GetFigureWithAccessMoves().begin(); it1 != map->GetFigureWithAccessMoves().end(); ++it1)
+			for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
+			{
+				FigureType movableFigure = map->GetFigureType(*(*it1).figurePosition), eatenFigure = map->GetFigureType((*it2));
+				if (eatenFigure != FigureType::Empty)
+					map->map[to_underlying(eatenFigure)] -= (*it2).ToBitboard();
+				map->map[to_underlying(movableFigure)] -= (*it1).figurePosition->ToBitboard();
+				map->map[to_underlying(movableFigure)] += (*it2).ToBitboard();
+				movesScores.push_back(CalculatePositionScore(*map, activeColor));
+				map->map[to_underlying(movableFigure)] += (*it1).figurePosition->ToBitboard();
+				map->map[to_underlying(movableFigure)] -= (*it2).ToBitboard();
+				if (eatenFigure != FigureType::Empty)
+					map->map[to_underlying(eatenFigure)] += (*it2).ToBitboard();
+			}
+
+		int minScore = movesScores[0];
+		int k = 0;
+		for (int i = 1; i != movesScores.size(); ++i)
+			if (movesScores[i] < minScore)
+				minScore = movesScores[i];
+
+		mut.lock();
+		if (startedMoves[indexOfMove][depth].score > minScore || !startedMoves[indexOfMove][depth].isStarted)
+			startedMoves[indexOfMove][depth].score = minScore;
+		startedMoves[indexOfMove][depth].isStarted = true;
+		--startedMoves[indexOfMove][depth].countOfThread;
+		mut.unlock();
+
+		activeColor = activeColor == Color::Black ? Color::White : Color::Black;
+		if (depth + 1 < DEPTH)
+			for (auto it1 = map->GetFigureWithAccessMoves().begin(); it1 != map->GetFigureWithAccessMoves().end(); ++it1)
+				for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
+					if (movesScores[k++] < minScore + 30)
+					{
+						Map* copyMap = new Map(*map);
+						Move nextMove(*(*it1).figurePosition, *it2);
+						std::thread th([indexOfMove, copyMap, nextMove, startedMoves, depth, activeColor]() { PlayerWithAIGame::CalculateFirstPartOfMove(indexOfMove, copyMap, nextMove, startedMoves, depth + 1, activeColor); });
+						th.detach();
+					}
+		delete map;
+	}
+	else
+	{
+		mut.lock();
+		if (!startedMoves[indexOfMove][depth].isStarted && startedMoves[indexOfMove][depth].countOfThread == 1)
+			for (int i = depth; i != DEPTH; ++i)
+			{
+				startedMoves[indexOfMove][i].score = INT32_MIN;
+				startedMoves[indexOfMove][i].isStarted = true;
+			}
+		--startedMoves[indexOfMove][depth].countOfThread;
+		mut.unlock();
+	}
 }
 
 int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color activeColor)
