@@ -50,8 +50,8 @@ protected:
 		}*/
 	};
 	void StartAI(); //first call to SecondCalc
-	static void CalculateFirstPartOfMove(int indexOfMove, Map* map, Move current, volatile Element** const startedMoves, int depth, Color);
-	static void CalculateSecondPartOfMove(int indexOfMove, Map* map, Move current, volatile Element** const startedMoves, int depth, Color);
+	static void CalculateFirstPartOfMove(int indexOfMove, Map* map, Move current, volatile Element** const startedMoves, int depth, const Color);
+	static void CalculateSecondPartOfMove(int indexOfMove, Map* map, Move current, volatile Element** const startedMoves, int depth, const Color);
 	static int CalculatePositionScore(const Map&, const Color); //&map
 	bool IsAllCalculated(volatile Element** elems, int range) const;
 public:

@@ -127,7 +127,7 @@ const float PlayerWithAIGame::bitboards[12][8][8] = {
 		 {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}
 };
 
-const int PlayerWithAIGame::DEPTH = 3; //13
+const int PlayerWithAIGame::DEPTH = 1; //13
 
 void PlayerWithAIGame::StartAI()
 {
@@ -136,7 +136,7 @@ void PlayerWithAIGame::StartAI()
 		for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
 			startedMovesPositions.push_back(Move(*(*it1).figurePosition, *it2));
 	volatile Element** const startedMoves = new volatile Element*[startedMovesPositions.size()];
-	Color activeColor = activePlayer->GetColor() == Color::Black ? Color::White : Color::Black;
+	Color activeColor = activePlayer->GetColor();
 	for (int i = 0; i != startedMovesPositions.size(); ++i)
 	{
 		mut.lock();
@@ -150,7 +150,7 @@ void PlayerWithAIGame::StartAI()
 	//sf::sleep(sf::seconds(10));
 	while (!IsAllCalculated(startedMoves, startedMovesPositions.size()))
 	{
-		sf::sleep(sf::seconds(1));
+		sf::sleep(sf::seconds(0.01));
 	}
 	int bestIndex = -1;
 	int bestScore = -1;
@@ -162,8 +162,9 @@ void PlayerWithAIGame::StartAI()
 			bestIndex = i;
 		}
 	}
-
+	mu.lock();
 	map.RunMakeMove(startedMovesPositions.at(bestIndex).from, startedMovesPositions.at(bestIndex).to);
+	mu.unlock();
 	for (int i = 0; i != startedMovesPositions.size(); ++i)
 		delete[] startedMoves[i];
 	delete startedMoves;
@@ -173,7 +174,7 @@ void PlayerWithAIGame::StartAI()
 	map.RunMakeMove(*map.GetFigureWithAccessMoves().at(rand1).figurePosition, map.GetFigureWithAccessMoves().at(rand1).possibleMoves->at(rand() % map.GetFigureWithAccessMoves().at(rand1).possibleMoves->size()));*/
 }
 
-void PlayerWithAIGame::CalculateFirstPartOfMove(int indexOfMove, Map *map, Move current, volatile Element** const startedMoves, int depth, Color activeColor)
+void PlayerWithAIGame::CalculateFirstPartOfMove(int indexOfMove, Map *map, Move current, volatile Element** const startedMoves, int depth, const Color activeColor)
 {
 	map->Move(current.from, current.to);
 	map->RunFindMoves(activeColor);
@@ -201,7 +202,6 @@ void PlayerWithAIGame::CalculateFirstPartOfMove(int indexOfMove, Map *map, Move 
 			if (movesScores[i] > maxScore)
 				maxScore = movesScores[i];
 
-		activeColor = activeColor == Color::Black ? Color::White : Color::Black;
 		for (auto it1 = map->GetFigureWithAccessMoves().begin(); it1 != map->GetFigureWithAccessMoves().end(); ++it1)
 			for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
 				if (movesScores[k++] > maxScore - 30)
@@ -218,10 +218,10 @@ void PlayerWithAIGame::CalculateFirstPartOfMove(int indexOfMove, Map *map, Move 
 	}
 }
 
-void PlayerWithAIGame::CalculateSecondPartOfMove(int indexOfMove, Map *map, Move current, volatile Element** const startedMoves, int depth, Color activeColor)
+void PlayerWithAIGame::CalculateSecondPartOfMove(int indexOfMove, Map *map, Move current, volatile Element** const startedMoves, int depth, const Color activeColor)
 {
 	map->Move(current.from, current.to);
-	map->RunFindMoves(activeColor);
+	map->RunFindMoves(activeColor == Color::Black ? Color::White : Color::Black);
 	if (!map->GetFigureWithAccessMoves().empty())
 	{
 		std::vector<int> movesScores;
@@ -253,7 +253,6 @@ void PlayerWithAIGame::CalculateSecondPartOfMove(int indexOfMove, Map *map, Move
 		--startedMoves[indexOfMove][depth].countOfThread;
 		mut.unlock();
 
-		activeColor = activeColor == Color::Black ? Color::White : Color::Black;
 		if (depth + 1 < DEPTH)
 			for (auto it1 = map->GetFigureWithAccessMoves().begin(); it1 != map->GetFigureWithAccessMoves().end(); ++it1)
 				for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
@@ -342,6 +341,8 @@ void PlayerWithAIGame::ChangeActivePlayer()
 		if (isTimeLimited)
 			activePlayer->StartTimer();
 	}
+	//activePlayer = (activePlayer == player2) ? player1 : player2;
+	//ChangeActivePlayer();
 }
 
 void PlayerWithAIGame::StartGame()
