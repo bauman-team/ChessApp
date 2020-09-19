@@ -127,8 +127,8 @@ const float PlayerWithAIGame::bitboards[12][8][8] = {
 		 {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}
 };
 
-const int PlayerWithAIGame::DEPTH = 1; //13
-
+const int PlayerWithAIGame::DEPTH = 4;//4
+/*
 void PlayerWithAIGame::StartAI()
 {
 	std::vector<Move> startedMovesPositions;
@@ -168,10 +168,7 @@ void PlayerWithAIGame::StartAI()
 	for (int i = 0; i != startedMovesPositions.size(); ++i)
 		delete[] startedMoves[i];
 	delete startedMoves;
-	/*srand(std::time(NULL));
-	int rand1 = rand() % map.GetFigureWithAccessMoves().size();
-	sf::sleep(sf::seconds(2));
-	map.RunMakeMove(*map.GetFigureWithAccessMoves().at(rand1).figurePosition, map.GetFigureWithAccessMoves().at(rand1).possibleMoves->at(rand() % map.GetFigureWithAccessMoves().at(rand1).possibleMoves->size()));*/
+	
 }
 
 void PlayerWithAIGame::CalculateFirstPartOfMove(int indexOfMove, Map *map, Move current, volatile Element** const startedMoves, int depth, const Color activeColor)
@@ -278,8 +275,61 @@ void PlayerWithAIGame::CalculateSecondPartOfMove(int indexOfMove, Map *map, Move
 		mut.unlock();
 	}
 }
+*/
 
-int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color activeColor)
+PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting = 0)
+{
+	std::vector<Move> startedAccessMovesPositions;
+	for (auto it1 = map.GetFigureWithAccessMoves().begin(); it1 != map.GetFigureWithAccessMoves().end(); ++it1)
+		for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
+			startedAccessMovesPositions.push_back(Move(*(*it1).figurePosition, *it2));
+	volatile TheWhorstCalculatedScoreOnDepth* const startedMovesScore = new volatile TheWhorstCalculatedScoreOnDepth[startedAccessMovesPositions.size()];
+	bool *isThreadCompleted = new bool[startedAccessMovesPositions.size()];
+	Color AIColor = activePlayer->GetColor();
+	for (int i = 0; i != startedAccessMovesPositions.size(); ++i)
+	{
+		isThreadCompleted[i] = false;
+		std::list<Map> listOfMaps;
+		mut.lock();
+		listOfMaps.push_back(map);
+		mut.unlock();
+		listOfMaps.back().Move(startedAccessMovesPositions[i].from, startedAccessMovesPositions[i].to);
+		//isThreadCompleted[i] = PlayerWithAIGame::CalculationScoreOfMoveInThread(listOfMaps, startedMovesScore[i], false, AIColor);
+		std::thread th([i, startedMovesScore, listOfMaps, AIColor, isThreadCompleted]() { 
+			isThreadCompleted[i] = PlayerWithAIGame::CalculationScoreOfMoveInThread(listOfMaps, startedMovesScore[i], false, AIColor);
+			});
+		th.detach();
+	}
+
+	sf::sleep(sf::seconds(timeForWaiting));
+
+	if (timeForWaiting == 0)
+		while (!IsAllThreadsOfMovesCompleted(isThreadCompleted, startedAccessMovesPositions.size()))
+			sf::sleep(sf::seconds(0.1));
+
+	int bestIndex = 0;
+	for (int i = 1; i != startedAccessMovesPositions.size(); ++i) // !!!!!! -1
+		if (startedMovesScore[i].score > startedMovesScore[bestIndex].score)
+			bestIndex = i;
+		else if (startedMovesScore[i].score == startedMovesScore[bestIndex].score
+			&& startedMovesScore[i].depth < startedMovesScore[bestIndex].depth)
+			bestIndex = i;
+
+	
+
+	delete isThreadCompleted;
+	delete startedMovesScore;
+
+	return startedAccessMovesPositions[bestIndex];
+
+	//rand bot, activate from ChangeActivePlayer
+	/*srand(std::time(NULL));
+	int rand1 = rand() % map.GetFigureWithAccessMoves().size();
+	sf::sleep(sf::seconds(2));
+	map.RunMakeMove(*map.GetFigureWithAccessMoves().at(rand1).figurePosition, map.GetFigureWithAccessMoves().at(rand1).possibleMoves->at(rand() % map.GetFigureWithAccessMoves().at(rand1).possibleMoves->size()));*/
+}
+
+int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color AIColor)
 {
 	int score = 0;
 	FigureType selected;
@@ -287,11 +337,115 @@ int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color
 	{
 		selected = selectedMap.GetFigureType(Pos::IndexToPosition(i));
 		if (selected != FigureType::Empty)
-			score += figureWeight[to_underlying(selected)] * bitboards[to_underlying(selected)][i % 8][i / 8] * (selectedMap.GetColor(selected) == activeColor ? 1 : -1);
+			score += figureWeight[to_underlying(selected)] * bitboards[to_underlying(selected)][i % 8][i / 8] * (selectedMap.GetColor(selected) == AIColor ? 1 : -1);
 	}
 	return score;
 }
 
+bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps, volatile TheWhorstCalculatedScoreOnDepth& startedMoves, bool isAIMoveNow, const Color AIColor)
+{
+	int depth = 0, countOfMapsInList, countNewCreatedMap = 20; // if change countNewCreatedMap look to the func end 
+	while (depth != DEPTH)
+	{
+		countOfMapsInList = listOfMaps.size();
+		for (int k = 0; k != countOfMapsInList; ++k)
+		{
+			auto itMap = listOfMaps.front();
+			itMap.RunFindMoves(isAIMoveNow ? AIColor : (AIColor == Color::Black ? Color::White : Color::Black));
+
+			if (!itMap.GetFigureWithAccessMoves().empty())
+			{
+				std::vector<int> movesScores;
+				for (auto it1 = itMap.GetFigureWithAccessMoves().begin(); it1 != itMap.GetFigureWithAccessMoves().end(); ++it1) // calculate score
+					for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
+					{
+						FigureType movableFigure = itMap.GetFigureType(*(*it1).figurePosition), eatenFigure = itMap.GetFigureType((*it2));
+						if (eatenFigure != FigureType::Empty)
+							itMap.map[to_underlying(eatenFigure)] -= (*it2).ToBitboard();
+						itMap.map[to_underlying(movableFigure)] -= (*it1).figurePosition->ToBitboard();
+						itMap.map[to_underlying(movableFigure)] += (*it2).ToBitboard();
+						movesScores.push_back(CalculatePositionScore(listOfMaps.front(), AIColor));
+						itMap.map[to_underlying(movableFigure)] += (*it1).figurePosition->ToBitboard();
+						itMap.map[to_underlying(movableFigure)] -= (*it2).ToBitboard();
+						if (eatenFigure != FigureType::Empty)
+							itMap.map[to_underlying(eatenFigure)] += (*it2).ToBitboard();
+					}
+
+				int sizeOfArrayIndexOfMoves = countNewCreatedMap > movesScores.size() ? movesScores.size() : countNewCreatedMap;
+				int* indexOfMovesWithBestScore = new int[sizeOfArrayIndexOfMoves]; //index of maps witch create later
+
+				if (isAIMoveNow)
+				{
+					for (int i = 0; i != sizeOfArrayIndexOfMoves; ++i) // max score for bot
+					{
+						indexOfMovesWithBestScore[i] = 0;
+						for (int j = 1; j != movesScores.size(); ++j)
+						{
+							if (movesScores[j] > movesScores[indexOfMovesWithBestScore[i]])
+								indexOfMovesWithBestScore[i] = j;
+						}
+						movesScores[indexOfMovesWithBestScore[i]] = INT32_MIN;
+					}
+				}
+				else
+				{
+					int minScore;
+					for (int i = 0; i != sizeOfArrayIndexOfMoves; ++i) // min score for opponent
+					{
+						indexOfMovesWithBestScore[i] = 0;
+						for (int j = 1; j != movesScores.size(); ++j)
+						{
+							if (movesScores[j] < movesScores[indexOfMovesWithBestScore[i]])
+								indexOfMovesWithBestScore[i] = j;
+						}
+						if (i == 0)
+							minScore = movesScores[indexOfMovesWithBestScore[i]];
+						movesScores[indexOfMovesWithBestScore[i]] = INT32_MAX;
+					}
+					mu.lock();
+					if (startedMoves.depth == -1 || startedMoves.score > minScore)
+					{
+						startedMoves.depth = depth + 1;
+						startedMoves.score = minScore;
+					}
+					mu.unlock();
+				}
+
+				int j = 0;
+				if (depth + 1 < DEPTH || depth + 1 == DEPTH && isAIMoveNow) // create maps
+					for (auto it1 = itMap.GetFigureWithAccessMoves().begin(); it1 != itMap.GetFigureWithAccessMoves().end(); ++it1)
+						for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2, ++j)
+							for (int i = 0; i != sizeOfArrayIndexOfMoves; ++i)
+								if (j == indexOfMovesWithBestScore[i])
+								{
+									listOfMaps.push_back(itMap);
+									listOfMaps.back().Move(*(*it1).figurePosition, *it2);
+								}
+				delete[] indexOfMovesWithBestScore;
+			}
+			itMap.RunClearPossibleMoves();
+			listOfMaps.pop_front();
+		}
+		depth += isAIMoveNow ? 0 : 1;
+		if (!isAIMoveNow)
+			countNewCreatedMap = countNewCreatedMap > 3 ? countNewCreatedMap / 3 : 1;
+		isAIMoveNow = !isAIMoveNow;
+	}
+	mu.lock();
+	if (startedMoves.depth == -1) // if bot win
+		startedMoves.score = INT32_MAX;
+	mu.unlock();
+	return true;
+}
+
+bool PlayerWithAIGame::IsAllThreadsOfMovesCompleted(bool* threadsInfo, int range)
+{
+	for (int i = 0; i != range; ++i)
+		if (!threadsInfo[i])
+			return false;
+	return true;
+}
+/*
 bool PlayerWithAIGame::IsAllCalculated(volatile Element** elems, int range) const
 {
 	for (int i = 0; i != range; ++i)
@@ -299,7 +453,7 @@ bool PlayerWithAIGame::IsAllCalculated(volatile Element** elems, int range) cons
 			return false;
 	return true;
 }
-
+*/
 void PlayerWithAIGame::SetPlayers(std::string name1, std::string name2, sf::Time timeLimit)
 {
 	if (timeLimit != sf::seconds(0))
@@ -332,7 +486,22 @@ void PlayerWithAIGame::ChangeActivePlayer()
 	if (status != GameStatus::Pat || status != GameStatus::Mat)
 	{
 		//
-		StartAI();
+		Move bestMove = StartAI();
+
+
+	/*	std::list<Map> a;
+		a.push_back(Map(map));
+		for (int i = 0; i != 100000; ++i)
+		{
+			a.push_back(Map(a.front()));
+			a.back().Move(bestMove.from, bestMove.to);
+		}
+		a.pop_front();*/
+
+
+		mu.lock();
+		map.RunMakeMove(bestMove.from, bestMove.to);
+		mu.unlock();
 		map.RunClearPossibleMoves();
 		activePlayer = (activePlayer == player2) ? player1 : player2;
 		map.RunFindMoves(activePlayer->GetColor());
@@ -341,8 +510,8 @@ void PlayerWithAIGame::ChangeActivePlayer()
 		if (isTimeLimited)
 			activePlayer->StartTimer();
 	}
-	//activePlayer = (activePlayer == player2) ? player1 : player2;
-	//ChangeActivePlayer();
+	activePlayer = (activePlayer == player2) ? player1 : player2;
+	ChangeActivePlayer();
 }
 
 void PlayerWithAIGame::StartGame()

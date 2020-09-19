@@ -1,5 +1,6 @@
 #pragma once
 #include "TwoPlayersGame.h"
+#include <list>
 #include <iostream>
 #include <iomanip>
 
@@ -13,9 +14,6 @@ private:
 protected:
 	bool isPlayerMoveFirst;
 	const static int DEPTH;
-	/*
-		methods for bot calculate move
-	*/
 	
 	struct Move
 	{
@@ -27,6 +25,7 @@ protected:
 			to = _to;
 		}
 	};
+	/*
 	struct Element
 	{
 		bool isStarted;
@@ -44,16 +43,30 @@ protected:
 			countOfThread = _countOfThread;
 			score = _score;
 		}
-		/*~Element() 
-		{
-			std::cout << "error!!!!";
-		}*/
+		
 	};
 	void StartAI(); //first call to SecondCalc
 	static void CalculateFirstPartOfMove(int indexOfMove, Map* map, Move current, volatile Element** const startedMoves, int depth, const Color);
 	static void CalculateSecondPartOfMove(int indexOfMove, Map* map, Move current, volatile Element** const startedMoves, int depth, const Color);
-	static int CalculatePositionScore(const Map&, const Color); //&map
+	
 	bool IsAllCalculated(volatile Element** elems, int range) const;
+	*/
+
+	struct TheWhorstCalculatedScoreOnDepth
+	{
+		int depth; // depth of score
+		int score;
+		TheWhorstCalculatedScoreOnDepth()
+		{
+			depth = -1;
+			score = 0;
+		}
+	};
+	Move StartAI(double timeForWaiting);
+	static int CalculatePositionScore(const Map& selectedMap, const Color AIColor);
+	static bool CalculationScoreOfMoveInThread(std::list<Map> listOfMaps, volatile TheWhorstCalculatedScoreOnDepth &startedMoves, bool isAIMoveNow, const Color AIColor); 
+	static bool IsAllThreadsOfMovesCompleted(bool* threadsInfo, int range);
+
 public:
 	PlayerWithAIGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties) 
 		: TwoPlayersGame(window, resource, _mapProperties), isPlayerMoveFirst(true) {}
