@@ -16,7 +16,8 @@ protected:
 
 	GameStatus virtual CheckGameFinal() = 0;
 public:
-	Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties);
+	Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
+		: drawer(window, resource, properties) {}
 
 	void virtual StartGame();
 	void virtual Show() = 0;

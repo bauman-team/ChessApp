@@ -70,7 +70,7 @@ void Map::RunFindMoves(const Color& activeColor)
 				{
 					PossibleMoves Moves;
 					Moves.figurePosition = &Pos::BitboardToPosition(j);
-					Moves.possibleMoves = &Figure::FindPossibleMoves((FigureType)i, *Moves.figurePosition); // for checking shah give numberOfFigures
+					Moves.possibleMoves = &Figure::FindPossibleMoves((FigureType)i, *Moves.figurePosition, *this); // for checking shah give numberOfFigures
 					CheckingPossibleMove(Moves);
 					if (!Moves.possibleMoves->empty())
 						figureWithAccessMoves->push_back(Moves);
@@ -127,6 +127,7 @@ void Map::Move(const Pos& from, const Pos& to)
 	}
 	map[to_underlying(movableFigure)] -= from.ToBitboard();
 	map[to_underlying(movableFigure)] += to.ToBitboard();
+	movesHistory.push_back(info);
 	if (movableFigure == FigureType::King_black || movableFigure == FigureType::King_white)
 	{
 		SetCastling(Figure::GetFigureTypeColor(movableFigure));
@@ -146,7 +147,6 @@ void Map::Move(const Pos& from, const Pos& to)
 		if (Figure::GetFigureTypeColor(movableFigure) == Color::Black && to.GetY() == 0 || Figure::GetFigureTypeColor(movableFigure) == Color::White && to.GetY() == 7)
 			PawnToQueen(to);
 	}
-	movesHistory.push_back(info);
 }
 
 void Map::SetToEmpty(const Pos& target)

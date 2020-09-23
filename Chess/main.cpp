@@ -5,6 +5,7 @@
 #include "PlayerWithAIGame.h"
 #include "Menu.h"
 
+
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(700, 550), "Chess");

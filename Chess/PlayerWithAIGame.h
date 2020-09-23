@@ -25,32 +25,6 @@ protected:
 			to = _to;
 		}
 	};
-	/*
-	struct Element
-	{
-		bool isStarted;
-		int countOfThread;
-		int score;
-		Element()
-		{
-			isStarted = false;
-			countOfThread = 0;
-			score = 0;
-		}
-		Element(bool _isStarted, int _countOfThread, int _score)
-		{
-			isStarted = _isStarted;
-			countOfThread = _countOfThread;
-			score = _score;
-		}
-		
-	};
-	void StartAI(); //first call to SecondCalc
-	static void CalculateFirstPartOfMove(int indexOfMove, Map* map, Move current, volatile Element** const startedMoves, int depth, const Color);
-	static void CalculateSecondPartOfMove(int indexOfMove, Map* map, Move current, volatile Element** const startedMoves, int depth, const Color);
-	
-	bool IsAllCalculated(volatile Element** elems, int range) const;
-	*/
 
 	struct TheWhorstCalculatedScoreOnDepth
 	{
@@ -73,11 +47,8 @@ public:
 
 	void virtual SetPlayers(std::string name1, std::string name2, sf::Time timeLimit = sf::seconds(0));
 
-	bool virtual SetPlayerChosenCell(int, int) override;
 	void virtual ChangeActivePlayer() override;
 	void virtual StartGame() override;
-
-
 	/*void output()
 	{
 		for (int i = 0; i != 6; ++i)
@@ -99,5 +70,4 @@ public:
 			std::cout << "},\n";
 		}
 	}*/
-
 };

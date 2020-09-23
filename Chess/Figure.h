@@ -35,19 +35,17 @@ class Player;
 class Figure
 {
 	friend class Map;
-	static Map* ptrMap;
 
-	static std::vector<Pos>& FindPossibleMoves(const FigureType&, const Pos&);
-	static std::vector<Pos>& FindPossibleMovesKing(const Pos&);
-	static std::vector<Pos>& FindPossibleMovesQueen(const Pos&);
-	static std::vector<Pos>& FindPossibleMovesBishop(const Pos&);
-	static std::vector<Pos>& FindPossibleMovesKnight(const Pos&);
-	static std::vector<Pos>& FindPossibleMovesRook(const Pos&);
-	static std::vector<Pos>& FindPossibleMovesPawn(const Pos&);
+	static std::vector<Pos>& FindPossibleMoves(const FigureType&, const Pos&, Map& ptrMap);
+	static std::vector<Pos>& FindPossibleMovesKing(const Pos&, Map& ptrMap);
+	static std::vector<Pos>& FindPossibleMovesQueen(const Pos&, Map& ptrMap);
+	static std::vector<Pos>& FindPossibleMovesBishop(const Pos&, Map& ptrMap);
+	static std::vector<Pos>& FindPossibleMovesKnight(const Pos&, Map& ptrMap);
+	static std::vector<Pos>& FindPossibleMovesRook(const Pos&, Map& ptrMap);
+	static std::vector<Pos>& FindPossibleMovesPawn(const Pos&, Map& ptrMap);
 
-	static std::vector<Pos> FindStraightMoves(const Pos& coords);
-	static std::vector<Pos> FindDiagonalMoves(const Pos& coords);
+	static std::vector<Pos> FindStraightMoves(const Pos& coords, Map& ptrMap);
+	static std::vector<Pos> FindDiagonalMoves(const Pos& coords, Map& ptrMap);
 public:
 	static Color GetFigureTypeColor(const FigureType&);
-	static void SetMapPtr(Map* _ptrMap) { ptrMap = _ptrMap; }
 };
