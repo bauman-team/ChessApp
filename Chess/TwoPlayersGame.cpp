@@ -1,6 +1,5 @@
 #include "TwoPlayersGame.h"
-#include "Figure.h"
-#include <iostream>
+
 std::mutex mut;
 std::mutex mu;
 

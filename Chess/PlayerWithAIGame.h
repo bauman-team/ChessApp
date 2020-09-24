@@ -1,11 +1,10 @@
 #pragma once
 #include "TwoPlayersGame.h"
+#include "Menu.h"
 #include <list>
-#include <iostream>
-#include <iomanip>
+//#include <iostream>
+//#include <iomanip>
 
-enum class FigureType;
-class TwoPlayersGame;
 class PlayerWithAIGame : public TwoPlayersGame
 {
 private:

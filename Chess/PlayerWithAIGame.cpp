@@ -1,5 +1,4 @@
 #include "PlayerWithAIGame.h"
-#include "Menu.h"
 
 extern std::mutex mu;
 extern std::mutex mut;
@@ -127,7 +126,7 @@ const float PlayerWithAIGame::bitboards[12][8][8] = {
 		 {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}
 };
 
-const int PlayerWithAIGame::DEPTH = 4;//4
+const int PlayerWithAIGame::DEPTH = 1;//4
 
 
 PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting = 0)
@@ -164,7 +163,7 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting = 0)
 
 		int bestIndex = 0;
 		mut.lock();
-		for (int i = 1; i != startedAccessMovesPositions.size(); ++i) // !!!!!! -1
+		for (int i = 1; i != startedAccessMovesPositions.size(); ++i)
 			if (startedMovesScore[i].score > startedMovesScore[bestIndex].score)
 				bestIndex = i;
 			else if (startedMovesScore[i].score == startedMovesScore[bestIndex].score
@@ -185,11 +184,6 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting = 0)
 		sf::sleep(sf::seconds(0.5));
 		return Move(*map.GetFigureWithAccessMoves().at(rand1).figurePosition, map.GetFigureWithAccessMoves().at(rand1).possibleMoves->at(rand() % map.GetFigureWithAccessMoves().at(rand1).possibleMoves->size()));
 	}*/
-	//rand bot, activate from ChangeActivePlayer
-	/*srand(std::time(NULL));
-	int rand1 = rand() % map.GetFigureWithAccessMoves().size();
-	sf::sleep(sf::seconds(2));
-	map.RunMakeMove(*map.GetFigureWithAccessMoves().at(rand1).figurePosition, map.GetFigureWithAccessMoves().at(rand1).possibleMoves->at(rand() % map.GetFigureWithAccessMoves().at(rand1).possibleMoves->size()));*/
 }
 
 int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color AIColor)
@@ -200,7 +194,7 @@ int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color
 	{
 		selected = selectedMap.GetFigureType(Pos::IndexToPosition(i));
 		if (selected != FigureType::Empty)
-			score += figureWeight[to_underlying(selected)] * bitboards[to_underlying(selected)][i % 8][i / 8] * (selectedMap.GetColor(selected) == AIColor ? 1 : -1);
+			score += figureWeight[(int)(selected)] * bitboards[(int)(selected)][i % 8][i / 8] * (selectedMap.GetColor(selected) == AIColor ? 1 : -1);
 	}
 	return score;
 }
@@ -224,14 +218,14 @@ bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps,
 					{
 						FigureType movableFigure = itMap->GetFigureType(*(*it1).figurePosition), eatenFigure = itMap->GetFigureType((*it2));
 						if (eatenFigure != FigureType::Empty)
-							itMap->map[to_underlying(eatenFigure)] -= (*it2).ToBitboard();
-						itMap->map[to_underlying(movableFigure)] -= (*it1).figurePosition->ToBitboard();
-						itMap->map[to_underlying(movableFigure)] += (*it2).ToBitboard();
+							itMap->map[(int)(eatenFigure)] -= (*it2).ToBitboard();
+						itMap->map[(int)(movableFigure)] -= (*it1).figurePosition->ToBitboard();
+						itMap->map[(int)(movableFigure)] += (*it2).ToBitboard();
 						movesScores.push_back(CalculatePositionScore(*itMap, AIColor));
-						itMap->map[to_underlying(movableFigure)] -= (*it2).ToBitboard();
-						itMap->map[to_underlying(movableFigure)] += (*it1).figurePosition->ToBitboard();
+						itMap->map[(int)(movableFigure)] -= (*it2).ToBitboard();
+						itMap->map[(int)(movableFigure)] += (*it1).figurePosition->ToBitboard();
 						if (eatenFigure != FigureType::Empty)
-							itMap->map[to_underlying(eatenFigure)] += (*it2).ToBitboard();
+							itMap->map[(int)(eatenFigure)] += (*it2).ToBitboard();
 					}
 
 				int sizeOfArrayIndexOfMoves = countNewCreatedMap > movesScores.size() ? movesScores.size() : countNewCreatedMap;
@@ -323,7 +317,7 @@ void PlayerWithAIGame::ChangeActivePlayer()
 {
 	mu.lock();
 	if (isTimeLimited)
-		drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
+		drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor()); // REMOVE TO DRAWER
 	activePlayer->SetChosenPosition(Pos::NULL_POS);
 	mu.unlock();
 
@@ -346,8 +340,11 @@ void PlayerWithAIGame::ChangeActivePlayer()
 		if (isTimeLimited)
 			activePlayer->StartTimer();
 	}
-	/*activePlayer = (activePlayer == player2) ? player1 : player2;
-	ChangeActivePlayer();*/
+	/*if (status != GameStatus::Pat && status != GameStatus::Mat)
+	{
+		activePlayer = (activePlayer == player2) ? player1 : player2;
+		ChangeActivePlayer();
+	}*/
 }
 
 void PlayerWithAIGame::StartGame()

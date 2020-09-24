@@ -1,8 +1,6 @@
 #pragma once
 #include "Map.h"
 #include "Drawer.h"
-#include "Pos.h"
-#include "MoveInfo.h"
 
 enum class GameStatus { Play, Shah, Mat, Pat, TimeIsOver };
 enum class GameMode {TwoPlayers, PlayerAndBot};

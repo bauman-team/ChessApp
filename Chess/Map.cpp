@@ -1,21 +1,20 @@
 #include "Map.h"
-#include "Pos.h"
 #include <cassert>
 
 Map::Map()
 {
-	map[to_underlying(FigureType::Rook_white)] = 129;
-	map[to_underlying(FigureType::Knight_white)] = 66;
-	map[to_underlying(FigureType::Bishop_white)] = 36;
-	map[to_underlying(FigureType::Queen_white)] = 8;
-	map[to_underlying(FigureType::King_white)] = 16;
-	map[to_underlying(FigureType::Pawn_white)] = 65'280;
-	map[to_underlying(FigureType::Rook_black)] = 9'295'429'630'892'703'744;
-	map[to_underlying(FigureType::Knight_black)] = 4'755'801'206'503'243'776;
-	map[to_underlying(FigureType::Bishop_black)] = 2'594'073'385'365'405'696;
-	map[to_underlying(FigureType::Queen_black)] = 576'460'752'303'423'488;
-	map[to_underlying(FigureType::King_black)] = 1'152'921'504'606'846'976;
-	map[to_underlying(FigureType::Pawn_black)] = 71'776'119'061'217'280;
+	map[(int)(FigureType::Rook_white)] = 129;
+	map[(int)(FigureType::Knight_white)] = 66;
+	map[(int)(FigureType::Bishop_white)] = 36;
+	map[(int)(FigureType::Queen_white)] = 8;
+	map[(int)(FigureType::King_white)] = 16;
+	map[(int)(FigureType::Pawn_white)] = 65'280;
+	map[(int)(FigureType::Rook_black)] = 9'295'429'630'892'703'744;
+	map[(int)(FigureType::Knight_black)] = 4'755'801'206'503'243'776;
+	map[(int)(FigureType::Bishop_black)] = 2'594'073'385'365'405'696;
+	map[(int)(FigureType::Queen_black)] = 576'460'752'303'423'488;
+	map[(int)(FigureType::King_black)] = 1'152'921'504'606'846'976;
+	map[(int)(FigureType::Pawn_black)] = 71'776'119'061'217'280;
 	possibleCastling[0] = true;
 	possibleCastling[1] = true;
 	possibleCastling[2] = true;
@@ -122,11 +121,11 @@ void Map::Move(const Pos& from, const Pos& to)
 	if (eatenFigure != FigureType::Empty)
 	{
 		info.SetEatenFigure(eatenFigure);
-		map[to_underlying(eatenFigure)] -= to.ToBitboard();
+		map[(int)(eatenFigure)] -= to.ToBitboard();
 		// TODO: decrease numOfFigures
 	}
-	map[to_underlying(movableFigure)] -= from.ToBitboard();
-	map[to_underlying(movableFigure)] += to.ToBitboard();
+	map[(int)(movableFigure)] -= from.ToBitboard();
+	map[(int)(movableFigure)] += to.ToBitboard();
 	movesHistory.push_back(info);
 	if (movableFigure == FigureType::King_black || movableFigure == FigureType::King_white)
 	{
@@ -154,7 +153,7 @@ void Map::SetToEmpty(const Pos& target)
 	assert(target.IsValid());
 	FigureType eatenFigure = GetFigureType(target);
 	movesHistory.back().SetEatenFigure(eatenFigure);
-	map[to_underlying(eatenFigure)] -= target.ToBitboard();
+	map[(int)(eatenFigure)] -= target.ToBitboard();
 }
 
 void Map::PawnToQueen(const Pos& target)
@@ -164,8 +163,8 @@ void Map::PawnToQueen(const Pos& target)
 	MoveInfo info(target, target, Queen);
 	info.SetEatenFigure(movableFigure);
 	movesHistory.push_back(info);
-	map[to_underlying(movableFigure)] -= target.ToBitboard();
-	map[to_underlying(Queen)] += target.ToBitboard();
+	map[(int)(movableFigure)] -= target.ToBitboard();
+	map[(int)(Queen)] += target.ToBitboard();
 }
 
 void Map::Castling(const Pos& from, const Pos& to)
@@ -327,12 +326,12 @@ void Map::CheckingPossibleMove(PossibleMoves& figureMoves)
 			kingPos = posMainFigure;
 		else
 		{
-			kingPos = &Pos::BitboardToPosition(map[to_underlying(Figure::GetFigureTypeColor(mainFigureType) == Color::Black ? FigureType::King_black : FigureType::King_white)]);
+			kingPos = &Pos::BitboardToPosition(map[(int)(Figure::GetFigureTypeColor(mainFigureType) == Color::Black ? FigureType::King_black : FigureType::King_white)]);
 			deleteKingPtr = true;
 		}
 
 		std::vector<Pos>::iterator it = figureMoves.possibleMoves->begin();
-		uint8_t mainFigureIndex = to_underlying(mainFigureType);
+		uint8_t mainFigureIndex = (int)(mainFigureType);
 		for (; it != figureMoves.possibleMoves->end();)
 		{
 			secondaryFigureType = GetFigureType(*it);
@@ -358,7 +357,7 @@ void Map::CheckingPossibleMove(PossibleMoves& figureMoves)
 			}
 			else
 			{
-				map[to_underlying(secondaryFigureType)] -= secondBitboard;
+				map[(int)(secondaryFigureType)] -= secondBitboard;
 				if (*kingPos == *posMainFigure)
 				{
 					if (CheckingShah(*it))
@@ -373,7 +372,7 @@ void Map::CheckingPossibleMove(PossibleMoves& figureMoves)
 					else
 						++it;
 				}
-				map[to_underlying(secondaryFigureType)] += secondBitboard;
+				map[(int)(secondaryFigureType)] += secondBitboard;
 			}
 			map[mainFigureIndex] += mainBitboard;
 			map[mainFigureIndex] -= secondBitboard;
@@ -409,12 +408,12 @@ FigureType Map::GetFigureType(const Pos& pos) const
 
 bool Map::GetCastling(const Color& selectedColor) const
 {
-	return possibleCastling[to_underlying(selectedColor)] || possibleCastling[to_underlying(selectedColor) + 1]; // why ||
+	return possibleCastling[(int)(selectedColor)] || possibleCastling[(int)(selectedColor) + 1]; // why ||
 }
 
 bool Map::GetCastling(const Color& selectedColor, const Pos& selectedPos) const
 {
-	int kingCoeff = 2 * to_underlying(selectedColor);
+	int kingCoeff = 2 * (int)(selectedColor);
 	if (selectedPos == Pos(0, 0) || selectedPos == Pos(0, 7))
 		return possibleCastling[kingCoeff];
 	if (selectedPos == Pos(7, 0) || selectedPos == Pos(7, 7))
@@ -423,14 +422,14 @@ bool Map::GetCastling(const Color& selectedColor, const Pos& selectedPos) const
 
 void Map::SetCastling(const Color& selectedColor)
 {
-	int kingCoeff = 2 * to_underlying(selectedColor);
+	int kingCoeff = 2 * (int)(selectedColor);
 	possibleCastling[kingCoeff] = false;
 	possibleCastling[kingCoeff + 1] = false;
 }
 
 void Map::SetCastling(const Color& selectedColor, const Pos& selectedPos)
 {
-	int kingCoeff = 2 * to_underlying(selectedColor);
+	int kingCoeff = 2 * (int)(selectedColor);
 	if (selectedPos == Pos(0, 0) || selectedPos == Pos(0, 7))
 		possibleCastling[kingCoeff] = false;
 	if (selectedPos == Pos(7, 0) || selectedPos == Pos(7, 7))

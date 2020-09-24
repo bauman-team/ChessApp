@@ -1,13 +1,13 @@
 #pragma once
 #include "Figure.h"
 #include "Pos.h"
-#include <vector>
 #include "MoveInfo.h"
 
-class Figure;
 enum class FigureType;
-class MoveInfo;
 enum class Color;
+
+class MoveInfo;
+class Figure;
 class PlayerWithAIGame;
 
 class Map

@@ -1,11 +1,8 @@
 #pragma once
 #include <string>
-#include "Figure.h"
 #include <SFML/Window.hpp>
+#include "Pos.h"
 
-class Figure;
-class Pos;
-class Map;
 enum class Color;
 
 class Player

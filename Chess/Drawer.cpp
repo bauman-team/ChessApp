@@ -1,4 +1,3 @@
-#include <SFML/Graphics.hpp>
 #include "Drawer.h"
 
 Drawer::Drawer(sf::RenderWindow* _window, const Resources& resource, const MapProperties& properties)
@@ -79,9 +78,9 @@ void Drawer::ShowMap(const Map& map)
 			if (selectedFigure != FigureType::Empty)
 			{
 				Pos coeff = (isWhiteActive) ? Pos(i, 7 - j) : Pos(7 - i, j);
-				figuresSprites[to_underlying(selectedFigure)].setPosition(mapProperties.GetPlayAreaTopLeftX() + coeff.GetX() * mapProperties.GetSquareSize(),
+				figuresSprites[(int)(selectedFigure)].setPosition(mapProperties.GetPlayAreaTopLeftX() + coeff.GetX() * mapProperties.GetSquareSize(),
 																		  mapProperties.GetPlayAreaTopLeftY() + coeff.GetY() * mapProperties.GetSquareSize());
-				window->draw(figuresSprites[to_underlying(selectedFigure)]);
+				window->draw(figuresSprites[(int)(selectedFigure)]);
 			}
 		}
 	}

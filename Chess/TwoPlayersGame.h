@@ -2,14 +2,11 @@
 #include <TGUI/TGUI.hpp>
 #include "Game.h"
 #include "Player.h"
-#include "Resources.h"
-#include "Map.h"
-#include <string>
+
 #include <thread>
-#include <atomic>
-#include <ctime>
-#include <cstdlib>
 #include <mutex>
+//#include <ctime>
+//#include <cstdlib>
 
 class TwoPlayersGame : public Game
 {

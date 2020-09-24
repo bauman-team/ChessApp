@@ -1,5 +1,4 @@
 #include "Menu.h"
-#include "TwoPlayersGame.h"
 
 const std::string Menu::botName = "bot";
 

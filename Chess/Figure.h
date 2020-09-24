@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include "Pos.h"
-#include "Player.h"
 #include "Map.h"
 
 enum class FigureType
@@ -22,15 +21,6 @@ enum class FigureType
 };
 
 enum class Color { White, Black, None }; // None color for Empty figure
-
-template <typename E>
-constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept {
-	return static_cast<typename std::underlying_type<E>::type>(e);
-}
-
-
-class Map;
-class Player;
 
 class Figure
 {
