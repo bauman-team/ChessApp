@@ -129,10 +129,14 @@ void Drawer::RotateBoard()
 	isWhiteActive = !isWhiteActive;
 }
 
-void Drawer::ResizeWindowForGame()
+void Drawer::ResizeWindowForGame(const sf::Vector2f& menuSize)
 {
 	// using create() because setSize() works incorrectly
-	window->create(sf::VideoMode(mapProperties.GetGameWindowHeight() + mapProperties.GetSideMenuWidth(), mapProperties.GetGameWindowHeight()), "Chess");
+	//window->create(sf::VideoMode(x, y), "Chess");
+	if (!menuSize.x)
+		window->create(sf::VideoMode(mapProperties.GetGameWindowHeight() + mapProperties.GetSideMenuWidth(), mapProperties.GetGameWindowHeight()), "Chess");
+	else
+		window->setSize((sf::Vector2u)menuSize);
 }
 
 Pos* Drawer::TransformMousePosition(int mouseX, int mouseY) const

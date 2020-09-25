@@ -2,6 +2,10 @@
 #include <TGUI/TGUI.hpp>
 #include "Game.h"
 
+class Game;
+enum class GameStatus;
+enum class GameMode;
+
 struct InputValues
 {
 	GameMode mode;
@@ -15,6 +19,7 @@ class Menu
 	tgui::Gui gui;
 	Game* game;
 	InputValues inputValues;
+	tgui::Vector2f menuSize;
 
 	const static std::string botName;
 	bool needStartGame; // true if the start button was pressed and the game can be started
@@ -37,6 +42,8 @@ public:
 	InputValues GetInputValues() const;
 	bool CanStartGame(); // returns true if game can be started
 	bool NeedStartGame() const;
+	void ActivateStartMenu();
 	void HandleEvent(sf::Event& event);
 	static std::string GetBotName();
+	tgui::Vector2f GetMenuSize() const;
 };

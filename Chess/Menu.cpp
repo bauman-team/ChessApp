@@ -8,6 +8,7 @@ Menu::Menu(sf::RenderWindow& window, std::string widgetsFile) : gui(window)
 	SetConnections();
 	LoadIcons();
 	needStartGame = false;
+	menuSize = gui.getView().getSize();
 }
 
 void Menu::Show()
@@ -28,6 +29,11 @@ void Menu::HandleEvent(sf::Event& event)
 std::string Menu::GetBotName()
 {
 	return botName;
+}
+
+tgui::Vector2f Menu::GetMenuSize() const
+{
+	return menuSize;
 }
 
 bool Menu::CanStartGame()
@@ -92,6 +98,11 @@ bool Menu::CanStartGame()
 bool Menu::NeedStartGame() const
 {
 	return needStartGame;
+}
+
+void Menu::ActivateStartMenu()
+{
+	needStartGame = false;
 }
 
 void Menu::SetConnections()

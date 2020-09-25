@@ -33,7 +33,7 @@ public:
 	void ShowPossibleMoves(const Map&, const Pos&);
 	void DisplayWindow();
 	void RotateBoard();
-	void ResizeWindowForGame();
+	void ResizeWindowForGame(const sf::Vector2f& menuSize = sf::Vector2f(0, 0));
 
 	Pos* TransformMousePosition(int, int) const; // if coords isn't valid, return nullptr
 };

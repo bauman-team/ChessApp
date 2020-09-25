@@ -1,7 +1,7 @@
 //#pragma comment(linker, "/HEAP:200000000")
 //#pragma comment(linker, "/STACK:1000000000")
 #include "PlayerWithAIGame.h"
-#include "Menu.h"
+#include "Game.h"
 
 int main()
 {
@@ -79,6 +79,12 @@ int main()
 			}
 			if (!game)
 				menu.HandleEvent(event);
+			else if (game->GetStatus() == GameStatus::Mat || game->GetStatus() == GameStatus::Pat || game->GetStatus() == GameStatus::TimeIsOver)
+			{
+				game->ReturnGameToInitialSettings(menu);
+				delete game;
+				game = nullptr;
+			}
 		}
 		if (!game && menu.NeedStartGame())
 		{

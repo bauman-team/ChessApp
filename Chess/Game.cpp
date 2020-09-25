@@ -28,3 +28,9 @@ void Game::Save()
 	out << numberOfMoves;
 	out.close();
 }
+
+void Game::ReturnGameToInitialSettings(Menu& menu)
+{
+	drawer.ResizeWindowForGame(menu.GetMenuSize());
+	menu.ActivateStartMenu();
+}

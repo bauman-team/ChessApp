@@ -22,6 +22,8 @@ enum class FigureType
 
 enum class Color { White, Black, None }; // None color for Empty figure
 
+class Map;
+
 class Figure
 {
 	friend class Map;

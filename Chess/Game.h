@@ -1,9 +1,12 @@
 #pragma once
 #include "Map.h"
 #include "Drawer.h"
+#include "Menu.h"
 
 enum class GameStatus { Play, Shah, Mat, Pat, TimeIsOver };
-enum class GameMode {TwoPlayers, PlayerAndBot};
+enum class GameMode { TwoPlayers, PlayerAndBot };
+
+class Menu;
 
 class Game
 {
@@ -26,6 +29,7 @@ public:
 	GameStatus GetStatus() const { return status; }
 
 	void Save();
+	void ReturnGameToInitialSettings(Menu& menu);
 
 	virtual ~Game(){}
 };
