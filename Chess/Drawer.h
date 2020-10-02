@@ -1,11 +1,13 @@
 #pragma once
-#include <SFML/Graphics.hpp>
+#include <TGUI/TGUI.hpp>
 #include "Resources.h"
 #include "Map.h"
 #include "MapProperties.h"
 
 class Drawer
 {
+	friend class Game;
+
 	sf::RenderWindow* window;
 	sf::Texture mapTexture;
 	sf::Sprite mapSprite;
@@ -34,6 +36,7 @@ public:
 	void DisplayWindow();
 	void RotateBoard();
 	void ResizeWindowForGame(const sf::Vector2f& menuSize = sf::Vector2f(0, 0));
+	void ShowGuiElems(tgui::Gui& gui);
 
 	Pos* TransformMousePosition(int, int) const; // if coords isn't valid, return nullptr
 };

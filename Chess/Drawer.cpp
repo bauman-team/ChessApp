@@ -3,6 +3,7 @@
 Drawer::Drawer(sf::RenderWindow* _window, const Resources& resource, const MapProperties& properties)
 	: window(_window), mapProperties(properties)
 {
+	ResizeWindowForGame();
 	window->setFramerateLimit(60);
 
 	SetResources(resource);
@@ -134,9 +135,19 @@ void Drawer::ResizeWindowForGame(const sf::Vector2f& menuSize)
 	// using create() because setSize() works incorrectly
 	//window->create(sf::VideoMode(x, y), "Chess");
 	if (!menuSize.x)
+	{
 		window->create(sf::VideoMode(mapProperties.GetGameWindowHeight() + mapProperties.GetSideMenuWidth(), mapProperties.GetGameWindowHeight()), "Chess");
+	}
 	else
+	{
+		window->setPosition(sf::Vector2i((sf::VideoMode::getDesktopMode().width - menuSize.x) / 2, (sf::VideoMode::getDesktopMode().height - menuSize.y) / 2));
 		window->setSize((sf::Vector2u)menuSize);
+	}
+}
+
+void Drawer::ShowGuiElems(tgui::Gui& gui)
+{
+	gui.draw();
 }
 
 Pos* Drawer::TransformMousePosition(int mouseX, int mouseY) const

@@ -5,7 +5,8 @@
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(700, 550), "Chess");
+	sf::RenderWindow window;
+	window.create(sf::VideoMode(700, 550), "Chess");
 
 	Resources res;
 	res.SetMapImage("images/map.png");
@@ -75,11 +76,19 @@ int main()
 						game->StartGame();
 					}
 				}
+				else if (!game && (event.key.code == sf::Keyboard::Escape))
+				{
+					if (game)
+						game->Save();
+					window.close();
+				}
 				break;
 			}
+			if (game)
+				game->HandleEvent(event);
 			if (!game)
 				menu.HandleEvent(event);
-			else if (game->GetStatus() == GameStatus::Mat || game->GetStatus() == GameStatus::Pat || game->GetStatus() == GameStatus::TimeIsOver)
+			else if (game->GetStatus() == GameStatus::Exit)
 			{
 				game->ReturnGameToInitialSettings(menu);
 				delete game;

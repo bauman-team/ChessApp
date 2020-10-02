@@ -4,7 +4,20 @@
 void Game::StartGame()
 {
 	status = GameStatus::Play;
-	drawer.ResizeWindowForGame();
+}
+
+Game::Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
+	: drawer(window, resource, properties), gui(*window)
+{
+	tgui::Button::Ptr exitButton = tgui::Button::create();
+	exitButton->setWidgetName("ExitButton");
+	exitButton->setText("Exit");
+	exitButton->setEnabled(true);
+	exitButton->setSize(drawer.mapProperties.GetSideMenuWidth() * 0.5, 50);
+	exitButton->setPosition((drawer.mapProperties.GetGameWindowWidth() - drawer.mapProperties.GetSideMenuWidth() / 2 - exitButton->getSize().x / 2),
+		(drawer.mapProperties.GetGameWindowHeight() - exitButton->getSize().y - 5));
+	exitButton->connect(tgui::Signals::Button::Clicked, &Game::SetExitStatus, this);
+	gui.add(exitButton);
 }
 
 void Game::Save()
@@ -27,6 +40,11 @@ void Game::Save()
 	out.seekp(0, std::ios::beg);
 	out << numberOfMoves;
 	out.close();
+}
+
+void Game::HandleEvent(sf::Event& event)
+{
+	gui.handleEvent(event);
 }
 
 void Game::ReturnGameToInitialSettings(Menu& menu)

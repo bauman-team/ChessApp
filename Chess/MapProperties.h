@@ -18,6 +18,7 @@ public:
 	uint8_t GetSquareSize() const { return squareSize; }
 	int GetGameWindowHeight() const { return gameWindowHeight; }
 	int GetSideMenuWidth() const { return sideMenuWidth; }
+	int GetGameWindowWidth() const { return gameWindowHeight + sideMenuWidth; }
 	uint8_t GetPlayAreaTopLeftX() const { return playAreaTopLeftX; }
 	uint8_t GetPlayAreaTopLeftY() const { return playAreaTopLeftY; }
 
@@ -26,4 +27,6 @@ public:
 	void SetSquareSize(uint8_t size) { squareSize = size; }
 	void SetPlayAreaTopLeft(uint8_t _playAreaTopLeftX, uint8_t _playAreaTopLeftY);
 	void SetScale(float scale);
+
+
 };

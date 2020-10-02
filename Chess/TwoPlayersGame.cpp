@@ -9,6 +9,7 @@ TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resour
 void TwoPlayersGame::Show()
 {
 	drawer.ShowMap(map);
+	drawer.ShowGuiElems(gui);
 	if (isTimeLimited)
 		drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
 	if (activePlayer->HasTime())
