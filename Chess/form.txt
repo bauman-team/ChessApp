@@ -153,6 +153,7 @@ RadioButton.TwoPlayersRB {
     Text = "2 players";
     TextSize = 15;
     renderer = &3;
+    Checked = true;
 }
 
 RadioButton.OnePlayerRB {

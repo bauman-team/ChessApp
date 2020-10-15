@@ -5,10 +5,16 @@ const std::string Menu::botName = "bot";
 Menu::Menu(sf::RenderWindow& window, std::string widgetsFile) : gui(window)
 {
 	gui.loadWidgetsFromFile(widgetsFile);
-	SetConnections();
 	LoadIcons();
+	if (gui.get<tgui::RadioButton>("TwoPlayersRB")->isChecked())
+		ShowTwoPlayersSettings();
+	else if (gui.get<tgui::RadioButton>("OnePlayerRB")->isChecked())
+		ShowOnePlayerSettings();
+	SetConnections();
 	needStartGame = false;
 	menuSize = gui.getView().getSize();
+	gui.get<tgui::EditBox>("FirstPlayerName")->setInputValidator("[a-zA-Z][a-zA-Z0-9]*");
+	gui.get<tgui::EditBox>("SecondPlayerName")->setInputValidator("[a-zA-z][a-zA-Z0-9]*");
 }
 
 void Menu::Show()

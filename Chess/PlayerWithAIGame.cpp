@@ -1,7 +1,8 @@
 #include "PlayerWithAIGame.h"
 
-extern std::mutex mu;
-extern std::mutex mut;
+extern std::mutex mut1;
+extern std::mutex mut2;
+extern std::mutex mut3;
 
 const int PlayerWithAIGame::figureWeight[12] = { 900, 90, 30, 30, 50, 30, 900, 90, 30, 30, 50, 10 };
 
@@ -144,9 +145,9 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting = 0)
 		{
 			isThreadCompleted[i] = false;
 			std::list<Map> listOfMaps;
-			mut.lock();
+			mut2.lock();
 			listOfMaps.push_back(map);
-			mut.unlock();
+			mut2.unlock();
 			listOfMaps.back().Move(startedAccessMovesPositions[i].from, startedAccessMovesPositions[i].to);
 			//isThreadCompleted[i] = PlayerWithAIGame::CalculationScoreOfMoveInThread(listOfMaps, startedMovesScore[i], false, AIColor);
 			std::thread th([i, startedMovesScore, listOfMaps, AIColor, isThreadCompleted]() {
@@ -162,14 +163,14 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting = 0)
 				sf::sleep(sf::seconds(0.1));
 
 		int bestIndex = 0;
-		mut.lock();
+		mut2.lock();
 		for (int i = 1; i != startedAccessMovesPositions.size(); ++i)
 			if (startedMovesScore[i].score > startedMovesScore[bestIndex].score)
 				bestIndex = i;
 			else if (startedMovesScore[i].score == startedMovesScore[bestIndex].score
 				&& startedMovesScore[i].depth < startedMovesScore[bestIndex].depth)
 				bestIndex = i;
-		mut.unlock();
+		mut2.unlock();
 
 
 		delete[] isThreadCompleted;
@@ -194,14 +195,14 @@ int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color
 	{
 		selected = selectedMap.GetFigureType(Pos::IndexToPosition(i));
 		if (selected != FigureType::Empty)
-			score += figureWeight[(int)(selected)] * bitboards[(int)(selected)][i % 8][i / 8] * (selectedMap.GetColor(selected) == AIColor ? 1 : -1);
+			score += figureWeight[(int)(selected)] * (selectedMap.GetColor(selected) == AIColor ? 1 : -1); // * bitboards[(int)(selected)][i % 8][i / 8] 
 	}
 	return score;
 }
 
 bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps, volatile TheWhorstCalculatedScoreOnDepth& startedMoves, bool isAIMoveNow, const Color AIColor)
 {
-	int depth = 0, countOfMapsInList, countNewCreatedMap = 10; // if change countNewCreatedMap look to the func end 
+	int depth = 0, countOfMapsInList, countNewCreatedMap = 30; // if change countNewCreatedMap look to the func end 
 	while (depth != DEPTH)
 	{
 		countOfMapsInList = listOfMaps.size();
@@ -259,13 +260,13 @@ bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps,
 							minScore = movesScores[indexOfMovesWithBestScore[i]];
 						movesScores[indexOfMovesWithBestScore[i]] = INT32_MAX;
 					}
-					mut.lock();
+					mut2.lock();
 					if (startedMoves.depth == -1 || startedMoves.score > minScore)
 					{
 						startedMoves.depth = depth + 1;
 						startedMoves.score = minScore;
 					}
-					mut.unlock();
+					mut2.unlock();
 				}
 
 				int j = 0;
@@ -284,14 +285,14 @@ bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps,
 			listOfMaps.pop_front();
 		}
 		depth += isAIMoveNow ? 0 : 1;
-		if (!isAIMoveNow)
-			countNewCreatedMap = countNewCreatedMap > 3 ? countNewCreatedMap / 3 : 1;
+		/*if (!isAIMoveNow)
+			countNewCreatedMap = countNewCreatedMap > 3 ? countNewCreatedMap / 3 : 1;*/
 		isAIMoveNow = !isAIMoveNow;
 	}
-	mut.lock();
+	mut2.lock();
 	if (startedMoves.depth == -1) // if bot win (add checking PAT)
 		startedMoves.score = INT32_MAX;
-	mut.unlock();
+	mut2.unlock();
 	return true;
 }
 
@@ -308,30 +309,33 @@ void PlayerWithAIGame::SetPlayers(std::string name1, std::string name2, sf::Time
 	if (timeLimit != sf::seconds(0))
 		isTimeLimited = true;
 	isPlayerMoveFirst = (name2 == Menu::GetBotName());
-	player1 = new Player(Color::White, name1, timeLimit);
-	player2 = new Player(Color::Black, name2, timeLimit);
+	player1 = new Player(Color::White, name1, timeLimit, name2 != Menu::GetBotName());
+	player2 = new Player(Color::Black, name2, timeLimit, name2 == Menu::GetBotName());
 	activePlayer = (isPlayerMoveFirst) ? player1 : player2;
 }
 
 void PlayerWithAIGame::ChangeActivePlayer()
 {
-	mu.lock();
-	if (isTimeLimited)
-		drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor()); // REMOVE TO DRAWER
+	mut3.lock();
+	UpdateSideMenu();
+	mut3.unlock();
+	mut1.lock();
 	activePlayer->SetChosenPosition(Pos::NULL_POS);
-	mu.unlock();
+	mut1.unlock();
 
 	map.RunClearPossibleMoves();
 	activePlayer = (activePlayer == player2) ? player1 : player2;
 	map.RunFindMoves(activePlayer->GetColor());
 	status = CheckGameFinal();
-
 	if (status != GameStatus::Pat && status != GameStatus::Mat)
 	{
 		Move bestMove = StartAI();
-		mu.lock();
+		mut1.lock();
 		map.RunMakeMove(bestMove.from, bestMove.to);
-		mu.unlock();
+		mut1.unlock();
+		mut3.lock();
+		UpdateSideMenu();
+		mut3.unlock();
 		map.RunClearPossibleMoves();
 		activePlayer = (activePlayer == player2) ? player1 : player2;
 		map.RunFindMoves(activePlayer->GetColor());

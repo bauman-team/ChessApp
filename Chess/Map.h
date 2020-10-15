@@ -19,10 +19,11 @@ class Map
 		Pos *figurePosition;
 		std::vector<Pos> *possibleMoves;
 	};
-	uint64_t map[12]; // 12 type of figure
+	uint64_t map[12]; // 12 types of figure
 	std::vector<MoveInfo> movesHistory;
 	std::vector<PossibleMoves> *figureWithAccessMoves;
 	bool possibleCastling[4];
+
 public:
 	Map(); 
 	Map(const Map&);
@@ -56,6 +57,8 @@ public:
 	MoveInfo* GetLastMoveInfo();
 
 	std::vector<MoveInfo>& GetMovesHistory();
+
+	int GetMovesCount() const { return movesHistory.size(); }
 
 	~Map()
 	{

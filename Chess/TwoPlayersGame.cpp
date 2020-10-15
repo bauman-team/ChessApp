@@ -1,27 +1,32 @@
 #include "TwoPlayersGame.h"
 
-std::mutex mut;
-std::mutex mu;
+std::mutex mut2;
+std::mutex mut1;
+std::mutex mut3;
 
 TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
 	: Game(window, resource, properties), isTimeLimited(false) {}
 
 void TwoPlayersGame::Show()
 {
+	mut1.lock();
 	drawer.ShowMap(map);
+	mut1.unlock();
+	mut3.lock();
 	drawer.ShowGuiElems(gui);
-	if (isTimeLimited)
+	mut3.unlock();
+	if (isTimeLimited && !activePlayer->GetIsBot())
 		drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
 	if (activePlayer->HasTime())
 	{
-		mu.lock();
+		mut1.lock();
 		Pos chosenPos = activePlayer->GetChosenPosition();
 		if (chosenPos != Pos::NULL_POS)
 		{
 			drawer.ShowActiveFigure(map, chosenPos);
 			drawer.ShowPossibleMoves(map, chosenPos);
 		}
-		mu.unlock();
+		mut1.unlock();
 	}
 	else
 	{
@@ -31,12 +36,15 @@ void TwoPlayersGame::Show()
 
 void TwoPlayersGame::ChangeActivePlayer()
 {
-	mu.lock();
+	mut3.lock();
+	UpdateSideMenu();
+	mut3.unlock();
+	mut1.lock();
 	map.RunClearPossibleMoves();
-	if (isTimeLimited)
-		drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
+	/*if (isTimeLimited)
+		drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());*/
 	activePlayer->SetChosenPosition(Pos::NULL_POS);
-	mu.unlock();
+	mut1.unlock();
 	//sf::sleep(sf::seconds(2));
 
 	activePlayer = (activePlayer == player2) ? player1 : player2;
@@ -129,7 +137,7 @@ void TwoPlayersGame::SetPlayers(std::string name1, std::string name2, sf::Time t
 {
 	if (timeLimit != sf::seconds(0))
 		isTimeLimited = true;
-	player1 = new Player(Color::White, name1, timeLimit);
-	player2 = new Player(Color::Black, name2, timeLimit);
+	player1 = new Player(Color::White, name1, timeLimit, false);
+	player2 = new Player(Color::Black, name2, timeLimit, false);
 	activePlayer = player1;
 }

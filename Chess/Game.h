@@ -33,6 +33,7 @@ public:
 	void virtual HandleEvent(sf::Event& event);
 	void SetExitStatus() { status = GameStatus::Exit; };
 	void ReturnGameToInitialSettings(Menu& menu);
+	void UpdateSideMenu();
 
 	virtual ~Game(){}
 };

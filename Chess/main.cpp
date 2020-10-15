@@ -1,13 +1,15 @@
-//#pragma comment(linker, "/HEAP:200000000")
-//#pragma comment(linker, "/STACK:1000000000")
+/* Bugs:
+	1) add transformation pawn to other figures (not only queen)
+*/
+
 #include "PlayerWithAIGame.h"
 #include "Game.h"
 
 int main()
 {
+	setlocale(0, "ru");
 	sf::RenderWindow window;
 	window.create(sf::VideoMode(700, 550), "Chess");
-
 	Resources res;
 	res.SetMapImage("images/map.png");
 	res.SetFigureImage(FigureType::King_black, "images/King_black.png");
@@ -57,7 +59,8 @@ int main()
 					if (thSetCellIsFinished)
 					{
 						thSetCellIsFinished = false;
-						thSetCell = new std::thread([game, mousePos, &thSetCellIsFinished]() { thSetCellIsFinished = game->SetPlayerChosenCell(mousePos.x, mousePos.y); });
+						thSetCell = new std::thread([game, mousePos, &thSetCellIsFinished]() { 
+							thSetCellIsFinished = game->SetPlayerChosenCell(mousePos.x, mousePos.y);});
 						thSetCell->detach();
 					}
 				}
@@ -84,7 +87,7 @@ int main()
 				}
 				break;
 			}
-			if (game)
+			if (game) // for side menu
 				game->HandleEvent(event);
 			if (!game)
 				menu.HandleEvent(event);

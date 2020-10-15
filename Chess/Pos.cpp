@@ -5,13 +5,8 @@ const Pos Pos::NULL_POS(-1, -1);
 Pos::Pos(uint8_t x, uint8_t y)
 {
 	xy = 255;
-	if (x < 8 && x >= 0 && y < 8 && y >= 0) // 16???
-	{
+	if (x < 8 && x >= 0 && y < 8 && y >= 0)
 		xy = (x << 4) | y;
-		/*xy = x;
-		xy <<= 4;
-		xy |= y;*/
-	}
 }
 
 uint8_t Pos::ToIndex() const
@@ -32,7 +27,6 @@ uint64_t& Pos::ToBitboard() const
 bool Pos::IsValid() const
 {
 	return (xy != 255);
-	//return ((xy >> 4) >= 0 && (xy >> 4) <= 7 && (xy & 15) >= 0 && (xy & 15) <= 7);
 }
 
 Pos& Pos::operator=(const Pos& coords)
@@ -49,6 +43,11 @@ bool Pos::operator==(const Pos& coords) const
 bool Pos::operator!=(const Pos& coords) const
 {
 	return xy != coords.xy;
+}
+
+std::string Pos::ToString() const
+{
+	return (char)((xy >> 4) + 'A') + std::to_string((xy & 15) + 1);
 }
 
 Pos Pos::Add(int8_t x, int8_t y) const
