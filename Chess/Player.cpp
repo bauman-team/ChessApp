@@ -19,6 +19,6 @@ sf::Time Player::GetRemainingTime()
 	else
 	{
 		timeIsUp = true;
-		sf::seconds(0);
+		return sf::seconds(0);
 	}
 }

@@ -20,7 +20,7 @@ class Player
 	bool isBot;
 	
 public:
-	Player(Color _color, std::string _name, sf::Time timeLimit, bool _isBot);
+	Player(Color _color, std::string _name, sf::Time timeLimit, bool _isBot = false);
 
 	int DecreaseNumOfFigures() { return --numOfFigures; }
 	void SetChosenPosition(Pos position) { chosenPos = position; }

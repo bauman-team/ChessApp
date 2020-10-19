@@ -27,6 +27,4 @@ public:
 	void SetSquareSize(uint8_t size) { squareSize = size; }
 	void SetPlayAreaTopLeft(uint8_t _playAreaTopLeftX, uint8_t _playAreaTopLeftY);
 	void SetScale(float scale);
-
-
 };

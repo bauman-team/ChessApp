@@ -1,6 +1,6 @@
 #include "Figure.h"
 
-std::vector<Pos> Figure::FindDiagonalMoves(const Pos& coords, Map& ptrMap)
+std::vector<Pos> Figure::FindDiagonalMoves(const Pos& coords, const Map& ptrMap)
 {
 	std::vector<Pos> moves;
 	Pos nextPosition;
@@ -101,7 +101,7 @@ std::vector<Pos>& Figure::FindPossibleMovesKing(const Pos& coords, Map& ptrMap)
 				&& ptrMap.CheckEmpty(coords, Pos(3, y)) == 1)
 			{
 				checkCastling.push_back(Pos(3, y));
-				Map::PossibleMoves checkMoves;
+				PossibleMoves checkMoves;
 				checkMoves.figurePosition = const_cast<Pos*>(&coords);
 				checkMoves.possibleMoves = &checkCastling;
 				ptrMap.CheckingPossibleMove(checkMoves);
@@ -114,7 +114,7 @@ std::vector<Pos>& Figure::FindPossibleMovesKing(const Pos& coords, Map& ptrMap)
 				&& ptrMap.CheckEmpty(coords, Pos(5, y)) == 1)
 			{
 				checkCastling.push_back(Pos(5, y));
-				Map::PossibleMoves checkMoves;
+				PossibleMoves checkMoves;
 				checkMoves.figurePosition = const_cast<Pos*>(&coords);
 				checkMoves.possibleMoves = &checkCastling;
 				ptrMap.CheckingPossibleMove(checkMoves);
@@ -126,7 +126,7 @@ std::vector<Pos>& Figure::FindPossibleMovesKing(const Pos& coords, Map& ptrMap)
 	return possibleMoves;
 }
 
-std::vector<Pos>& Figure::FindPossibleMovesQueen(const Pos& coords, Map& ptrMap)
+std::vector<Pos>& Figure::FindPossibleMovesQueen(const Pos& coords, const Map& ptrMap)
 {
 	std::vector<Pos>& possibleMoves = *(new std::vector<Pos>);
 	possibleMoves = FindStraightMoves(coords, ptrMap);
@@ -135,14 +135,14 @@ std::vector<Pos>& Figure::FindPossibleMovesQueen(const Pos& coords, Map& ptrMap)
 	return possibleMoves;
 }
 
-std::vector<Pos>& Figure::FindPossibleMovesBishop(const Pos& coords, Map& ptrMap)
+std::vector<Pos>& Figure::FindPossibleMovesBishop(const Pos& coords, const Map& ptrMap)
 {
 	std::vector<Pos>& possibleMoves = *(new std::vector<Pos>);
 	possibleMoves = FindDiagonalMoves(coords, ptrMap);
 	return possibleMoves;
 }
 
-std::vector<Pos>& Figure::FindPossibleMovesKnight(const Pos& coords, Map& ptrMap)
+std::vector<Pos>& Figure::FindPossibleMovesKnight(const Pos& coords, const Map& ptrMap)
 {
 	Pos nextPosition;
 	std::vector<Pos>& possibleMoves = *(new std::vector<Pos>);
@@ -167,14 +167,14 @@ std::vector<Pos>& Figure::FindPossibleMovesKnight(const Pos& coords, Map& ptrMap
 	return possibleMoves;
 }
 
-std::vector<Pos>& Figure::FindPossibleMovesRook(const Pos& coords, Map& ptrMap)
+std::vector<Pos>& Figure::FindPossibleMovesRook(const Pos& coords, const Map& ptrMap)
 {
 	std::vector<Pos>& possibleMoves = *(new std::vector<Pos>);
 	possibleMoves = FindStraightMoves(coords, ptrMap);
 	return possibleMoves;
 }
 
-std::vector<Pos>& Figure::FindPossibleMovesPawn(const Pos& coords, Map& ptrMap)
+std::vector<Pos>& Figure::FindPossibleMovesPawn(const Pos& coords, const Map& ptrMap)
 {
 	Pos nextPosition = coords;
 	std::vector<Pos>& possibleMoves = *(new std::vector<Pos>);
@@ -213,7 +213,7 @@ std::vector<Pos>& Figure::FindPossibleMovesPawn(const Pos& coords, Map& ptrMap)
 	return possibleMoves;
 }
 
-std::vector<Pos> Figure::FindStraightMoves(const Pos& coords, Map& ptrMap)
+std::vector<Pos> Figure::FindStraightMoves(const Pos& coords, const Map& ptrMap)
 {
 	std::vector<Pos> moves;
 	Pos nextPosition;

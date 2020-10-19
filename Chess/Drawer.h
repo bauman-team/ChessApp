@@ -6,8 +6,6 @@
 
 class Drawer
 {
-	friend class Game;
-
 	sf::RenderWindow* window;
 	sf::Texture mapTexture;
 	sf::Sprite mapSprite;
@@ -28,6 +26,7 @@ public:
 
 	sf::Vector2u GetSideMenuSize() const;
 	int GetSizeMenuTopLeftX() const;
+	MapProperties GetMapProps() const;
 
 	void ShowMap(const Map& map);
 	void ShowTimer(sf::Time time, Color activeColor);

@@ -14,14 +14,13 @@ protected:
 	Drawer drawer;
 	Map map;
 	GameStatus status;
-
-	tgui::Gui gui;
+	tgui::Gui gameGui;
 
 	GameStatus virtual CheckGameFinal() = 0;
 public:
 	Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties);
 
-	void virtual StartGame();
+	void virtual StartGame() = 0;
 	void virtual Show() = 0;
 	void virtual ChangeActivePlayer() = 0;
 	bool virtual SetPlayerChosenCell(int, int) = 0;
@@ -30,7 +29,7 @@ public:
 	GameStatus GetStatus() const { return status; }
 
 	void Save();
-	void virtual HandleEvent(sf::Event& event);
+	void HandleEvent(sf::Event& event);
 	void SetExitStatus() { status = GameStatus::Exit; };
 	void ReturnGameToInitialSettings(Menu& menu);
 	void UpdateSideMenu();

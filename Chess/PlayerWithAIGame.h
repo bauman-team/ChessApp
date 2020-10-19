@@ -35,7 +35,7 @@ protected:
 			score = 0;
 		}
 	};
-	Move StartAI(double timeForWaiting);
+	Move StartAI(double timeForWaiting = 0);
 	static int CalculatePositionScore(const Map& selectedMap, const Color AIColor);
 	static bool CalculationScoreOfMoveInThread(std::list<Map> listOfMaps, volatile TheWhorstCalculatedScoreOnDepth &startedMoves, bool isAIMoveNow, const Color AIColor); 
 	static bool IsAllThreadsOfMovesCompleted(bool* threadsInfo, int range);

@@ -16,7 +16,7 @@ struct InputValues
 
 class Menu
 {
-	tgui::Gui gui;
+	tgui::Gui menuGui;
 	Game* game;
 	InputValues inputValues;
 	tgui::Vector2f menuSize;

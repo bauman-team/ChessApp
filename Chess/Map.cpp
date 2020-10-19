@@ -29,17 +29,9 @@ Map::Map(const Map& baseMap)
 	possibleCastling[0] = baseMap.possibleCastling[0];
 	possibleCastling[1] = baseMap.possibleCastling[1];
 	possibleCastling[2] = baseMap.possibleCastling[2];
-	possibleCastling[3] = baseMap.possibleCastling[3];
-	if (baseMap.movesHistory.size() > 7)
-	{
-		int x = 5;
-		x += 2;
-	}
-	
+	possibleCastling[3] = baseMap.possibleCastling[3];	
 	if (!baseMap.movesHistory.empty())
 		movesHistory = baseMap.movesHistory;
-	/*for (int i = 0; i != baseMap.movesHistory.size(); ++i)
-		movesHistory.push_back(MoveInfo(baseMap.movesHistory[i]));*/
 	figureWithAccessMoves = new std::vector<PossibleMoves>;
 }
 
@@ -148,6 +140,27 @@ void Map::Move(const Pos& from, const Pos& to)
 	}
 }
 
+void Map::DoImitationMove(const Pos& from, const Pos& to)
+{
+	FigureType moved = GetFigureType(from);
+	FigureType eaten = GetFigureType(to);
+	if (eaten != FigureType::Empty)
+		map[(int)eaten] -= to.ToBitboard();
+	map[(int)moved] -= from.ToBitboard();
+	map[(int)moved] += to.ToBitboard();
+}
+
+void Map::UndoImitationMove(const Pos& from, const Pos& to, FigureType eatenType)
+{
+	FigureType moved = GetFigureType(to);
+	FigureType eaten = eatenType;
+	if (eaten != FigureType::Empty)
+		map[(int)eaten] += to.ToBitboard();
+	map[(int)moved] -= to.ToBitboard();
+	map[(int)moved] += from.ToBitboard();
+	
+}
+
 void Map::SetToEmpty(const Pos& target)
 {
 	assert(target.IsValid());
@@ -185,7 +198,7 @@ void Map::Castling(const Pos& from, const Pos& to)
 	Move(rookFrom, rookTo);
 }
 
-bool Map::CheckingShah(const Pos& kingPos)
+bool Map::CheckingShah(const Pos& kingPos) const
 {
 	if (true) // numOfFigures
 	{ // high // method FROM KING
@@ -408,7 +421,7 @@ FigureType Map::GetFigureType(const Pos& pos) const
 
 bool Map::GetCastling(const Color& selectedColor) const
 {
-	return possibleCastling[(int)(selectedColor)] || possibleCastling[(int)(selectedColor) + 1]; // why ||
+	return possibleCastling[(int)(selectedColor)] || possibleCastling[(int)(selectedColor) + 1]; // TODO: why ||
 }
 
 bool Map::GetCastling(const Color& selectedColor, const Pos& selectedPos) const
@@ -448,12 +461,12 @@ int8_t Map::CheckEmpty(const Pos& from, const Pos& to) const
 	return 0; // if Pos contains the figure with same color or output border
 }
 
-MoveInfo* Map::GetLastMoveInfo()
+const MoveInfo* Map::GetLastMoveInfo() const
 {
 	return (!movesHistory.empty()) ? &movesHistory.back() : nullptr;
 }
 
-std::vector<MoveInfo>& Map::GetMovesHistory()
+const std::vector<MoveInfo>& Map::GetMovesHistory() const
 {
 	return movesHistory;
 }

@@ -21,7 +21,6 @@ public:
 	bool operator!=(const Pos& coords) const;
 	std::string ToString() const;
 
-
 	Pos Add(int8_t x, int8_t y) const;
 
 	static Pos& BitboardToPosition(uint64_t);

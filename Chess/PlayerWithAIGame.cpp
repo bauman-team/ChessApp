@@ -130,7 +130,7 @@ const float PlayerWithAIGame::bitboards[12][8][8] = {
 const int PlayerWithAIGame::DEPTH = 1;//4
 
 
-PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting = 0)
+PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 {
 	/*if (activePlayer->GetColor() != Color::Black)
 	{*/
@@ -139,11 +139,11 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting = 0)
 			for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
 				startedAccessMovesPositions.push_back(Move(*(*it1).figurePosition, *it2));
 		volatile TheWhorstCalculatedScoreOnDepth* const startedMovesScore = new volatile TheWhorstCalculatedScoreOnDepth[startedAccessMovesPositions.size()];
-		bool* isThreadCompleted = new bool[startedAccessMovesPositions.size()];
+		bool* isThreadCompleted = new bool[startedAccessMovesPositions.size()]();
 		Color AIColor = activePlayer->GetColor();
 		for (int i = 0; i != startedAccessMovesPositions.size(); ++i)
 		{
-			isThreadCompleted[i] = false;
+			//isThreadCompleted[i] = false;
 			std::list<Map> listOfMaps;
 			mut2.lock();
 			listOfMaps.push_back(map);
@@ -158,7 +158,7 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting = 0)
 
 		sf::sleep(sf::seconds(timeForWaiting));
 
-		if (timeForWaiting == 0)
+		if (timeForWaiting == 0) // TODO: delete this unnessesary if?
 			while (!IsAllThreadsOfMovesCompleted(isThreadCompleted, startedAccessMovesPositions.size()))
 				sf::sleep(sf::seconds(0.1));
 
@@ -171,7 +171,6 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting = 0)
 				&& startedMovesScore[i].depth < startedMovesScore[bestIndex].depth)
 				bestIndex = i;
 		mut2.unlock();
-
 
 		delete[] isThreadCompleted;
 		delete[] startedMovesScore;
@@ -217,20 +216,23 @@ bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps,
 				for (auto it1 = itMap->GetFigureWithAccessMoves().begin(); it1 != itMap->GetFigureWithAccessMoves().end(); ++it1) // calculate score
 					for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
 					{
-						FigureType movableFigure = itMap->GetFigureType(*(*it1).figurePosition), eatenFigure = itMap->GetFigureType((*it2));
-						if (eatenFigure != FigureType::Empty)
+						//FigureType movableFigure = itMap->GetFigureType(*(*it1).figurePosition), eatenFigure = itMap->GetFigureType((*it2));
+						FigureType eatenFigure = itMap->GetFigureType(*it2);
+						itMap->DoImitationMove(*(*it1).figurePosition, *it2);
+						/*if (eatenFigure != FigureType::Empty)
 							itMap->map[(int)(eatenFigure)] -= (*it2).ToBitboard();
 						itMap->map[(int)(movableFigure)] -= (*it1).figurePosition->ToBitboard();
-						itMap->map[(int)(movableFigure)] += (*it2).ToBitboard();
+						itMap->map[(int)(movableFigure)] += (*it2).ToBitboard();*/
 						movesScores.push_back(CalculatePositionScore(*itMap, AIColor));
-						itMap->map[(int)(movableFigure)] -= (*it2).ToBitboard();
+						/*itMap->map[(int)(movableFigure)] -= (*it2).ToBitboard();
 						itMap->map[(int)(movableFigure)] += (*it1).figurePosition->ToBitboard();
 						if (eatenFigure != FigureType::Empty)
-							itMap->map[(int)(eatenFigure)] += (*it2).ToBitboard();
+							itMap->map[(int)(eatenFigure)] += (*it2).ToBitboard();*/
+						itMap->UndoImitationMove(*(*it1).figurePosition, *it2, eatenFigure);
 					}
 
-				int sizeOfArrayIndexOfMoves = countNewCreatedMap > movesScores.size() ? movesScores.size() : countNewCreatedMap;
-				int* indexOfMovesWithBestScore = new int[sizeOfArrayIndexOfMoves]; //index of maps witch create later
+				int sizeOfArrayIndexOfMoves = ((countNewCreatedMap > movesScores.size()) ? movesScores.size() : countNewCreatedMap);
+				int* indexOfMovesWithBestScore = new int[sizeOfArrayIndexOfMoves]; //index of maps which create later
 
 				if (isAIMoveNow)
 				{
@@ -256,7 +258,7 @@ bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps,
 							if (movesScores[j] < movesScores[indexOfMovesWithBestScore[i]])
 								indexOfMovesWithBestScore[i] = j;
 						}
-						if (i == 0)
+						if (i == 0) // why 0
 							minScore = movesScores[indexOfMovesWithBestScore[i]];
 						movesScores[indexOfMovesWithBestScore[i]] = INT32_MAX;
 					}
@@ -276,6 +278,7 @@ bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps,
 							for (int i = 0; i != sizeOfArrayIndexOfMoves; ++i)
 								if (j == indexOfMovesWithBestScore[i])
 								{
+									// TODO: maybe increase j
 									listOfMaps.push_back(*itMap);
 									listOfMaps.back().Move(*(*it1).figurePosition, *it2);
 								}
@@ -353,7 +356,6 @@ void PlayerWithAIGame::ChangeActivePlayer()
 
 void PlayerWithAIGame::StartGame()
 {
-	Game::StartGame();
 	if (!isPlayerMoveFirst)
 	{
 		drawer.RotateBoard();

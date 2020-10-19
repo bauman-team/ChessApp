@@ -13,7 +13,7 @@ void TwoPlayersGame::Show()
 	drawer.ShowMap(map);
 	mut1.unlock();
 	mut3.lock();
-	drawer.ShowGuiElems(gui);
+	drawer.ShowGuiElems(gameGui);
 	mut3.unlock();
 	if (isTimeLimited && !activePlayer->GetIsBot())
 		drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
@@ -29,9 +29,7 @@ void TwoPlayersGame::Show()
 		mut1.unlock();
 	}
 	else
-	{
 		status = GameStatus::TimeIsOver;
-	}
 }
 
 void TwoPlayersGame::ChangeActivePlayer()
@@ -127,7 +125,6 @@ GameStatus TwoPlayersGame::CheckGameFinal()
 
 void TwoPlayersGame::StartGame()
 {
-	Game::StartGame();
 	map.RunFindMoves(activePlayer->GetColor());
 	if (isTimeLimited)
 		activePlayer->StartTimer();
@@ -137,7 +134,7 @@ void TwoPlayersGame::SetPlayers(std::string name1, std::string name2, sf::Time t
 {
 	if (timeLimit != sf::seconds(0))
 		isTimeLimited = true;
-	player1 = new Player(Color::White, name1, timeLimit, false);
-	player2 = new Player(Color::Black, name2, timeLimit, false);
+	player1 = new Player(Color::White, name1, timeLimit);
+	player2 = new Player(Color::Black, name2, timeLimit);
 	activePlayer = player1;
 }

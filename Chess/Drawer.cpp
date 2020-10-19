@@ -33,6 +33,11 @@ int Drawer::GetSizeMenuTopLeftX() const
 	return mapProperties.GetGameWindowHeight(); // because board height = board width
 }
 
+MapProperties Drawer::GetMapProps() const
+{
+	return mapProperties;
+}
+
 void Drawer::SetResources(const Resources& resource)
 {
 	mapTexture.loadFromFile(resource.GetPathToMapImage());
@@ -80,7 +85,7 @@ void Drawer::ShowMap(const Map& map)
 			{
 				Pos coeff = (isWhiteActive) ? Pos(i, 7 - j) : Pos(7 - i, j);
 				figuresSprites[(int)(selectedFigure)].setPosition(mapProperties.GetPlayAreaTopLeftX() + coeff.GetX() * mapProperties.GetSquareSize(),
-																		  mapProperties.GetPlayAreaTopLeftY() + coeff.GetY() * mapProperties.GetSquareSize());
+																  mapProperties.GetPlayAreaTopLeftY() + coeff.GetY() * mapProperties.GetSquareSize());
 				window->draw(figuresSprites[(int)(selectedFigure)]);
 			}
 		}
@@ -132,10 +137,9 @@ void Drawer::RotateBoard()
 
 void Drawer::ResizeWindowForGame(const sf::Vector2f& menuSize)
 {
-	// using create() because setSize() works incorrectly
-	//window->create(sf::VideoMode(x, y), "Chess");
 	if (!menuSize.x)
 	{
+		// using create() because setSize() works incorrectly
 		window->create(sf::VideoMode(mapProperties.GetGameWindowHeight() + mapProperties.GetSideMenuWidth(), mapProperties.GetGameWindowHeight()), "Chess");
 	}
 	else
