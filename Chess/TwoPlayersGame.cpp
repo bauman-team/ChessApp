@@ -1,8 +1,9 @@
 #include "TwoPlayersGame.h"
 
-std::mutex mut2;
 std::mutex mut1;
+std::mutex mut2;
 std::mutex mut3;
+std::mutex mut4;
 
 TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
 	: Game(window, resource, properties), isTimeLimited(false) {}
@@ -70,7 +71,7 @@ void TwoPlayersGame::ChangeActivePlayer()
 		activePlayer->StartTimer();
 }
 
-bool TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
+void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 {
 	if (activePlayer->HasTime())
 	{
@@ -99,7 +100,6 @@ bool TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 			delete position;
 		}
 	}
-	return 1;
 }
 
 GameStatus TwoPlayersGame::CheckGameFinal()

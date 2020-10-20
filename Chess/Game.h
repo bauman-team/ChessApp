@@ -24,10 +24,10 @@ public:
 	void virtual StartGame();
 	void virtual Show() = 0;
 	void virtual ChangeActivePlayer() = 0;
-	bool virtual SetPlayerChosenCell(int, int) = 0;
+	void virtual SetPlayerChosenCell(int, int) = 0;
 	void virtual SetPlayers(std::string name1, std::string name2, sf::Time timeLimit = sf::seconds(0)) = 0;
 
-	GameStatus GetStatus() const { return status; }
+	volatile GameStatus GetStatus() const { return status; }
 
 	void Save();
 	void virtual HandleEvent(sf::Event& event);

@@ -322,7 +322,6 @@ void PlayerWithAIGame::ChangeActivePlayer()
 	mut1.lock();
 	activePlayer->SetChosenPosition(Pos::NULL_POS);
 	mut1.unlock();
-
 	map.RunClearPossibleMoves();
 	activePlayer = (activePlayer == player2) ? player1 : player2;
 	map.RunFindMoves(activePlayer->GetColor());
@@ -357,8 +356,6 @@ void PlayerWithAIGame::StartGame()
 	if (!isPlayerMoveFirst)
 	{
 		drawer.RotateBoard();
-		std::thread th(&PlayerWithAIGame::ChangeActivePlayer, std::ref(*this));
-		th.detach();
 	}
 	else
 	{

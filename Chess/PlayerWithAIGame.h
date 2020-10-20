@@ -48,6 +48,8 @@ public:
 
 	void virtual ChangeActivePlayer() override;
 	void virtual StartGame() override;
+
+	bool GetIsPlayerMoveFirst() { return isPlayerMoveFirst; }
 	/*void output()
 	{
 		for (int i = 0; i != 6; ++i)
