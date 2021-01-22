@@ -5,6 +5,9 @@
 #include "PlayerWithAIGame.h"
 #include "Game.h"
 
+extern std::mutex mut4;
+
+
 int main()
 {
 	setlocale(0, "ru");
@@ -59,8 +62,14 @@ int main()
 					if (thSetCellIsFinished)
 					{
 						thSetCellIsFinished = false;
-						thSetCell = new std::thread([game, mousePos, &thSetCellIsFinished]() { 
-							thSetCellIsFinished = game->SetPlayerChosenCell(mousePos.x, mousePos.y);});
+						Game* ptrGame = game;
+						thSetCell = new std::thread([&ptrGame, &thSetCellIsFinished, mousePos]() {
+							ptrGame->SetPlayerChosenCell(mousePos.x, mousePos.y);
+							/*mut4.lock();
+							if (ptrGame->GetStatus() == GameStatus::Exit)
+								delete ptrGame;
+							mut4.unlock();*/
+							thSetCellIsFinished = true; });
 						thSetCell->detach();
 					}
 				}
@@ -77,6 +86,23 @@ int main()
 							game = new PlayerWithAIGame(&window, res, prop);
 						game->SetPlayers(inputValues.firstName, inputValues.secondName, inputValues.time);
 						game->StartGame();
+						if (typeid(*game) == typeid(PlayerWithAIGame))
+						{
+							if (!((PlayerWithAIGame*)game)->GetIsPlayerMoveFirst())
+							{
+								while (!thSetCellIsFinished) sf::sleep(sf::seconds(0.1));
+								thSetCellIsFinished = false;
+								Game* ptrGame = game;
+								thSetCell = new std::thread([&ptrGame, &thSetCellIsFinished]() {
+									ptrGame->ChangeActivePlayer();
+									/*mut4.lock();
+									if (ptrGame->GetStatus() == GameStatus::Exit)
+										delete ptrGame;
+									mut4.unlock();*/
+									thSetCellIsFinished = true; });
+								thSetCell->detach();
+							}
+						}
 					}
 				}
 				else if (!game && (event.key.code == sf::Keyboard::Escape))
@@ -87,16 +113,21 @@ int main()
 				}
 				break;
 			}
-			if (game) // for side menu
-				game->HandleEvent(event);
+			//mut4.lock();
+			if (game)
+			{
+				game->HandleEvent(event); // for side menu
+				if (game->GetStatus() == GameStatus::Exit) // button exit is clicked
+				{
+					game->ReturnGameToInitialSettings(menu);
+					if (thSetCellIsFinished)
+						delete game;
+					game = nullptr;
+				}
+			}
+			//mut4.unlock();
 			if (!game)
 				menu.HandleEvent(event);
-			else if (game->GetStatus() == GameStatus::Exit)
-			{
-				game->ReturnGameToInitialSettings(menu);
-				delete game;
-				game = nullptr;
-			}
 		}
 		if (!game && menu.NeedStartGame())
 		{
@@ -107,6 +138,23 @@ int main()
 				game = new PlayerWithAIGame(&window, res, prop);
 			game->SetPlayers(inputValues.firstName, inputValues.secondName, inputValues.time);
 			game->StartGame();
+			if (typeid(*game) == typeid(PlayerWithAIGame))
+			{
+				if (!((PlayerWithAIGame*)game)->GetIsPlayerMoveFirst())
+				{
+					while (!thSetCellIsFinished) sf::sleep(sf::seconds(0.1));
+					thSetCellIsFinished = false;
+					Game* ptrGame = game;
+					thSetCell = new std::thread([&ptrGame, &thSetCellIsFinished]() {
+						ptrGame->ChangeActivePlayer();
+						/*mut4.lock();
+						if (ptrGame->GetStatus() == GameStatus::Exit)
+							delete ptrGame;
+						mut4.unlock();*/
+						thSetCellIsFinished = true; });
+					thSetCell->detach();
+				}
+			}
 		}
 		(game) ? game->Show() : menu.Show();
 		window.display();
