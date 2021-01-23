@@ -137,7 +137,7 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 		std::vector<Move> startedAccessMovesPositions;
 		for (auto it1 = map.GetFigureWithAccessMoves().begin(); it1 != map.GetFigureWithAccessMoves().end(); ++it1)
 			for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
-				startedAccessMovesPositions.push_back(Move(*(*it1).figurePosition, *it2));
+				startedAccessMovesPositions.push_back(Move((*it1).figurePosition, *it2));
 		volatile TheWhorstCalculatedScoreOnDepth* const startedMovesScore = new volatile TheWhorstCalculatedScoreOnDepth[startedAccessMovesPositions.size()];
 		bool* isThreadCompleted = new bool[startedAccessMovesPositions.size()]();
 		Color AIColor = activePlayer->GetColor();
@@ -218,7 +218,7 @@ bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps,
 					{
 						//FigureType movableFigure = itMap->GetFigureType(*(*it1).figurePosition), eatenFigure = itMap->GetFigureType((*it2));
 						FigureType eatenFigure = itMap->GetFigureType(*it2);
-						itMap->DoImitationMove(*(*it1).figurePosition, *it2);
+						itMap->DoImitationMove((*it1).figurePosition, *it2);
 						/*if (eatenFigure != FigureType::Empty)
 							itMap->map[(int)(eatenFigure)] -= (*it2).ToBitboard();
 						itMap->map[(int)(movableFigure)] -= (*it1).figurePosition->ToBitboard();
@@ -228,7 +228,7 @@ bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps,
 						itMap->map[(int)(movableFigure)] += (*it1).figurePosition->ToBitboard();
 						if (eatenFigure != FigureType::Empty)
 							itMap->map[(int)(eatenFigure)] += (*it2).ToBitboard();*/
-						itMap->UndoImitationMove(*(*it1).figurePosition, *it2, eatenFigure);
+						itMap->UndoImitationMove((*it1).figurePosition, *it2, eatenFigure);
 					}
 
 				int sizeOfArrayIndexOfMoves = ((countNewCreatedMap > movesScores.size()) ? movesScores.size() : countNewCreatedMap);
@@ -280,7 +280,7 @@ bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps,
 								{
 									// TODO: maybe increase j
 									listOfMaps.push_back(*itMap);
-									listOfMaps.back().Move(*(*it1).figurePosition, *it2);
+									listOfMaps.back().Move((*it1).figurePosition, *it2);
 								}
 				delete[] indexOfMovesWithBestScore;
 				itMap->RunClearPossibleMoves();

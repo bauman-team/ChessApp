@@ -154,16 +154,16 @@ void Drawer::ShowGuiElems(tgui::Gui& gui)
 	gui.draw();
 }
 
-Pos* Drawer::TransformMousePosition(int mouseX, int mouseY) const
+Pos Drawer::TransformMousePosition(int mouseX, int mouseY) const
 {
 	if (mouseX >= mapProperties.GetPlayAreaTopLeftX() && mouseX <= mapProperties.GetPlayAreaTopLeftX() + mapProperties.GetSquareSize() * 8 &&
 		mouseY >= mapProperties.GetPlayAreaTopLeftY() && mouseY <= mapProperties.GetPlayAreaTopLeftY() + mapProperties.GetSquareSize() * 8)
 	{
 		int coordX = (mouseX - mapProperties.GetPlayAreaTopLeftX()) / mapProperties.GetSquareSize();
 		int coordY = 7 - (mouseY - mapProperties.GetPlayAreaTopLeftY()) / mapProperties.GetSquareSize();
-		return new Pos(coordX, coordY);
+		return Pos(coordX, coordY);
 	}
-	return nullptr;
+	return Pos::NULL_POS;
 }
 
 void Drawer::ShowPossibleMoves(const Map& map, const Pos& selectedFigure)

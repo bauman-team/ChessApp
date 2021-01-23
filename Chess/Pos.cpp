@@ -55,7 +55,7 @@ Pos Pos::Add(int8_t x, int8_t y) const
 	return Pos((xy >> 4) + x, (xy & 15) + y);
 }
 
-Pos& Pos::BitboardToPosition(uint64_t bitboard)
+Pos Pos::BitboardToPosition(uint64_t bitboard)
 {
 	uint8_t x = 0, y = 0;
 	while (bitboard > 128)
@@ -68,7 +68,7 @@ Pos& Pos::BitboardToPosition(uint64_t bitboard)
 		++x;
 		bitboard >>= 1;
 	}
-	return *(new Pos(x, y));
+	return Pos(x, y);
 }
 
 Pos Pos::IndexToPosition(uint8_t index)

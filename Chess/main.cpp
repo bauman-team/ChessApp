@@ -1,5 +1,6 @@
 /* Bugs:
 	1) add transformation pawn to other figures (not only queen)
+	2) fix scaling window
 */
 
 #include "PlayerWithAIGame.h"

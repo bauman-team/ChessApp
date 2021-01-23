@@ -12,7 +12,7 @@ class PlayerWithAIGame;
 
 struct PossibleMoves
 {
-	Pos* figurePosition;
+	Pos figurePosition;
 	std::vector<Pos>* possibleMoves;
 };
 

@@ -102,7 +102,7 @@ std::vector<Pos>& Figure::FindPossibleMovesKing(const Pos& coords, Map& ptrMap)
 			{
 				checkCastling.push_back(Pos(3, y));
 				PossibleMoves checkMoves;
-				checkMoves.figurePosition = const_cast<Pos*>(&coords);
+				checkMoves.figurePosition = coords;
 				checkMoves.possibleMoves = &checkCastling;
 				ptrMap.CheckingPossibleMove(checkMoves);
 				if (!checkMoves.possibleMoves->empty())
@@ -115,7 +115,7 @@ std::vector<Pos>& Figure::FindPossibleMovesKing(const Pos& coords, Map& ptrMap)
 			{
 				checkCastling.push_back(Pos(5, y));
 				PossibleMoves checkMoves;
-				checkMoves.figurePosition = const_cast<Pos*>(&coords);
+				checkMoves.figurePosition = coords;
 				checkMoves.possibleMoves = &checkCastling;
 				ptrMap.CheckingPossibleMove(checkMoves);
 				if (!checkMoves.possibleMoves->empty())

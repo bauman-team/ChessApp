@@ -42,7 +42,7 @@ const std::vector<Pos>* Map::GetPossibleMoves(const Pos& figurePosition) const
 	{
 		std::vector<PossibleMoves>::const_iterator it = figureWithAccessMoves->begin(), end = figureWithAccessMoves->end();
 		for (; it != end; ++it)
-			if (*(*it).figurePosition == figurePosition)
+			if ((*it).figurePosition == figurePosition)
 				return (*it).possibleMoves;
 	}
 	return nullptr;
@@ -60,16 +60,13 @@ void Map::RunFindMoves(const Color& activeColor)
 				if (j & map[i])
 				{
 					PossibleMoves Moves;
-					Moves.figurePosition = &Pos::BitboardToPosition(j);
-					Moves.possibleMoves = &Figure::FindPossibleMoves((FigureType)i, *Moves.figurePosition, *this); // for checking shah give numberOfFigures
+					Moves.figurePosition = Pos::BitboardToPosition(j);
+					Moves.possibleMoves = &Figure::FindPossibleMoves((FigureType)i, Moves.figurePosition, *this); // for checking shah give numberOfFigures
 					CheckingPossibleMove(Moves);
 					if (!Moves.possibleMoves->empty())
 						figureWithAccessMoves->push_back(Moves);
 					else
-					{
-						delete Moves.figurePosition;
 						delete Moves.possibleMoves;
-					}
 				}
 				j <<= 1;
 			}
@@ -81,7 +78,7 @@ bool Map::RunMakeMove(const Pos& previousPosition, const Pos& nextPosition)
 {
 	std::vector<PossibleMoves>::const_iterator it1 = figureWithAccessMoves->begin(), end1 = figureWithAccessMoves->end();
 	for (; it1 != end1; ++it1)
-		if (*(*it1).figurePosition == previousPosition)
+		if ((*it1).figurePosition == previousPosition)
 		{
 			std::vector<Pos>::const_iterator it2 = (*it1).possibleMoves->begin(), end2 = (*it1).possibleMoves->end();
 			for (; it2 != end2; ++it2)
@@ -99,10 +96,7 @@ void Map::RunClearPossibleMoves()
 {
 	std::vector<PossibleMoves>::const_iterator it = figureWithAccessMoves->begin(), end = figureWithAccessMoves->end();
 	for (; it != end; ++it)
-	{
-		delete (*it).figurePosition;
 		delete (*it).possibleMoves;
-	}
 	figureWithAccessMoves->clear();
 }
 
@@ -329,22 +323,18 @@ void Map::CheckingPossibleMove(PossibleMoves& figureMoves)
 {
 	if (!figureMoves.possibleMoves->empty())
 	{
-		Pos* posMainFigure = figureMoves.figurePosition;
-		FigureType mainFigureType = GetFigureType(*posMainFigure), secondaryFigureType;
-		uint64_t mainBitboard = posMainFigure->ToBitboard(), secondBitboard;
+		Pos posMainFigure = figureMoves.figurePosition;
+		FigureType mainFigureType = GetFigureType(posMainFigure), secondaryFigureType;
+		uint64_t mainBitboard = posMainFigure.ToBitboard(), secondBitboard;
+		std::vector<Pos>::iterator it = figureMoves.possibleMoves->begin();
+		uint8_t mainFigureIndex = (int)(mainFigureType);
+		Pos kingPos = Pos::NULL_POS;
 
-		Pos* kingPos = nullptr;
-		bool deleteKingPtr = false;
 		if (mainFigureType == FigureType::King_black || mainFigureType == FigureType::King_white)
 			kingPos = posMainFigure;
 		else
-		{
-			kingPos = &Pos::BitboardToPosition(map[(int)(Figure::GetFigureTypeColor(mainFigureType) == Color::Black ? FigureType::King_black : FigureType::King_white)]);
-			deleteKingPtr = true;
-		}
+			kingPos = Pos::BitboardToPosition(map[(int)(Figure::GetFigureTypeColor(mainFigureType) == Color::Black ? FigureType::King_black : FigureType::King_white)]);
 
-		std::vector<Pos>::iterator it = figureMoves.possibleMoves->begin();
-		uint8_t mainFigureIndex = (int)(mainFigureType);
 		for (; it != figureMoves.possibleMoves->end();)
 		{
 			secondaryFigureType = GetFigureType(*it);
@@ -353,7 +343,7 @@ void Map::CheckingPossibleMove(PossibleMoves& figureMoves)
 			map[mainFigureIndex] += secondBitboard;
 			if (secondaryFigureType == FigureType::Empty)
 			{
-				if (*kingPos == *posMainFigure)
+				if (kingPos == posMainFigure)
 				{
 					if (CheckingShah(*it))
 						it = figureMoves.possibleMoves->erase(it);
@@ -362,7 +352,7 @@ void Map::CheckingPossibleMove(PossibleMoves& figureMoves)
 				}
 				else
 				{
-					if (CheckingShah(*kingPos))
+					if (CheckingShah(kingPos))
 						it = figureMoves.possibleMoves->erase(it);
 					else
 						++it;
@@ -371,7 +361,7 @@ void Map::CheckingPossibleMove(PossibleMoves& figureMoves)
 			else
 			{
 				map[(int)(secondaryFigureType)] -= secondBitboard;
-				if (*kingPos == *posMainFigure)
+				if (kingPos == posMainFigure)
 				{
 					if (CheckingShah(*it))
 						it = figureMoves.possibleMoves->erase(it);
@@ -380,7 +370,7 @@ void Map::CheckingPossibleMove(PossibleMoves& figureMoves)
 				}
 				else
 				{
-					if (CheckingShah(*kingPos))
+					if (CheckingShah(kingPos))
 						it = figureMoves.possibleMoves->erase(it);
 					else
 						++it;
@@ -390,8 +380,6 @@ void Map::CheckingPossibleMove(PossibleMoves& figureMoves)
 			map[mainFigureIndex] += mainBitboard;
 			map[mainFigureIndex] -= secondBitboard;
 		}
-		if (deleteKingPtr)
-			delete kingPos;
 	}
 }
 

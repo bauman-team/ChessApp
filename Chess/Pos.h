@@ -13,7 +13,7 @@ public:
 	uint8_t GetY() const { return xy & 15; }
 
 	uint8_t ToIndex() const;
-	uint64_t& ToBitboard() const;
+	uint64_t& ToBitboard() const; // ??? &
 	bool IsValid() const;
 
 	Pos& operator=(const Pos& coords);
@@ -23,7 +23,7 @@ public:
 
 	Pos Add(int8_t x, int8_t y) const;
 
-	static Pos& BitboardToPosition(uint64_t);
+	static Pos BitboardToPosition(uint64_t);
 	static Pos IndexToPosition(uint8_t);
 
 	const static Pos NULL_POS;

@@ -68,7 +68,7 @@ void Game::UpdateSideMenu()
 		}
 		else
 		{
-			label->setText(map.GetLastMoveInfo()->GetPosBeforeMove().ToString() + " --> " + map.GetLastMoveInfo()->GetPosAfterMove().ToString());
+			label->setText(std::to_string(map.GetMovesCount()) + ") " + map.GetLastMoveInfo()->GetPosBeforeMove().ToString() + " --> " + map.GetLastMoveInfo()->GetPosAfterMove().ToString());
 			if (map.GetMovesCount() != 1)
 				label->setPosition(0, gameGui.get<tgui::ScrollablePanel>("ScrollablePanel")->get(std::to_string(map.GetMovesCount() - 1))->getPosition().y + 20);
 		}

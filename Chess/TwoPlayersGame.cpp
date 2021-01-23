@@ -71,29 +71,28 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 {
 	if (activePlayer->HasTime())
 	{
-		Pos* position = drawer.TransformMousePosition(mouseX, mouseY); // transform coords on window to position on map
-		if (position != nullptr)
+		Pos position = drawer.TransformMousePosition(mouseX, mouseY); // transform coords on window to position on map
+		if (position != Pos::NULL_POS)
 		{
 			if (activePlayer->GetColor() == Color::Black)
 			{
-				*position = Pos(7 - position->GetX(), 7 - position->GetY());
+				position = Pos(7 - position.GetX(), 7 - position.GetY());
 			}
-			if (position->IsValid()) // if position is correct
+			if (position.IsValid()) // if position is correct
 			{
 				bool chosenPositionIsPossible = false;
 				if (activePlayer->GetChosenPosition() != Pos::NULL_POS && // if chosen position exists and
-					activePlayer->GetColor() != map.GetColor(*position)) // position and activePlayer colors aren't same
+					activePlayer->GetColor() != map.GetColor(position)) // position and activePlayer colors aren't same
 				{
-					if (map.RunMakeMove(activePlayer->GetChosenPosition(), *position))
+					if (map.RunMakeMove(activePlayer->GetChosenPosition(), position))
 					{
 						chosenPositionIsPossible = true;
 						ChangeActivePlayer();
 					}
 				}
 				if (!chosenPositionIsPossible)
-					activePlayer->SetChosenPosition(*position);
+					activePlayer->SetChosenPosition(position);
 			}
-			delete position;
 		}
 	}
 }
