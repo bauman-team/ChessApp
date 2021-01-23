@@ -319,24 +319,18 @@ void PlayerWithAIGame::ChangeActivePlayer()
 	mut1.unlock();
 	map.RunClearPossibleMoves();
 	activePlayer = (activePlayer == player2) ? player1 : player2;
-	mut1.lock();
 	map.RunFindMoves(activePlayer->GetColor());
-	mut1.unlock();
 	status = CheckGameFinal();
 	if (status != GameStatus::Pat && status != GameStatus::Mat)
 	{
 		Move bestMove = StartAI();
-		mut1.lock();
 		map.RunMakeMove(bestMove.from, bestMove.to);
-		mut1.unlock();
 		mut3.lock();
 		UpdateSideMenu();
 		mut3.unlock();
 		map.RunClearPossibleMoves();
 		activePlayer = (activePlayer == player2) ? player1 : player2;
-		mut1.lock();
 		map.RunFindMoves(activePlayer->GetColor());
-		mut1.unlock();
 		status = CheckGameFinal();
 
 		if (stopTime)
