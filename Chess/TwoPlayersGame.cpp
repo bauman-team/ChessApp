@@ -40,15 +40,13 @@ void TwoPlayersGame::ChangeActivePlayer()
 	mut3.unlock();
 	mut1.lock();
 	map.RunClearPossibleMoves();
-	/*if (isTimeLimited)
-		drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());*/
 	activePlayer->SetChosenPosition(Pos::NULL_POS);
 	mut1.unlock();
-	//sf::sleep(sf::seconds(2));
+	sf::sleep(sf::seconds(2));
 
 	activePlayer = (activePlayer == player2) ? player1 : player2;
 
-	/*sf::Clock clock;
+	/*sf::Clock clock; // test of speed algorithm calculation possible moves
 	std::atomic<int> crucialCount = 0;
 	int countOfThreads = 50, i = 0;
 	while (crucialCount != countOfThreads)
@@ -102,13 +100,13 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 
 GameStatus TwoPlayersGame::CheckGameFinal()
 {
-	Pos* kingPos = nullptr;
-	for (int i = 0; i != 64 && !kingPos; ++i)
+	Pos kingPos = Pos::NULL_POS;
+	for (int i = 0; i != 64 && kingPos == Pos::NULL_POS; ++i)
 		if (map.GetColor(Pos::IndexToPosition(i)) == activePlayer->GetColor() &&
 			(map.GetFigureType(Pos::IndexToPosition(i)) == FigureType::King_black ||
 			map.GetFigureType(Pos::IndexToPosition(i)) == FigureType::King_white))
-			kingPos = &Pos::IndexToPosition(i);
-	if (map.CheckingShah(*kingPos))
+			kingPos = Pos::IndexToPosition(i);
+	if (map.CheckingShah(kingPos))
 	{
 		map.SetCastling(activePlayer->GetColor(), false);
 		if (!map.GetFigureWithAccessMoves().empty())

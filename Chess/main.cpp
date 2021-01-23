@@ -65,17 +65,13 @@ int main()
 						Game* ptrGame = game;
 						thSetCell = new std::thread([&ptrGame, &thSetCellIsFinished, mousePos]() {
 							ptrGame->SetPlayerChosenCell(mousePos.x, mousePos.y);
-							/*mut4.lock();
-							if (ptrGame->GetStatus() == GameStatus::Exit)
-								delete ptrGame;
-							mut4.unlock();*/
 							thSetCellIsFinished = true; });
 						thSetCell->detach();
 					}
 				}
 				break;
 			case sf::Event::KeyPressed:
-				if (!game && (event.key.code == sf::Keyboard::Enter))
+				if (!game && (event.key.code == sf::Keyboard::Enter)) // button Enter press handler (start game)
 				{
 					if (menu.CanStartGame())
 					{
@@ -88,17 +84,13 @@ int main()
 						game->StartGame();
 						if (typeid(*game) == typeid(PlayerWithAIGame))
 						{
-							if (!((PlayerWithAIGame*)game)->GetIsPlayerMoveFirst())
+							if (!((PlayerWithAIGame*)game)->GetIsPlayerMoveFirst()) // if the first move of the bot
 							{
 								while (!thSetCellIsFinished) sf::sleep(sf::seconds(0.1));
 								thSetCellIsFinished = false;
 								Game* ptrGame = game;
 								thSetCell = new std::thread([&ptrGame, &thSetCellIsFinished]() {
 									ptrGame->ChangeActivePlayer();
-									/*mut4.lock();
-									if (ptrGame->GetStatus() == GameStatus::Exit)
-										delete ptrGame;
-									mut4.unlock();*/
 									thSetCellIsFinished = true; });
 								thSetCell->detach();
 							}
@@ -113,23 +105,21 @@ int main()
 				}
 				break;
 			}
-			//mut4.lock();
 			if (game)
 			{
 				game->HandleEvent(event); // for side menu
-				if (game->GetStatus() == GameStatus::Exit) // button exit is clicked
+				if (game->GetStatus() == GameStatus::Exit) // button exit is clicked (open start menu)
 				{
 					game->ReturnGameToInitialSettings(menu);
 					if (thSetCellIsFinished)
-						delete game;
+						delete game; // ??? MEMORY LEAK game delete (why memory clear, when theard don't finished?) 
 					game = nullptr;
 				}
 			}
-			//mut4.unlock();
 			if (!game)
-				menu.HandleEvent(event);
+				menu.HandleEvent(event); // menu handler
 		}
-		if (!game && menu.NeedStartGame())
+		if (!game && menu.NeedStartGame()) // after click "start" button, handler start game
 		{
 			InputValues inputValues = menu.GetInputValues();
 			if (inputValues.mode == GameMode::TwoPlayers)
@@ -140,17 +130,13 @@ int main()
 			game->StartGame();
 			if (typeid(*game) == typeid(PlayerWithAIGame))
 			{
-				if (!((PlayerWithAIGame*)game)->GetIsPlayerMoveFirst())
+				if (!((PlayerWithAIGame*)game)->GetIsPlayerMoveFirst()) // if the first move of the bot
 				{
 					while (!thSetCellIsFinished) sf::sleep(sf::seconds(0.1));
 					thSetCellIsFinished = false;
 					Game* ptrGame = game;
 					thSetCell = new std::thread([&ptrGame, &thSetCellIsFinished]() {
 						ptrGame->ChangeActivePlayer();
-						/*mut4.lock();
-						if (ptrGame->GetStatus() == GameStatus::Exit)
-							delete ptrGame;
-						mut4.unlock();*/
 						thSetCellIsFinished = true; });
 					thSetCell->detach();
 				}
