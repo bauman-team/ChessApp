@@ -84,9 +84,9 @@ void Drawer::ShowMap(const Map& map)
 			if (selectedFigure != FigureType::Empty)
 			{
 				Pos coeff = (isWhiteActive) ? Pos(i, 7 - j) : Pos(7 - i, j);
-				figuresSprites[(int)(selectedFigure)].setPosition(mapProperties.GetPlayAreaTopLeftX() + coeff.GetX() * mapProperties.GetSquareSize(),
+				figuresSprites[static_cast<int>(selectedFigure)].setPosition(mapProperties.GetPlayAreaTopLeftX() + coeff.GetX() * mapProperties.GetSquareSize(),
 																  mapProperties.GetPlayAreaTopLeftY() + coeff.GetY() * mapProperties.GetSquareSize());
-				window->draw(figuresSprites[(int)(selectedFigure)]);
+				window->draw(figuresSprites[static_cast<int>(selectedFigure)]);
 			}
 		}
 	}

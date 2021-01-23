@@ -35,8 +35,10 @@ void TwoPlayersGame::Show()
 
 void TwoPlayersGame::ChangeActivePlayer()
 {
+	bool stopTime = isTimeLimited;
+	isTimeLimited = false; // stop game timer
 	mut3.lock();
-	UpdateSideMenu();
+	UpdateSideMenu(); // add info about current move to side menu
 	mut3.unlock();
 	mut1.lock();
 	map.RunClearPossibleMoves();
@@ -59,12 +61,12 @@ void TwoPlayersGame::ChangeActivePlayer()
 		}
 	}
 	sf::Time time = clock.getElapsedTime();*/
-
 	map.RunFindMoves(activePlayer->GetColor());
 	drawer.RotateBoard();
 	status = CheckGameFinal();
-	if (isTimeLimited)
-		activePlayer->StartTimer();
+	if (stopTime)
+		activePlayer->StartTimer(); // restart game(move) clock
+	isTimeLimited = stopTime; 
 }
 
 void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
@@ -80,17 +82,11 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 			}
 			if (position.IsValid()) // if position is correct
 			{
-				bool chosenPositionIsPossible = false;
 				if (activePlayer->GetChosenPosition() != Pos::NULL_POS && // if chosen position exists and
-					activePlayer->GetColor() != map.GetColor(position)) // position and activePlayer colors aren't same
-				{
-					if (map.RunMakeMove(activePlayer->GetChosenPosition(), position))
-					{
-						chosenPositionIsPossible = true;
+					activePlayer->GetColor() != map.GetColor(position) &&  // position and activePlayer colors aren't same
+					map.RunMakeMove(activePlayer->GetChosenPosition(), position)) // try to move
 						ChangeActivePlayer();
-					}
-				}
-				if (!chosenPositionIsPossible)
+				else // select position
 					activePlayer->SetChosenPosition(position);
 			}
 		}
@@ -100,14 +96,14 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 GameStatus TwoPlayersGame::CheckGameFinal()
 {
 	Pos kingPos = Pos::NULL_POS;
-	for (int i = 0; i != 64 && kingPos == Pos::NULL_POS; ++i)
+	for (int i = 0; i != 64 && kingPos == Pos::NULL_POS; ++i) // find King position
 		if (map.GetColor(Pos::IndexToPosition(i)) == activePlayer->GetColor() &&
 			(map.GetFigureType(Pos::IndexToPosition(i)) == FigureType::King_black ||
 			map.GetFigureType(Pos::IndexToPosition(i)) == FigureType::King_white))
 			kingPos = Pos::IndexToPosition(i);
 	if (map.CheckingShah(kingPos))
 	{
-		map.SetCastling(activePlayer->GetColor(), false);
+		map.SetCastling(activePlayer->GetColor(), false); // if King is attacked => castling disabled
 		if (!map.GetFigureWithAccessMoves().empty())
 			return GameStatus::Shah;
 		return GameStatus::Mat;

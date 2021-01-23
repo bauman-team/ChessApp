@@ -194,7 +194,7 @@ int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color
 	{
 		selected = selectedMap.GetFigureType(Pos::IndexToPosition(i));
 		if (selected != FigureType::Empty)
-			score += figureWeight[(int)(selected)] * (selectedMap.GetColor(selected) == AIColor ? 1 : -1); // * bitboards[(int)(selected)][i % 8][i / 8] 
+			score += figureWeight[static_cast<int>(selected)] * (selectedMap.GetColor(selected) == AIColor ? 1 : -1); // * bitboards[static_cast<int>(selected)][i % 8][i / 8] 
 	}
 	return score;
 }
@@ -216,18 +216,9 @@ bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps,
 				for (auto it1 = itMap->GetFigureWithAccessMoves().begin(); it1 != itMap->GetFigureWithAccessMoves().end(); ++it1) // calculate score
 					for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
 					{
-						//FigureType movableFigure = itMap->GetFigureType(*(*it1).figurePosition), eatenFigure = itMap->GetFigureType((*it2));
 						FigureType eatenFigure = itMap->GetFigureType(*it2);
 						itMap->DoImitationMove((*it1).figurePosition, *it2);
-						/*if (eatenFigure != FigureType::Empty)
-							itMap->map[(int)(eatenFigure)] -= (*it2).ToBitboard();
-						itMap->map[(int)(movableFigure)] -= (*it1).figurePosition->ToBitboard();
-						itMap->map[(int)(movableFigure)] += (*it2).ToBitboard();*/
 						movesScores.push_back(CalculatePositionScore(*itMap, AIColor));
-						/*itMap->map[(int)(movableFigure)] -= (*it2).ToBitboard();
-						itMap->map[(int)(movableFigure)] += (*it1).figurePosition->ToBitboard();
-						if (eatenFigure != FigureType::Empty)
-							itMap->map[(int)(eatenFigure)] += (*it2).ToBitboard();*/
 						itMap->UndoImitationMove((*it1).figurePosition, *it2, eatenFigure);
 					}
 
@@ -278,7 +269,6 @@ bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps,
 							for (int i = 0; i != sizeOfArrayIndexOfMoves; ++i)
 								if (j == indexOfMovesWithBestScore[i])
 								{
-									// TODO: maybe increase j
 									listOfMaps.push_back(*itMap);
 									listOfMaps.back().Move((*it1).figurePosition, *it2);
 								}
@@ -319,6 +309,8 @@ void PlayerWithAIGame::SetPlayers(std::string name1, std::string name2, sf::Time
 
 void PlayerWithAIGame::ChangeActivePlayer()
 {
+	bool stopTime = isTimeLimited;
+	isTimeLimited = false;
 	mut3.lock();
 	UpdateSideMenu();
 	mut3.unlock();
@@ -327,7 +319,9 @@ void PlayerWithAIGame::ChangeActivePlayer()
 	mut1.unlock();
 	map.RunClearPossibleMoves();
 	activePlayer = (activePlayer == player2) ? player1 : player2;
+	mut1.lock();
 	map.RunFindMoves(activePlayer->GetColor());
+	mut1.unlock();
 	status = CheckGameFinal();
 	if (status != GameStatus::Pat && status != GameStatus::Mat)
 	{
@@ -340,11 +334,14 @@ void PlayerWithAIGame::ChangeActivePlayer()
 		mut3.unlock();
 		map.RunClearPossibleMoves();
 		activePlayer = (activePlayer == player2) ? player1 : player2;
+		mut1.lock();
 		map.RunFindMoves(activePlayer->GetColor());
+		mut1.unlock();
 		status = CheckGameFinal();
 
-		if (isTimeLimited)
+		if (stopTime)
 			activePlayer->StartTimer();
+		isTimeLimited = stopTime;
 	}
 	/*if (status != GameStatus::Pat && status != GameStatus::Mat)
 	{

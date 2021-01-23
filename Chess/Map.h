@@ -13,7 +13,7 @@ class PlayerWithAIGame;
 struct PossibleMoves
 {
 	Pos figurePosition;
-	std::vector<Pos>* possibleMoves;
+	std::vector<Pos>* possibleMoves; 
 };
 
 class Map

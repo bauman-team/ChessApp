@@ -13,6 +13,8 @@ class MoveInfo
 	Pos to;
 public:
 	MoveInfo(const Pos& _from, const Pos& _to, FigureType _activeFigure); // fix bug with undefined type - FigureType and return Constructor
+	MoveInfo(const Pos& _from, const Pos& _to, FigureType _activeFigure, FigureType _eatenFigure)
+		: activeFigure(_activeFigure), eatenFigure(_eatenFigure), from(_from), to(_to) { }
 	MoveInfo(const MoveInfo& copy);
 
 	bool isEatenFigureExists() const;

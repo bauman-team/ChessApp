@@ -61,7 +61,7 @@ public:
 				for (int k = 0; k != 8; ++k)
 				{
 					std::cout << bitboards[i][7 - j][7 - k];
-					if (bitboards[i][7 - j][7 - k] == ((int)bitboards[i][7 - j][7 - k]))
+					if (bitboards[i][7 - j][7 - k] == (static_cast<int>bitboards[i][7 - j][7 - k]))
 						std::cout << ".0";
 					if (k != 7)
 						std::cout << ", ";

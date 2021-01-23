@@ -180,7 +180,7 @@ void Menu::ShowTwoPlayersSettings()
 
 void Menu::ChangeChoosenTime()
 {
-	menuGui.get<tgui::Label>("TimeLabel")->setText("Minutes: " + std::to_string((int)menuGui.get<tgui::Slider>("TimeSlider")->getValue()));
+	menuGui.get<tgui::Label>("TimeLabel")->setText("Minutes: " + std::to_string(static_cast<int>(menuGui.get<tgui::Slider>("TimeSlider")->getValue())));
 }
 
 void Menu::ShowChoosenColor()

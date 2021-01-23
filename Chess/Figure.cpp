@@ -31,12 +31,7 @@ Color Figure::GetFigureTypeColor(const FigureType& selectedType)
 {
 	if (selectedType == FigureType::Empty)
 		return Color::None;
-	if (selectedType == FigureType::King_black ||
-		selectedType == FigureType::Queen_black ||
-		selectedType == FigureType::Bishop_black ||
-		selectedType == FigureType::Knight_black ||
-		selectedType == FigureType::Rook_black ||
-		selectedType == FigureType::Pawn_black)
+	if (static_cast<int>(selectedType) < 6) // used fixed enum order
 		return Color::Black;
 	return Color::White;
 }

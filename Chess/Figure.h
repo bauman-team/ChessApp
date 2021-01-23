@@ -3,7 +3,7 @@
 #include "Pos.h"
 #include "Map.h"
 
-enum class FigureType
+enum class FigureType // used current fixed order
 {
 	King_black,
 	Queen_black,
