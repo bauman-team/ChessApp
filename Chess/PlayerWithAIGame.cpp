@@ -136,7 +136,7 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 	{*/
 		std::vector<Move> startedAccessMovesPositions;
 		for (auto it1 = map.GetFigureWithAccessMoves().begin(); it1 != map.GetFigureWithAccessMoves().end(); ++it1)
-			for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
+			for (auto it2 = (*it1).possibleMoves.begin(); it2 != (*it1).possibleMoves.end(); ++it2)
 				startedAccessMovesPositions.push_back(Move((*it1).figurePosition, *it2));
 		volatile TheWhorstCalculatedScoreOnDepth* const startedMovesScore = new volatile TheWhorstCalculatedScoreOnDepth[startedAccessMovesPositions.size()];
 		bool* isThreadCompleted = new bool[startedAccessMovesPositions.size()]();
@@ -158,7 +158,7 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 
 		sf::sleep(sf::seconds(timeForWaiting));
 
-		if (timeForWaiting == 0) // TODO: delete this unnessesary if?
+		if (timeForWaiting == 0)
 			while (!IsAllThreadsOfMovesCompleted(isThreadCompleted, startedAccessMovesPositions.size()))
 				sf::sleep(sf::seconds(0.1));
 
@@ -214,7 +214,7 @@ bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps,
 			{
 				std::vector<int> movesScores;
 				for (auto it1 = itMap->GetFigureWithAccessMoves().begin(); it1 != itMap->GetFigureWithAccessMoves().end(); ++it1) // calculate score
-					for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2)
+					for (auto it2 = (*it1).possibleMoves.begin(); it2 != (*it1).possibleMoves.end(); ++it2)
 					{
 						FigureType eatenFigure = itMap->GetFigureType(*it2);
 						itMap->DoImitationMove((*it1).figurePosition, *it2);
@@ -265,7 +265,7 @@ bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps,
 				int j = 0;
 				if (depth + 1 < DEPTH || depth + 1 == DEPTH && isAIMoveNow) // create maps
 					for (auto it1 = itMap->GetFigureWithAccessMoves().begin(); it1 != itMap->GetFigureWithAccessMoves().end(); ++it1)
-						for (auto it2 = (*it1).possibleMoves->begin(); it2 != (*it1).possibleMoves->end(); ++it2, ++j)
+						for (auto it2 = (*it1).possibleMoves.begin(); it2 != (*it1).possibleMoves.end(); ++it2, ++j)
 							for (int i = 0; i != sizeOfArrayIndexOfMoves; ++i)
 								if (j == indexOfMovesWithBestScore[i])
 								{

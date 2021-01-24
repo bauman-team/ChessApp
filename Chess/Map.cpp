@@ -21,7 +21,6 @@ Map::Map()
 	map[static_cast<int>(FigureType::Pawn_white)] = 65'280;
 	for (int i = 0; i != 4; ++i)
 		possibleCastling[i] = true;
-	figureWithAccessMoves = new std::vector<PossibleMoves>;
 }
 
 Map::Map(const Map& baseMap)
@@ -34,20 +33,19 @@ Map::Map(const Map& baseMap)
 	}
 	if (!baseMap.movesHistory.empty())
 		movesHistory = baseMap.movesHistory;
-	figureWithAccessMoves = new std::vector<PossibleMoves>;
 }
 
-const std::vector<Pos>* Map::GetPossibleMoves(const Pos& figurePosition) const
+std::vector<Pos> Map::GetPossibleMoves(const Pos& figurePosition) const
 {
-	assert(figurePosition != Pos::NULL_POS); // TODO: fix bug with invalid figurePosition
-	if (!figureWithAccessMoves->empty())
+	assert(figurePosition != Pos::NULL_POS);
+	if (!figureWithAccessMoves.empty())
 	{
-		std::vector<PossibleMoves>::const_iterator it = figureWithAccessMoves->begin(), end = figureWithAccessMoves->end();
+		std::vector<PossibleMoves>::const_iterator it = figureWithAccessMoves.begin(), end = figureWithAccessMoves.end();
 		for (; it != end; ++it)
 			if ((*it).figurePosition == figurePosition)
 				return (*it).possibleMoves;
 	}
-	return nullptr;
+	return {}; // returns empty vector
 }
 
 void Map::RunFindMoves(const Color& activeColor)
@@ -62,13 +60,11 @@ void Map::RunFindMoves(const Color& activeColor)
 			{
 				PossibleMoves Moves;
 				Moves.figurePosition = Pos::BitboardToPosition(j);
-				Moves.possibleMoves = &Figure::FindPossibleMoves((FigureType)i, Moves.figurePosition, *this); // find figure possible moves without checking shah 
+				Moves.possibleMoves = Figure::FindPossibleMoves((FigureType)i, Moves.figurePosition, *this); // find figure possible moves without checking shah 
 				mut1.lock();
 				CheckingPossibleMove(Moves); // TODO: for checking shah give numberOfFigures
-				if (!Moves.possibleMoves->empty())
-					figureWithAccessMoves->push_back(Moves);
-				else
-					delete Moves.possibleMoves;
+				if (!Moves.possibleMoves.empty())
+					figureWithAccessMoves.push_back(std::move(Moves));
 				mut1.unlock();
 			}
 			j <<= 1;
@@ -78,11 +74,11 @@ void Map::RunFindMoves(const Color& activeColor)
 
 bool Map::RunMakeMove(const Pos& previousPosition, const Pos& nextPosition)
 {
-	std::vector<PossibleMoves>::const_iterator it1 = figureWithAccessMoves->begin(), end1 = figureWithAccessMoves->end();
+	std::vector<PossibleMoves>::const_iterator it1 = figureWithAccessMoves.begin(), end1 = figureWithAccessMoves.end();
 	for (; it1 != end1; ++it1) // search figure in the vector of figure with access moves
 		if ((*it1).figurePosition == previousPosition)
 		{
-			std::vector<Pos>::const_iterator it2 = (*it1).possibleMoves->begin(), end2 = (*it1).possibleMoves->end();
+			std::vector<Pos>::const_iterator it2 = (*it1).possibleMoves.begin(), end2 = (*it1).possibleMoves.end();
 			for (; it2 != end2; ++it2) // search move in the vector of possible moves
 				if (*it2 == nextPosition)
 				{
@@ -98,10 +94,7 @@ bool Map::RunMakeMove(const Pos& previousPosition, const Pos& nextPosition)
 
 void Map::RunClearPossibleMoves()
 {
-	std::vector<PossibleMoves>::const_iterator it = figureWithAccessMoves->begin(), end = figureWithAccessMoves->end();
-	for (; it != end; ++it)
-		delete (*it).possibleMoves;
-	figureWithAccessMoves->clear();
+	figureWithAccessMoves.clear();
 }
 
 void Map::Move(const Pos& from, const Pos& to)
@@ -324,10 +317,10 @@ bool Map::CheckingShah(const Pos& kingPos) const
 
 void Map::CheckingPossibleMove(PossibleMoves& figureMoves)
 {
-	if (!figureMoves.possibleMoves->empty())
+	if (!figureMoves.possibleMoves.empty())
 	{
 		FigureType typeSelectedFigure = GetFigureType(figureMoves.figurePosition), typeEatenFigure;
-		std::vector<Pos>::iterator it = figureMoves.possibleMoves->begin();
+		std::vector<Pos>::iterator it = figureMoves.possibleMoves.begin();
 		Pos kingPos = Pos::NULL_POS;
 
 		if (typeSelectedFigure == FigureType::King_black || typeSelectedFigure == FigureType::King_white)
@@ -335,14 +328,14 @@ void Map::CheckingPossibleMove(PossibleMoves& figureMoves)
 		else
 			kingPos = Pos::BitboardToPosition(map[static_cast<int>(Figure::GetFigureTypeColor(typeSelectedFigure) == Color::Black ? FigureType::King_black : FigureType::King_white)]);
 
-		for (; it != figureMoves.possibleMoves->end();)
+		for (; it != figureMoves.possibleMoves.end();)
 		{
 			typeEatenFigure = GetFigureType(*it);
 			DoImitationMove(figureMoves.figurePosition, *it);
 			if (CheckingShah(kingPos == figureMoves.figurePosition ? *it : kingPos)) // if King is movable figure
 			{
 				UndoImitationMove(figureMoves.figurePosition, *it, typeEatenFigure); // if King in check after move 
-				it = figureMoves.possibleMoves->erase(it);
+				it = figureMoves.possibleMoves.erase(it);
 			}
 			else
 			{

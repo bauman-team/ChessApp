@@ -14,7 +14,7 @@ uint8_t Pos::ToIndex() const
 	return (xy & 15) * 8 + (xy >> 4);
 }
 
-uint64_t& Pos::ToBitboard() const
+uint64_t Pos::ToBitboard() const
 {
 	uint64_t bitboard = 1;
 	for (int i = 0; i != GetY(); ++i)

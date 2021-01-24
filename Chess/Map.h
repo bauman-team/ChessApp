@@ -13,7 +13,7 @@ class PlayerWithAIGame;
 struct PossibleMoves
 {
 	Pos figurePosition;
-	std::vector<Pos>* possibleMoves; 
+	std::vector<Pos> possibleMoves; 
 };
 
 class Map
@@ -22,15 +22,15 @@ class Map
 
 	uint64_t map[12]; // 12 types of figure
 	std::vector<MoveInfo> movesHistory;
-	std::vector<PossibleMoves> *figureWithAccessMoves;
+	std::vector<PossibleMoves> figureWithAccessMoves;
 	bool possibleCastling[4];
 
 public:
 	Map(); 
 	Map(const Map&);
 
-	const std::vector<Pos>* GetPossibleMoves(const Pos&) const; // if moves is empty for selected position return nullptr
-	std::vector<PossibleMoves>& GetFigureWithAccessMoves() const { return *figureWithAccessMoves; }
+	std::vector<Pos> GetPossibleMoves(const Pos&) const;
+	const std::vector<PossibleMoves>& GetFigureWithAccessMoves() const { return figureWithAccessMoves; }
 
 	void RunFindMoves(const Color& activeColor);
 	bool RunMakeMove(const Pos& previousPosition, const Pos& nextPosition);
@@ -40,7 +40,7 @@ public:
 
 	// functions for bot to easy do and undo different moves
 	void DoImitationMove(const Pos& from, const Pos& to);
-	void UndoImitationMove(const Pos& from, const Pos& to, FigureType eatenType); //
+	void UndoImitationMove(const Pos& from, const Pos& to, FigureType eatenType);
 
 	void SetToEmpty(const Pos& target);
 	void PawnToQueen(const Pos& target);
@@ -64,8 +64,5 @@ public:
 	const std::vector<MoveInfo>& GetMovesHistory() const;
 	int GetMovesCount() const { return movesHistory.size(); }
 
-	~Map()
-	{
-		delete figureWithAccessMoves;
-	}
+	~Map(){}
 };

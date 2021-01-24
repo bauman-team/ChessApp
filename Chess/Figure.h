@@ -26,16 +26,16 @@ class Map;
 
 class Figure
 {
-	static std::vector<Pos>& FindPossibleMovesKing(const Pos&, Map& ptrMap);
-	static std::vector<Pos>& FindPossibleMovesQueen(const Pos&, const Map& ptrMap);
-	static std::vector<Pos>& FindPossibleMovesBishop(const Pos&, const Map& ptrMap);
-	static std::vector<Pos>& FindPossibleMovesKnight(const Pos&, const Map& ptrMap);
-	static std::vector<Pos>& FindPossibleMovesRook(const Pos&, const Map& ptrMap);
-	static std::vector<Pos>& FindPossibleMovesPawn(const Pos&, const Map& ptrMap);
+	static std::vector<Pos> FindPossibleMovesKing(const Pos&, Map& ptrMap);
+	static std::vector<Pos> FindPossibleMovesQueen(const Pos&, const Map& ptrMap);
+	static std::vector<Pos> FindPossibleMovesBishop(const Pos&, const Map& ptrMap);
+	static std::vector<Pos> FindPossibleMovesKnight(const Pos&, const Map& ptrMap);
+	static std::vector<Pos> FindPossibleMovesRook(const Pos&, const Map& ptrMap);
+	static std::vector<Pos> FindPossibleMovesPawn(const Pos&, const Map& ptrMap);
 
 	static std::vector<Pos> FindStraightMoves(const Pos& coords, const Map& ptrMap);
 	static std::vector<Pos> FindDiagonalMoves(const Pos& coords, const Map& ptrMap);
 public:
-	static std::vector<Pos>& FindPossibleMoves(const FigureType&, const Pos&, Map& ptrMap);
+	static std::vector<Pos> FindPossibleMoves(const FigureType&, const Pos&, Map& ptrMap);
 	static Color GetFigureTypeColor(const FigureType&);
 };
