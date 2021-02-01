@@ -62,7 +62,7 @@ void Map::RunFindMoves(const Color& activeColor)
 				Moves.figurePosition = Pos::BitboardToPosition(j);
 				Moves.possibleMoves = Figure::FindPossibleMoves((FigureType)i, Moves.figurePosition, *this); // find figure possible moves without checking shah 
 				mut1.lock();
-				CheckingPossibleMove(Moves); // TODO: for checking shah give numberOfFigures
+				CheckingPossibleMove(Moves);
 				if (!Moves.possibleMoves.empty())
 					figureWithAccessMoves.push_back(std::move(Moves));
 				mut1.unlock();
@@ -100,7 +100,7 @@ void Map::RunClearPossibleMoves()
 void Map::Move(const Pos& from, const Pos& to)
 {
 	FigureType movableFigure = GetFigureType(from), eatenFigure = GetFigureType(to);
-	MoveInfo info(from, to, movableFigure, eatenFigure); 
+	MoveInfo info(from, to, movableFigure, eatenFigure, possibleCastling); 
 	movesHistory.push_back(info); // save info about move
 	if (eatenFigure != FigureType::Empty)
 	{
@@ -129,6 +129,27 @@ void Map::Move(const Pos& from, const Pos& to)
 		if (abs(from.GetX() - to.GetX()) == 2)
 			Castling(from, to); // disable opportunity of castling for King
 	}
+}
+
+void Map::UndoMove()
+{
+	MoveInfo info(*GetLastMoveInfo());
+	movesHistory.pop_back();
+	if (GetLastMoveInfo() && GetColor(GetLastMoveInfo()->GetTypeActiveFigure()) == GetColor(info.GetTypeActiveFigure()))
+	{
+		if (info.GetTypeEatenFigure() != FigureType::Empty)
+			map[static_cast<int>(info.GetTypeEatenFigure())] += info.GetPosAfterMove().ToBitboard();
+		map[static_cast<int>(info.GetTypeActiveFigure())] -= info.GetPosAfterMove().ToBitboard();
+		map[static_cast<int>(info.GetTypeActiveFigure())] += info.GetPosBeforeMove().ToBitboard();
+		info = *GetLastMoveInfo();
+		movesHistory.pop_back();
+	}
+	if (info.GetTypeEatenFigure() != FigureType::Empty)
+		map[static_cast<int>(info.GetTypeEatenFigure())] += info.GetPosAfterMove().ToBitboard();
+	map[static_cast<int>(info.GetTypeActiveFigure())] -= info.GetPosAfterMove().ToBitboard();
+	map[static_cast<int>(info.GetTypeActiveFigure())] += info.GetPosBeforeMove().ToBitboard();
+	for (int i = 0; i != 4; ++i)
+		possibleCastling[i] = info.GetCastlingInfo()[i];
 }
 
 void Map::DoImitationMove(const Pos& from, const Pos& to)
@@ -164,7 +185,7 @@ void Map::PawnToQueen(const Pos& target)
 {
 	FigureType movableFigure = GetFigureType(target);
 	FigureType Queen = Figure::GetFigureTypeColor(movableFigure) == Color::White ? FigureType::Queen_white : FigureType::Queen_black;
-	MoveInfo info(target, target, Queen, movableFigure);
+	MoveInfo info(target, target, Queen, movableFigure, possibleCastling);
 	movesHistory.push_back(info);
 	map[static_cast<int>(movableFigure)] -= target.ToBitboard();
 	map[static_cast<int>(Queen)] += target.ToBitboard();
@@ -190,129 +211,122 @@ void Map::Castling(const Pos& from, const Pos& to)
 
 bool Map::CheckingShah(const Pos& kingPos) const
 {
-	if (true) // numOfFigures
-	{ // high count of figures // method FROM KING
-		Color kingColor = GetColor(kingPos);
-		Pos selectedPosition;
-		bool isChecked;
-		FigureType selectedFigureType; // 8 directions
-		for (int x, y, i = 0; i != 8; ++i)
+	Color kingColor = GetColor(kingPos);
+	Pos selectedPosition;
+	bool isChecked;
+	FigureType selectedFigureType; // 8 directions
+	for (int x, y, i = 0; i != 8; ++i)
+	{
+		x = 0; y = 0;
+		isChecked = false;
+		do 
 		{
-			x = 0; y = 0;
-			isChecked = false;
-			do 
+			/*
+				0 | 7 | 6
+				---------
+				1 | K | 5
+				---------
+				2 | 3 | 4
+			*/
+			if (i == 0 || i == 1 || i == 2) // 0 - up && left; 1 - left; 2 - down && left; ... (counter-clockwise)
+				--x;
+			else if (i == 4 || i == 5 || i == 6)
+				++x;
+			if (i == 0 || i == 7 || i == 6)
+				++y;
+			else if (i == 2 || i == 3 || i == 4)
+				--y;
+			selectedPosition = kingPos.Add(x, y);
+			if (selectedPosition.IsValid()) // over the edge of the map
 			{
-				/*
-					0 | 7 | 6
-					---------
-					1 | K | 5
-					---------
-					2 | 3 | 4
-				*/
-				if (i == 0 || i == 1 || i == 2) // 0 - up && left; 1 - left; 2 - down && left; ... (counter-clockwise)
-					--x;
-				else if (i == 4 || i == 5 || i == 6)
-					++x;
-				if (i == 0 || i == 7 || i == 6)
-					++y;
-				else if (i == 2 || i == 3 || i == 4)
-					--y;
-				selectedPosition = kingPos.Add(x, y);
-				if (selectedPosition.IsValid()) // over the edge of the map
+				selectedFigureType = GetFigureType(selectedPosition);
+				if (selectedFigureType != FigureType::Empty)
 				{
-					selectedFigureType = GetFigureType(selectedPosition);
-					if (selectedFigureType != FigureType::Empty)
+					if (GetColor(selectedFigureType) != kingColor) // opponent figure 
 					{
-						if (GetColor(selectedFigureType) != kingColor) // opponent figure 
-						{
-							if (selectedFigureType == FigureType::Queen_black || selectedFigureType == FigureType::Queen_white) // all
-								return true;
-							if (i % 2 && (selectedFigureType == FigureType::Rook_black || selectedFigureType == FigureType::Rook_white)) // 1, 3, 5, 7 
-								return true;
-							if (!(i % 2) && (selectedFigureType == FigureType::Bishop_black || selectedFigureType == FigureType::Bishop_white)) // 0, 2, 4, 6
-								return true;			
-							if (abs(x) < 2 && abs(y) < 2 && (selectedFigureType == FigureType::King_black || selectedFigureType == FigureType::King_white))
-								return true;
-						}
-						isChecked = true;
+						if (selectedFigureType == FigureType::Queen_black || selectedFigureType == FigureType::Queen_white) // all
+							return true;
+						if (i % 2 && (selectedFigureType == FigureType::Rook_black || selectedFigureType == FigureType::Rook_white)) // 1, 3, 5, 7 
+							return true;
+						if (!(i % 2) && (selectedFigureType == FigureType::Bishop_black || selectedFigureType == FigureType::Bishop_white)) // 0, 2, 4, 6
+							return true;			
+						if (abs(x) < 2 && abs(y) < 2 && (selectedFigureType == FigureType::King_black || selectedFigureType == FigureType::King_white))
+							return true;
 					}
-				}
-				else
-				{
 					isChecked = true;
 				}
+			}
+			else
+			{
+				isChecked = true;
+			}
 						
-			} while (!isChecked);
-		}
-		// pawn
-		if (kingColor == Color::White)
-		{
-			selectedPosition = kingPos.Add(-1, 1);
-			if (selectedPosition.IsValid())
-				if (GetFigureType(selectedPosition) == FigureType::Pawn_black)
-					return true;
-			selectedPosition = kingPos.Add(1, 1);
-			if (selectedPosition.IsValid())
-				if (GetFigureType(selectedPosition) == FigureType::Pawn_black)
-					return true;
-		}
-		else
-		{
-			selectedPosition = kingPos.Add(-1, -1);
-			if (selectedPosition.IsValid())
-				if (GetFigureType(selectedPosition) == FigureType::Pawn_white)
-					return true;
-			selectedPosition = kingPos.Add(1, -1);
-			if (selectedPosition.IsValid())
-				if (GetFigureType(selectedPosition) == FigureType::Pawn_white)
-					return true;
-		}
-		// knight
-		FigureType type;
-		for (int i = 0; i != 2; ++i)
-		{
-			selectedPosition = kingPos.Add((i % 2 + 1), ((i + 1) % 2 + 1));
-			if (selectedPosition.IsValid())
-			{
-				type = GetFigureType(selectedPosition);
-				if (type == FigureType::Knight_black || type == FigureType::Knight_white)
-					if (kingColor != GetColor(type))
-						return true;
-			}
-
-			selectedPosition = kingPos.Add(-(i % 2 + 1), ((i + 1) % 2 + 1));
-			if (selectedPosition.IsValid())
-			{
-				type = GetFigureType(selectedPosition);
-				if (type == FigureType::Knight_black || type == FigureType::Knight_white)
-					if (kingColor != GetColor(type))
-						return true;
-			}
-
-			selectedPosition = kingPos.Add((i % 2 + 1), -((i + 1) % 2 + 1));
-			if (selectedPosition.IsValid())
-			{
-				type = GetFigureType(selectedPosition);
-				if (type == FigureType::Knight_black || type == FigureType::Knight_white)
-					if (kingColor != GetColor(type))
-						return true;
-			}
-
-			selectedPosition = kingPos.Add(-(i % 2 + 1), -((i + 1) % 2 + 1));
-			if (selectedPosition.IsValid())
-			{
-				type = GetFigureType(selectedPosition);
-				if (type == FigureType::Knight_black || type == FigureType::Knight_white)
-					if (kingColor != GetColor(type))
-						return true;
-			}
-		}
-		return false;
+		} while (!isChecked);
+	}
+	// pawn
+	if (kingColor == Color::White)
+	{
+		selectedPosition = kingPos.Add(-1, 1);
+		if (selectedPosition.IsValid())
+			if (GetFigureType(selectedPosition) == FigureType::Pawn_black)
+				return true;
+		selectedPosition = kingPos.Add(1, 1);
+		if (selectedPosition.IsValid())
+			if (GetFigureType(selectedPosition) == FigureType::Pawn_black)
+				return true;
 	}
 	else
-	{ // TODO: low count of figures // method TO KING
-
+	{
+		selectedPosition = kingPos.Add(-1, -1);
+		if (selectedPosition.IsValid())
+			if (GetFigureType(selectedPosition) == FigureType::Pawn_white)
+				return true;
+		selectedPosition = kingPos.Add(1, -1);
+		if (selectedPosition.IsValid())
+			if (GetFigureType(selectedPosition) == FigureType::Pawn_white)
+				return true;
 	}
+	// knight
+	FigureType type;
+	for (int i = 0; i != 2; ++i)
+	{
+		selectedPosition = kingPos.Add((i % 2 + 1), ((i + 1) % 2 + 1));
+		if (selectedPosition.IsValid())
+		{
+			type = GetFigureType(selectedPosition);
+			if (type == FigureType::Knight_black || type == FigureType::Knight_white)
+				if (kingColor != GetColor(type))
+					return true;
+		}
+
+		selectedPosition = kingPos.Add(-(i % 2 + 1), ((i + 1) % 2 + 1));
+		if (selectedPosition.IsValid())
+		{
+			type = GetFigureType(selectedPosition);
+			if (type == FigureType::Knight_black || type == FigureType::Knight_white)
+				if (kingColor != GetColor(type))
+					return true;
+		}
+
+		selectedPosition = kingPos.Add((i % 2 + 1), -((i + 1) % 2 + 1));
+		if (selectedPosition.IsValid())
+		{
+			type = GetFigureType(selectedPosition);
+			if (type == FigureType::Knight_black || type == FigureType::Knight_white)
+				if (kingColor != GetColor(type))
+					return true;
+		}
+
+		selectedPosition = kingPos.Add(-(i % 2 + 1), -((i + 1) % 2 + 1));
+		if (selectedPosition.IsValid())
+		{
+			type = GetFigureType(selectedPosition);
+			if (type == FigureType::Knight_black || type == FigureType::Knight_white)
+				if (kingColor != GetColor(type))
+					return true;
+		}
+	}
+	return false;
 }
 
 void Map::CheckingPossibleMove(PossibleMoves& figureMoves)

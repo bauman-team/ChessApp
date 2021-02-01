@@ -37,6 +37,7 @@ public:
 	void RunClearPossibleMoves();
 
 	void Move(const Pos& from, const Pos& to);
+	void UndoMove();
 
 	// functions for bot to easy do and undo different moves
 	void DoImitationMove(const Pos& from, const Pos& to);

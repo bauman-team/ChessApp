@@ -11,9 +11,9 @@ class MoveInfo
 	FigureType eatenFigure;
 	Pos from;
 	Pos to;
+	bool castling[4];
 public:
-	MoveInfo(const Pos& _from, const Pos& _to, FigureType _activeFigure, FigureType _eatenFigure = FigureType::Empty)
-		: activeFigure(_activeFigure), eatenFigure(_eatenFigure), from(_from), to(_to) { }
+	MoveInfo(const Pos& _from, const Pos& _to, FigureType _activeFigure, FigureType _eatenFigure, bool *_castling);
 	MoveInfo(const MoveInfo& copy);
 
 	bool isEatenFigureExists() const;
@@ -22,6 +22,7 @@ public:
 	FigureType GetTypeEatenFigure() const { return eatenFigure; }
 	Pos GetPosBeforeMove() const { return from; }
 	Pos GetPosAfterMove() const { return to; }
+	bool *GetCastlingInfo() { return castling; }
 
 	void SetEatenFigure(FigureType _eatenFigure) { eatenFigure = _eatenFigure; }
 };

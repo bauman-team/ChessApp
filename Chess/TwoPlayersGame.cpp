@@ -38,7 +38,7 @@ void TwoPlayersGame::ChangeActivePlayer()
 	bool stopTime = isTimeLimited;
 	isTimeLimited = false; // stop game timer
 	mut3.lock();
-	UpdateSideMenu(); // add info about current move to side menu
+	UpdateSideMenu(); // TODO: add info about current move to side menu
 	mut3.unlock();
 	mut1.lock();
 	map.RunClearPossibleMoves();
@@ -103,7 +103,7 @@ GameStatus TwoPlayersGame::CheckGameFinal()
 			kingPos = Pos::IndexToPosition(i);
 	if (map.CheckingShah(kingPos))
 	{
-		map.SetCastling(activePlayer->GetColor(), false); // if King is attacked => castling disabled
+		map.SetCastling(activePlayer->GetColor()); // if King is attacked => castling disabled
 		if (!map.GetFigureWithAccessMoves().empty())
 			return GameStatus::Shah;
 		return GameStatus::Mat;
