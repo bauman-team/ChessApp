@@ -25,13 +25,14 @@ public:
 	int DecreaseNumOfFigures() { return --numOfFigures; }
 	void SetChosenPosition(Pos position) { chosenPos = position; }
 
-	const Pos& GetChosenPosition() const { return chosenPos; }
+	Pos GetChosenPosition() const { return chosenPos; }
 	Color GetColor() const { return color; }
 	std::string GetName() const { return name; }
+	bool GetIsBot() const { return isBot; }
+	sf::Time GetRemainingTime();
 
 	void StartTimer();
-	sf::Time GetRemainingTime();
-	bool HasTime() const { return !timeIsUp; } // if time isn't limited, return true
 
-	bool GetIsBot() const { return isBot; }
+	// if time isn't limited, return true
+	bool HasTime() const { return !timeIsUp; } 
 };

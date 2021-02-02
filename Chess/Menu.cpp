@@ -22,9 +22,9 @@ void Menu::Show()
 	menuGui.draw();
 }
 
-InputValues Menu::GetInputValues() const
+InitialData Menu::GetInitialData() const
 {
-	return inputValues;
+	return initData;
 }
 
 void Menu::HandleEvent(sf::Event& event)
@@ -57,13 +57,13 @@ bool Menu::CanStartGame()
 			errorMessage = "Enter different names for players!";
 		else
 		{
-			inputValues.mode = GameMode::TwoPlayers;
-			inputValues.firstName = firstName;
-			inputValues.secondName = secondName;
-			inputValues.time = sf::seconds(0);
+			initData.mode = GameMode::TwoPlayers;
+			initData.firstName = firstName;
+			initData.secondName = secondName;
+			initData.time = sf::seconds(0);
 			if (menuGui.get<tgui::CheckBox>("TimerCheckBox")->isChecked())
 			{
-				inputValues.time = sf::seconds(menuGui.get<tgui::Slider>("TimeSlider")->getValue() * 60);
+				initData.time = sf::seconds(menuGui.get<tgui::Slider>("TimeSlider")->getValue() * 60);
 			}
 		}
 
@@ -75,21 +75,21 @@ bool Menu::CanStartGame()
 			errorMessage = "Enter the name!";
 		else
 		{
-			inputValues.mode = GameMode::PlayerAndBot;
+			initData.mode = GameMode::PlayerAndBot;
 			if (menuGui.get<tgui::Tabs>("ColorsTab")->getSelected() == "White")
 			{
-				inputValues.firstName = name;
-				inputValues.secondName = botName;
+				initData.firstName = name;
+				initData.secondName = botName;
 			}
 			else
 			{
-				inputValues.firstName = botName;
-				inputValues.secondName = name;
+				initData.firstName = botName;
+				initData.secondName = name;
 			}
-			inputValues.time = sf::seconds(0);
+			initData.time = sf::seconds(0);
 			if (menuGui.get<tgui::CheckBox>("TimerCheckBox")->isChecked())
 			{
-				inputValues.time = sf::seconds(menuGui.get<tgui::Slider>("TimeSlider")->getValue() * 60);
+				initData.time = sf::seconds(menuGui.get<tgui::Slider>("TimeSlider")->getValue() * 60);
 			}
 		}
 	}

@@ -9,6 +9,16 @@ Pos::Pos(uint8_t x, uint8_t y)
 		xy = (x << 4) | y;
 }
 
+uint8_t Pos::GetX() const
+{
+	return xy >> 4;
+}
+
+uint8_t Pos::GetY() const
+{
+	return xy & 15;
+}
+
 uint8_t Pos::ToIndex() const
 {
 	return (xy & 15) * 8 + (xy >> 4);

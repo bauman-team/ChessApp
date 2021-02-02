@@ -1,190 +1,202 @@
 #include "Figure.h"
 
-std::vector<Pos> Figure::FindDiagonalMoves(const Pos& coords, const Map& ptrMap)
+constexpr auto DIAG_DIRECTIONS = 4;
+constexpr auto STRAIGHT_DIRECTIONS = 4;
+
+std::vector<Pos> Figure::FindDiagonalMoves(const Pos& coord, const Map& map)
 {
-	std::vector<Pos> moves;
+	std::vector<Pos> possibleMoves;
 	Pos nextPosition;
-	bool isChecking;
-	for (int i = 0; i != 4; ++i)
+	int8_t emptyStatus;
+
+	for (int i = 0; i < DIAG_DIRECTIONS; ++i)
 	{
-		isChecking = true;
-		nextPosition = coords;
-		while (isChecking)
+		nextPosition = coord;
+		do
 		{
-			nextPosition = nextPosition.Add((i == 0 || i == 1 ? 1 : -1), (i == 0 || i == 2 ? 1 : -1)); // diagonal 
-			if (ptrMap.CheckEmpty(coords, nextPosition))
-			{
-				moves.push_back(nextPosition);
-				if (ptrMap.CheckEmpty(coords, nextPosition) == 2)
-					isChecking = false;
-			}
-			else
-			{
-				isChecking = false;
-			}
-		}
+			nextPosition = nextPosition.Add((i == 0 || i == 1 ? 1 : -1), (i == 0 || i == 2 ? 1 : -1)); // diagonal offset
+			emptyStatus = map.CheckEmpty(coord, nextPosition); // TODO: create enum class for empty status
+			if (emptyStatus)
+				possibleMoves.push_back(nextPosition);
+		} 
+		while (emptyStatus == 1);
 	}
-	return moves;
+	return possibleMoves;
 }
 
-Color Figure::GetFigureTypeColor(const FigureType& selectedType)
+Color Figure::GetFigureTypeColor(FigureType figureType)
 {
-	if (selectedType == FigureType::Empty)
+	if (figureType == FigureType::Empty)
 		return Color::None;
-	if (static_cast<int>(selectedType) < 6) // used fixed enum order
+	if (static_cast<int>(figureType) < 6) // used fixed enum order
 		return Color::Black;
 	return Color::White;
 }
 
-std::vector<Pos> Figure::FindPossibleMoves(const FigureType& type, const Pos& figurePosition, Map& ptrMap)
+std::vector<Pos> Figure::FindPossibleMoves(const Pos& figurePosition, FigureType figureType, Map& map)
 {
-	if (type == FigureType::King_black || type == FigureType::King_white)
+	if (figureType == FigureType::King_black || figureType == FigureType::King_white)
 	{
-		return FindPossibleMovesKing(figurePosition, ptrMap);
+		return FindPossibleMovesKing(figurePosition, map);
 	}
-	else if (type == FigureType::Queen_black || type == FigureType::Queen_white)
+	else if (figureType == FigureType::Queen_black || figureType == FigureType::Queen_white)
 	{
-		return FindPossibleMovesQueen(figurePosition, ptrMap);
+		return FindPossibleMovesQueen(figurePosition, map);
 	}
-	else if (type == FigureType::Bishop_black || type == FigureType::Bishop_white)
+	else if (figureType == FigureType::Bishop_black || figureType == FigureType::Bishop_white)
 	{
-		return FindPossibleMovesBishop(figurePosition, ptrMap);
+		return FindPossibleMovesBishop(figurePosition, map);
 	}
-	else if (type == FigureType::Knight_black || type == FigureType::Knight_white)
+	else if (figureType == FigureType::Knight_black || figureType == FigureType::Knight_white)
 	{
-		return FindPossibleMovesKnight(figurePosition, ptrMap);
+		return FindPossibleMovesKnight(figurePosition, map);
 	}
-	else if (type == FigureType::Rook_black || type == FigureType::Rook_white)
+	else if (figureType == FigureType::Rook_black || figureType == FigureType::Rook_white)
 	{
-		return FindPossibleMovesRook(figurePosition, ptrMap);
+		return FindPossibleMovesRook(figurePosition, map);
 	}
 	else 
 	{
-		return FindPossibleMovesPawn(figurePosition, ptrMap);
+		return FindPossibleMovesPawn(figurePosition, map);
 	}
 }
 
-std::vector<Pos> Figure::FindPossibleMovesKing(const Pos& coords, Map& ptrMap)
+std::vector<Pos> Figure::FindPossibleMovesKing(const Pos& coord, Map& map)
 {
 	Pos nextPosition;
 	std::vector<Pos> possibleMoves;
+
+	// checking all nearby squares
 	for (int i = -1; i != 3; i += 2)
 	{
-		nextPosition = coords.Add(0, i);
-		if (ptrMap.CheckEmpty(coords, nextPosition))
+		nextPosition = coord.Add(0, i);
+		if (map.CheckEmpty(coord, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords.Add(i, i);
-		if (ptrMap.CheckEmpty(coords, nextPosition))
+		nextPosition = coord.Add(i, i);
+		if (map.CheckEmpty(coord, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords.Add(i, -i);
-		if (ptrMap.CheckEmpty(coords, nextPosition))
+		nextPosition = coord.Add(i, -i);
+		if (map.CheckEmpty(coord, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords.Add(i, 0);
-		if (ptrMap.CheckEmpty(coords, nextPosition))
+		nextPosition = coord.Add(i, 0);
+		if (map.CheckEmpty(coord, nextPosition))
 			possibleMoves.push_back(nextPosition);
 	}
-	if (ptrMap.GetCastling(ptrMap.GetColor(coords)))
+	
+	// castling
+	if (map.IsCastlingAllowedForKing(coord))
 	{
-		int y = (ptrMap.GetColor(coords) == Color::White) ? 0 : 7;
-		if (ptrMap.GetCastling(ptrMap.GetColor(coords), Pos(0, y)))
-			if (ptrMap.CheckEmpty(coords, Pos(1, y)) == 1
-			 && ptrMap.CheckEmpty(coords, Pos(2, y)) == 1
-			 && ptrMap.CheckEmpty(coords, Pos(3, y)) == 1)
-			{
-				PossibleMoves checkMoves;
-				checkMoves.figurePosition = coords;
-				checkMoves.possibleMoves.push_back(Pos(3, y));
+		int y = (map.GetColor(coord) == Color::White) ? 0 : 7;
 
-				ptrMap.CheckingPossibleMove(checkMoves);
-				if (!checkMoves.possibleMoves.empty())
-					possibleMoves.push_back(Pos(2, y));
-			}
-		if (ptrMap.GetCastling(ptrMap.GetColor(coords), Pos(7, y)))
-			if (ptrMap.CheckEmpty(coords, Pos(6, y)) == 1
-			 && ptrMap.CheckEmpty(coords, Pos(5, y)) == 1)
-			{
-				PossibleMoves checkMoves;
-				checkMoves.figurePosition = coords;
-				checkMoves.possibleMoves.push_back(Pos(5, y));
+		// checking long castling
+		if (map.IsCastlingAllowedWithRook(Pos(0, y)) &&
+			map.CheckEmpty(coord, Pos(1, y)) == 1 &&
+			map.CheckEmpty(coord, Pos(2, y)) == 1 &&
+			map.CheckEmpty(coord, Pos(3, y)) == 1)
+		{
+			OneFigureMoves checkMoves;
+			checkMoves.from = coord;
+			checkMoves.to.push_back(Pos(3, y));
 
-				ptrMap.CheckingPossibleMove(checkMoves);
-				if (!checkMoves.possibleMoves.empty())
-					possibleMoves.push_back(Pos(6, y));
-			}
+			map.EraseForbiddenMoves(checkMoves);
+			if (!checkMoves.to.empty())
+				possibleMoves.push_back(Pos(2, y));
+		}
+
+		// checking short castling
+		if (map.IsCastlingAllowedWithRook(Pos(7, y)) &&
+			map.CheckEmpty(coord, Pos(6, y)) == 1 &&
+			map.CheckEmpty(coord, Pos(5, y)) == 1)
+		{
+			OneFigureMoves checkMoves;
+			checkMoves.from = coord;
+			checkMoves.to.push_back(Pos(5, y));
+
+			map.EraseForbiddenMoves(checkMoves);
+			if (!checkMoves.to.empty())
+				possibleMoves.push_back(Pos(6, y));
+		}
 	}
 	return possibleMoves;
 }
 
-std::vector<Pos> Figure::FindPossibleMovesQueen(const Pos& coords, const Map& ptrMap)
+std::vector<Pos> Figure::FindPossibleMovesQueen(const Pos& coord, const Map& map)
 {
-	std::vector<Pos> possibleMoves = FindStraightMoves(coords, ptrMap);
-	std::vector<Pos> moreMoves = FindDiagonalMoves(coords, ptrMap);
+	std::vector<Pos> possibleMoves = FindStraightMoves(coord, map);
+	std::vector<Pos> moreMoves = FindDiagonalMoves(coord, map);
 	possibleMoves.insert(possibleMoves.end(), moreMoves.begin(), moreMoves.end());
 	return possibleMoves;
 }
 
-std::vector<Pos> Figure::FindPossibleMovesBishop(const Pos& coords, const Map& ptrMap)
+std::vector<Pos> Figure::FindPossibleMovesBishop(const Pos& coord, const Map& map)
 {
-	return FindDiagonalMoves(coords, ptrMap);
+	return FindDiagonalMoves(coord, map);
 }
 
-std::vector<Pos> Figure::FindPossibleMovesKnight(const Pos& coords, const Map& ptrMap)
+std::vector<Pos> Figure::FindPossibleMovesKnight(const Pos& coord, const Map& map)
 {
 	Pos nextPosition;
 	std::vector<Pos> possibleMoves;
 	for (int i = -1, j = 2 * i; i != 3; i += 2, j = 2 * i)
 	{
-		nextPosition = coords.Add(i, j);
-		if (ptrMap.CheckEmpty(coords, nextPosition))
+		nextPosition = coord.Add(i, j);
+		if (map.CheckEmpty(coord, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords.Add(i, -j);
-		if (ptrMap.CheckEmpty(coords, nextPosition))
+		nextPosition = coord.Add(i, -j);
+		if (map.CheckEmpty(coord, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords.Add(j, i);
-		if (ptrMap.CheckEmpty(coords, nextPosition))
+		nextPosition = coord.Add(j, i);
+		if (map.CheckEmpty(coord, nextPosition))
 			possibleMoves.push_back(nextPosition);
 
-		nextPosition = coords.Add(-j, i);
-		if (ptrMap.CheckEmpty(coords, nextPosition))
+		nextPosition = coord.Add(-j, i);
+		if (map.CheckEmpty(coord, nextPosition))
 			possibleMoves.push_back(nextPosition);
 	}
 	return possibleMoves;
 }
 
-std::vector<Pos> Figure::FindPossibleMovesRook(const Pos& coords, const Map& ptrMap)
+std::vector<Pos> Figure::FindPossibleMovesRook(const Pos& coord, const Map& map)
 {
-	return FindStraightMoves(coords, ptrMap);;
+	return FindStraightMoves(coord, map);
 }
 
-std::vector<Pos> Figure::FindPossibleMovesPawn(const Pos& coords, const Map& ptrMap)
+std::vector<Pos> Figure::FindPossibleMovesPawn(const Pos& coord, const Map& map)
 {
-	Pos nextPosition = coords;
+	Pos nextPosition = coord;
 	std::vector<Pos> possibleMoves;
-	Color color = ptrMap.GetColor(coords);
-	nextPosition = nextPosition.Add(0, color == Color::Black ? -1 : 1); // black go down | white go up
-	if (ptrMap.CheckEmpty(coords, nextPosition) == 1)
+	Color pawnColor = map.GetColor(coord);
+	int8_t offset = pawnColor == Color::Black ? -1 : 1; // black go down | white go up
+	nextPosition = nextPosition.Add(0, offset); 
+
+	// checking straight moves
+	if (map.CheckEmpty(coord, nextPosition) == 1)
 	{
 		possibleMoves.push_back(nextPosition);
-		if (coords.GetY() == 1 && color == Color::White || coords.GetY() == 6 && color == Color::Black) // check for double move check position
+
+		// checking the pawn for the possibility of a long move
+		if (coord.GetY() == 1 && pawnColor == Color::White || coord.GetY() == 6 && pawnColor == Color::Black)
 		{
-			nextPosition = nextPosition.Add(0, color == Color::Black ? -1 : 1);
-			if (ptrMap.CheckEmpty(coords, nextPosition) == 1)
+			nextPosition = nextPosition.Add(0, offset);
+			if (map.CheckEmpty(coord, nextPosition) == 1)
 				possibleMoves.push_back(nextPosition);
 		}
 	}
 
-	nextPosition = coords.Add(1, color == Color::Black ? -1 : 1); // if can eat
-	if (ptrMap.CheckEmpty(coords, nextPosition) == 2)
+	// checking diagonal moves (eating enemy figure)
+	nextPosition = coord.Add(1, offset);
+	if (map.CheckEmpty(coord, nextPosition) == 2)
 		possibleMoves.push_back(nextPosition);
-	nextPosition = coords.Add(-1, color == Color::Black ? -1 : 1);
-	if (ptrMap.CheckEmpty(coords, nextPosition) == 2)
+	nextPosition = coord.Add(-1, offset);
+	if (map.CheckEmpty(coord, nextPosition) == 2)
 		possibleMoves.push_back(nextPosition);
 
+	// checking capture en passant
 	const MoveInfo lastMove = ptrMap.GetLastMoveInfo();
 	if (lastMove != MoveInfo::NULL_INFO)
 	{
@@ -200,32 +212,27 @@ std::vector<Pos> Figure::FindPossibleMovesPawn(const Pos& coords, const Map& ptr
 	return possibleMoves;
 }
 
-std::vector<Pos> Figure::FindStraightMoves(const Pos& coords, const Map& ptrMap)
+std::vector<Pos> Figure::FindStraightMoves(const Pos& coord, const Map& map)
 {
-	std::vector<Pos> moves;
+	std::vector<Pos> possibleMoves;
 	Pos nextPosition;
-	bool isChecking;
-	for (int i = 0; i != 4; ++i)
+	int8_t emptyStatus;
+
+	for (int i = 0; i != STRAIGHT_DIRECTIONS; ++i)
 	{
-		isChecking = true;
-		nextPosition = coords;
-		while (isChecking)
+		nextPosition = coord;
+		do
 		{
-			if (i < 2) // at first along Ox
-				nextPosition = nextPosition.Add((i == 0 ? 1 : -1), 0);
-			else // Oy
-				nextPosition = nextPosition.Add(0, (i == 2 ? 1 : -1));
-			if (ptrMap.CheckEmpty(coords, nextPosition))
-			{
-				moves.push_back(nextPosition);
-				if (ptrMap.CheckEmpty(coords, nextPosition) == 2)
-					isChecking = false;
-			}
+			if (i < 2)
+				nextPosition = nextPosition.Add((i == 0 ? 1 : -1), 0); // offset along Ox
 			else
-			{
-				isChecking = false;
-			}
+				nextPosition = nextPosition.Add(0, (i == 2 ? 1 : -1)); // offset along Oy
+
+			emptyStatus = map.CheckEmpty(coord, nextPosition);
+			if (emptyStatus)
+				possibleMoves.push_back(nextPosition);
 		}
+		while (emptyStatus == 1);
 	}
-	return moves;
+	return possibleMoves;
 }

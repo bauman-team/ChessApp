@@ -76,7 +76,7 @@ int main()
 				{
 					if (menu.CanStartGame())
 					{
-						InputValues inputValues = menu.GetInputValues();
+						InitialData inputValues = menu.GetInitialData();
 						if (inputValues.mode == GameMode::TwoPlayers)
 							game = new TwoPlayersGame(&window, res, prop);
 						else
@@ -111,7 +111,7 @@ int main()
 				game->HandleEvent(event); // for side menu
 				if (game->GetStatus() == GameStatus::Exit) // button exit is clicked (open start menu)
 				{
-					game->ReturnGameToInitialSettings(menu);
+					game->ActivateMenuSettings(menu);
 					if (thSetCellIsFinished)
 						delete game; // ??? MEMORY LEAK game delete (why memory clear, when theard don't finished?) 
 					game = nullptr;
@@ -122,7 +122,7 @@ int main()
 		}
 		if (!game && menu.NeedStartGame()) // after click "start" button, handler start game
 		{
-			InputValues inputValues = menu.GetInputValues();
+			InitialData inputValues = menu.GetInitialData();
 			if (inputValues.mode == GameMode::TwoPlayers)
 				game = new TwoPlayersGame(&window, res, prop);
 			else

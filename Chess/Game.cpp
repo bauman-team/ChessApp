@@ -15,14 +15,18 @@ Game::Game(sf::RenderWindow* window, const Resources& resource, const MapPropert
 	exitButton->setWidgetName("ExitButton");
 	
 	tgui::ScrollablePanel::Ptr panel = tgui::ScrollablePanel::create();
-	tgui::Label::Ptr t1 = tgui::Label::create(), t2 = tgui::Label::create(), t3 = tgui::Label::create();
 	panel->setPosition((drawer.GetMapProps().GetGameWindowWidth() - drawer.GetMapProps().GetSideMenuWidth() / 2 - exitButton->getSize().x / 2), 0);
 	panel->setSize(200, 600);
 	gameGui.add(panel);
 	panel->tgui::Widget::setWidgetName("ScrollablePanel");
 }
 
-void Game::Save()
+volatile GameStatus Game::GetStatus() const
+{
+	return status;
+}
+
+void Game::Save() const
 {
 	std::vector<MoveInfo> movesHistory = map.GetMovesHistory();
 	std::ofstream out("LastGame.txt");
@@ -52,9 +56,14 @@ void Game::HandleEvent(sf::Event& event)
 	gameGui.handleEvent(event);
 }
 
-void Game::ReturnGameToInitialSettings(Menu& menu)
+void Game::SetExitStatus()
 {
-	drawer.ResizeWindowForGame(menu.GetMenuSize());
+	status = GameStatus::Exit;
+}
+
+void Game::ActivateMenuSettings(Menu& menu)
+{
+	drawer.ResizeWindowForMenu(menu.GetMenuSize());
 	menu.ActivateStartMenu();
 }
 

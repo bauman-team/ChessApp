@@ -25,7 +25,7 @@ public:
 	void virtual Show() override;
 	void virtual ChangeActivePlayer() override;
 
-	void virtual SetPlayerChosenCell(int, int) override;
+	void virtual SetPlayerChosenCell(int mouseX, int mouseY) override;
 
 	void virtual StartGame() override;
 
@@ -33,22 +33,12 @@ public:
 
 	bool IsTimeLimited() const { return isTimeLimited; }
 
+	// Methods for testing
+	static void SpeedTestingOnProcessorThread(Map &map, Color activeColor, int count, std::atomic<int> &crucialCount);
+
 	virtual ~TwoPlayersGame() override
 	{
 		delete player1;
 		delete player2;
 	}
-
-	// Methods for testing
-	static void SpeedTestingOnProcessorThread(Map &map, Color activeColor, int count, std::atomic<int> &crucialCount);
 };
-
-inline void TwoPlayersGame::SpeedTestingOnProcessorThread(Map &map, Color activeColor, int count, std::atomic<int> &crucialCount)
-{
-	for (int i = 0; i < count; ++i)
-	{
-		map.RunFindMoves(activeColor);
-		map.RunClearPossibleMoves();
-	}
-	++crucialCount;
-}

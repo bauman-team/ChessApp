@@ -22,7 +22,7 @@ public:
 	FigureType GetTypeEatenFigure() const { return eatenFigure; }
 	Pos GetPosBeforeMove() const { return from; }
 	Pos GetPosAfterMove() const { return to; }
-	bool *GetCastlingInfo() { return castling; }
+	const bool *GetCastlingInfo() const { return castling; }
 
 	void SetEatenFigure(FigureType _eatenFigure) { eatenFigure = _eatenFigure; }
 

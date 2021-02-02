@@ -204,18 +204,18 @@ bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps,
 		for (int k = 0; k != countOfMapsInList; ++k)
 		{
 			Map* itMap = &listOfMaps.front();
-			itMap->RunFindMoves(isAIMoveNow ? AIColor : (AIColor == Color::Black ? Color::White : Color::Black));
+			itMap->FindAllPossibleMoves(isAIMoveNow ? AIColor : (AIColor == Color::Black ? Color::White : Color::Black));
 
-			if (!itMap->GetFigureWithAccessMoves().empty())
+			if (!itMap->GetAllPossibleMoves().empty())
 			{
 				std::vector<int> movesScores;
-				for (auto it1 = itMap->GetFigureWithAccessMoves().begin(); it1 != itMap->GetFigureWithAccessMoves().end(); ++it1) // calculate score
-					for (auto it2 = (*it1).possibleMoves.begin(); it2 != (*it1).possibleMoves.end(); ++it2)
+				for (auto it1 = itMap->GetAllPossibleMoves().begin(); it1 != itMap->GetAllPossibleMoves().end(); ++it1) // calculate score
+					for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
 					{
 						FigureType eatenFigure = itMap->GetFigureType(*it2);
-						itMap->DoImitationMove((*it1).figurePosition, *it2);
+						itMap->DoImitationMove((*it1).from, *it2);
 						movesScores.push_back(CalculatePositionScore(*itMap, AIColor));
-						itMap->UndoImitationMove((*it1).figurePosition, *it2, eatenFigure);
+						itMap->UndoImitationMove((*it1).from, *it2, eatenFigure);
 					}
 
 				int sizeOfArrayIndexOfMoves = ((countNewCreatedMap > movesScores.size()) ? movesScores.size() : countNewCreatedMap);
@@ -260,16 +260,16 @@ bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps,
 
 				int j = 0;
 				if (depth + 1 < DEPTH || depth + 1 == DEPTH && isAIMoveNow) // create maps
-					for (auto it1 = itMap->GetFigureWithAccessMoves().begin(); it1 != itMap->GetFigureWithAccessMoves().end(); ++it1)
-						for (auto it2 = (*it1).possibleMoves.begin(); it2 != (*it1).possibleMoves.end(); ++it2, ++j)
+					for (auto it1 = itMap->GetAllPossibleMoves().begin(); it1 != itMap->GetAllPossibleMoves().end(); ++it1)
+						for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2, ++j)
 							for (int i = 0; i != sizeOfArrayIndexOfMoves; ++i)
 								if (j == indexOfMovesWithBestScore[i])
 								{
 									listOfMaps.push_back(*itMap);
-									listOfMaps.back().Move((*it1).figurePosition, *it2);
+									listOfMaps.back().Move((*it1).from, *it2);
 								}
 				delete[] indexOfMovesWithBestScore;
-				itMap->RunClearPossibleMoves();
+				itMap->ClearPossibleMoves();
 			}
 			listOfMaps.pop_front();
 		}
@@ -313,20 +313,20 @@ void PlayerWithAIGame::ChangeActivePlayer()
 	mut1.lock();
 	activePlayer->SetChosenPosition(Pos::NULL_POS);
 	mut1.unlock();
-	map.RunClearPossibleMoves();
+	map.ClearPossibleMoves();
 	activePlayer = (activePlayer == player2) ? player1 : player2;
-	map.RunFindMoves(activePlayer->GetColor());
+	map.FindAllPossibleMoves(activePlayer->GetColor());
 	status = CheckGameFinal();
 	if (status != GameStatus::Pat && status != GameStatus::Mat)
 	{
 		Move bestMove = StartAI();
-		map.RunMakeMove(bestMove.from, bestMove.to);
+		map.MakeMove(bestMove.from, bestMove.to);
 		mut3.lock();
 		UpdateSideMenu();
 		mut3.unlock();
-		map.RunClearPossibleMoves();
+		map.ClearPossibleMoves();
 		activePlayer = (activePlayer == player2) ? player1 : player2;
-		map.RunFindMoves(activePlayer->GetColor());
+		map.FindAllPossibleMoves(activePlayer->GetColor());
 		status = CheckGameFinal();
 
 		if (stopTime)
@@ -348,7 +348,7 @@ void PlayerWithAIGame::StartGame()
 	}
 	else
 	{
-		map.RunFindMoves(activePlayer->GetColor());
+		map.FindAllPossibleMoves(activePlayer->GetColor());
 		if (isTimeLimited)
 			activePlayer->StartTimer();
 	}

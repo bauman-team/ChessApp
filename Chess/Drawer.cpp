@@ -1,12 +1,12 @@
 #include "Drawer.h"
 
-Drawer::Drawer(sf::RenderWindow* _window, const Resources& resource, const MapProperties& properties)
-	: window(_window), mapProperties(properties)
+Drawer::Drawer(sf::RenderWindow* _window, const Resources& resources, const MapProperties& properties)
+	: window(_window), mapProps(properties)
 {
 	ResizeWindowForGame();
 	window->setFramerateLimit(60);
 
-	SetResources(resource);
+	SetResources(resources);
 	SetScale();
 	isWhiteActive = true;
 
@@ -25,29 +25,29 @@ Drawer::Drawer(sf::RenderWindow* _window, const Resources& resource, const MapPr
 
 sf::Vector2u Drawer::GetSideMenuSize() const
 {
-	return sf::Vector2u(mapProperties.GetSideMenuWidth(), mapProperties.GetGameWindowHeight());
+	return sf::Vector2u(mapProps.GetSideMenuWidth(), mapProps.GetGameWindowHeight());
 }
 
 int Drawer::GetSizeMenuTopLeftX() const
 {
-	return mapProperties.GetGameWindowHeight(); // because board height = board width
+	return mapProps.GetGameWindowHeight(); // because board height = board width
 }
 
 MapProperties Drawer::GetMapProps() const
 {
-	return mapProperties;
+	return mapProps;
 }
 
-void Drawer::SetResources(const Resources& resource)
+void Drawer::SetResources(const Resources& resources)
 {
-	mapTexture.loadFromFile(resource.GetPathToMapImage());
+	mapTexture.loadFromFile(resources.GetPathToMapImage());
 	mapSprite.setTexture(mapTexture);	
 
-	font.loadFromFile(resource.GetPathToFont());
+	font.loadFromFile(resources.GetPathToFont());
 	timeText.setFont(font);
 
 	for (int i = 0; i < FIGURE_TYPES; ++i)
-		figuresTextures[i].loadFromFile(resource.GetPathToFigure((FigureType)i));
+		figuresTextures[i].loadFromFile(resources.GetPathToFigure((FigureType)i));
 
 	for (int i = 0; i < FIGURE_TYPES; ++i)
 		figuresSprites[i].setTexture(figuresTextures[i]);
@@ -55,19 +55,20 @@ void Drawer::SetResources(const Resources& resource)
 
 void Drawer::SetScale()
 {
-	float mapScale = (float)mapProperties.GetGameWindowHeight() / mapTexture.getSize().x;
-	float figureScale = mapScale * (float)mapProperties.GetSquareSize() / figuresTextures[0].getSize().x;
+	float mapScale = (float)mapProps.GetGameWindowHeight() / mapTexture.getSize().x;
+	float figureScale = mapScale * mapProps.GetSquareSize() / figuresTextures[0].getSize().x;
 
 	mapSprite.setScale(mapScale, mapScale); // set the mapSprite size to the window size
 	mapSprite.setOrigin(mapSprite.getLocalBounds().width / 2, mapSprite.getLocalBounds().height / 2);
 	mapSprite.setPosition(mapSprite.getLocalBounds().width * mapScale / 2, mapSprite.getLocalBounds().height * mapScale / 2);
 
-	circle.setRadius(mapScale * 0.2 * (float)mapProperties.GetSquareSize());
+	float radius = 0.2; // relative to sqaure size
+	circle.setRadius(radius * mapScale * mapProps.GetSquareSize());
 	circle.setOrigin(circle.getRadius(), circle.getRadius());
 
-	square.setSize(sf::Vector2f(mapScale * mapProperties.GetSquareSize(), mapScale * mapProperties.GetSquareSize()));
+	square.setSize(sf::Vector2f(mapScale * mapProps.GetSquareSize(), mapScale * mapProps.GetSquareSize()));
 
-	mapProperties.SetScale(mapScale);
+	mapProps.SetScale(mapScale);
 
 	for (int i = 0; i < FIGURE_TYPES; ++i)
 		figuresSprites[i].setScale(figureScale, figureScale);
@@ -76,28 +77,29 @@ void Drawer::SetScale()
 void Drawer::ShowMap(const Map& map)
 {
 	window->draw(mapSprite);
+	const uint8_t squareSize = mapProps.GetSquareSize();
 	for (int j = 0; j != 8; ++j)
 	{
 		for (int i = 0; i != 8; ++i)
 		{
-			FigureType selectedFigure = map.GetFigureType(Pos(i, j));
-			if (selectedFigure != FigureType::Empty)
+			FigureType figureType = map.GetFigureType(Pos(i, j));
+			if (figureType != FigureType::Empty)
 			{
-				Pos coeff = (isWhiteActive) ? Pos(i, 7 - j) : Pos(7 - i, j);
-				figuresSprites[static_cast<int>(selectedFigure)].setPosition(mapProperties.GetPlayAreaTopLeftX() + coeff.GetX() * mapProperties.GetSquareSize(),
-																  mapProperties.GetPlayAreaTopLeftY() + coeff.GetY() * mapProperties.GetSquareSize());
-				window->draw(figuresSprites[static_cast<int>(selectedFigure)]);
+				Pos coord = (isWhiteActive) ? Pos(i, 7 - j) : Pos(7 - i, j);
+				figuresSprites[static_cast<int>(figureType)].setPosition(mapProps.GetPlayAreaTopLeftX() + coord.GetX() * squareSize,
+																			 mapProps.GetPlayAreaTopLeftY() + coord.GetY() * squareSize);
+				window->draw(figuresSprites[static_cast<int>(figureType)]);
 			}
 		}
 	}
 }
 
-void Drawer::ShowTimer(sf::Time time, Color activeColor)
+void Drawer::ShowTimer(sf::Time time)
 {
 	int seconds = time.asSeconds();
 	if (seconds > 60)
 	{
-		if (activeColor == Color::White)
+		if (isWhiteActive)
 		{
 			timeText.setFillColor(sf::Color::White);
 			timeText.setOutlineThickness(1);
@@ -121,11 +123,11 @@ void Drawer::ShowTimer(sf::Time time, Color activeColor)
 	window->draw(timeText);
 }
 
-void Drawer::ShowActiveFigure(const Map& map, const Pos& chosenPos)
+void Drawer::ShowActiveFigure(const Pos& chosenPos, const Map& map)
 {
-	Pos coeff = (isWhiteActive) ? Pos(chosenPos.GetX(), 7 - chosenPos.GetY()) : Pos(7 - chosenPos.GetX(), chosenPos.GetY());
-	square.setPosition(mapProperties.GetPlayAreaTopLeftX() + coeff.GetX() * mapProperties.GetSquareSize(), 
-					   mapProperties.GetPlayAreaTopLeftY() + coeff.GetY() * mapProperties.GetSquareSize());
+	Pos coord = (isWhiteActive) ? Pos(chosenPos.GetX(), 7 - chosenPos.GetY()) : Pos(7 - chosenPos.GetX(), chosenPos.GetY());
+	square.setPosition(mapProps.GetPlayAreaTopLeftX() + coord.GetX() * mapProps.GetSquareSize(),
+					   mapProps.GetPlayAreaTopLeftY() + coord.GetY() * mapProps.GetSquareSize());
 	window->draw(square);
 }
 
@@ -135,18 +137,17 @@ void Drawer::RotateBoard()
 	isWhiteActive = !isWhiteActive;
 }
 
-void Drawer::ResizeWindowForGame(const sf::Vector2f& menuSize)
+void Drawer::ResizeWindowForGame()
 {
-	if (!menuSize.x)
-	{
-		// using create() because setSize() works incorrectly
-		window->create(sf::VideoMode(mapProperties.GetGameWindowHeight() + mapProperties.GetSideMenuWidth(), mapProperties.GetGameWindowHeight()), "Chess");
-	}
-	else
-	{
-		window->setPosition(sf::Vector2i((sf::VideoMode::getDesktopMode().width - menuSize.x) / 2, (sf::VideoMode::getDesktopMode().height - menuSize.y) / 2));
-		window->setSize((sf::Vector2u)menuSize);
-	}
+	// using create() because setSize() works incorrectly
+	window->create(sf::VideoMode(mapProps.GetGameWindowWidth(), mapProps.GetGameWindowHeight()), "Chess");
+}
+
+void Drawer::ResizeWindowForMenu(const sf::Vector2f& menuSize)
+{
+	window->setPosition(sf::Vector2i((sf::VideoMode::getDesktopMode().width - menuSize.x) / 2, 
+									 (sf::VideoMode::getDesktopMode().height - menuSize.y) / 2));
+	window->setSize((sf::Vector2u)menuSize);
 }
 
 void Drawer::ShowGuiElems(tgui::Gui& gui)
@@ -156,26 +157,28 @@ void Drawer::ShowGuiElems(tgui::Gui& gui)
 
 Pos Drawer::TransformMousePosition(int mouseX, int mouseY) const
 {
-	if (mouseX >= mapProperties.GetPlayAreaTopLeftX() && mouseX <= mapProperties.GetPlayAreaTopLeftX() + mapProperties.GetSquareSize() * 8 &&
-		mouseY >= mapProperties.GetPlayAreaTopLeftY() && mouseY <= mapProperties.GetPlayAreaTopLeftY() + mapProperties.GetSquareSize() * 8)
+	if (mouseX >= mapProps.GetPlayAreaTopLeftX() && mouseX <= mapProps.GetPlayAreaTopLeftX() + mapProps.GetSquareSize() * 8 &&
+		mouseY >= mapProps.GetPlayAreaTopLeftY() && mouseY <= mapProps.GetPlayAreaTopLeftY() + mapProps.GetSquareSize() * 8)
 	{
-		int coordX = (mouseX - mapProperties.GetPlayAreaTopLeftX()) / mapProperties.GetSquareSize();
-		int coordY = 7 - (mouseY - mapProperties.GetPlayAreaTopLeftY()) / mapProperties.GetSquareSize();
+		int coordX = (mouseX - mapProps.GetPlayAreaTopLeftX()) / mapProps.GetSquareSize();
+		int coordY = 7 - (mouseY - mapProps.GetPlayAreaTopLeftY()) / mapProps.GetSquareSize();
 		return Pos(coordX, coordY);
 	}
 	return Pos::NULL_POS;
 }
 
-void Drawer::ShowPossibleMoves(const Map& map, const Pos& selectedFigure)
+void Drawer::ShowPossibleMoves(const Pos& chosenPos, const Map& map)
 {
-	const std::vector<Pos> possiblePositions = map.GetPossibleMoves(selectedFigure);
-	std::vector<Pos>::const_iterator it = possiblePositions.begin();
-	std::vector<Pos>::const_iterator end = possiblePositions.end();
-	for (; it != end; ++it)
+	std::vector<Pos> possiblePositions = map.GetPossibleMovesFrom(chosenPos);
+	std::vector<Pos>::iterator posItr = possiblePositions.begin();
+	std::vector<Pos>::iterator end = possiblePositions.end();
+
+	float offset = 0.5; // to draw circles in the center of squares
+	for (; posItr != end; ++posItr)
 	{
-		Pos coeff = (isWhiteActive) ? Pos(it->GetX(), 7 - it->GetY()) : Pos(7 - it->GetX(), it->GetY());
-		circle.setPosition(mapProperties.GetPlayAreaTopLeftX() + (coeff.GetX() + 0.5) * mapProperties.GetSquareSize(),
-			mapProperties.GetPlayAreaTopLeftY() + (coeff.GetY() + 0.5) * mapProperties.GetSquareSize());
+		Pos coord = (isWhiteActive) ? Pos(posItr->GetX(), 7 - posItr->GetY()) : Pos(7 - posItr->GetX(), posItr->GetY());
+		circle.setPosition(mapProps.GetPlayAreaTopLeftX() + (coord.GetX() + offset) * mapProps.GetSquareSize(),
+						   mapProps.GetPlayAreaTopLeftY() + (coord.GetY() + offset) * mapProps.GetSquareSize());
 		window->draw(circle);
 	}
 }

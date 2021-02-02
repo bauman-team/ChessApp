@@ -6,7 +6,7 @@ class Game;
 enum class GameStatus;
 enum class GameMode;
 
-struct InputValues
+struct InitialData
 {
 	GameMode mode;
 	sf::Time time;
@@ -18,7 +18,7 @@ class Menu
 {
 	tgui::Gui menuGui;
 	Game* game;
-	InputValues inputValues;
+	InitialData initData;
 	tgui::Vector2f menuSize;
 
 	const static std::string botName;
@@ -39,7 +39,7 @@ public:
 	Menu(sf::RenderWindow& window, std::string widgetsFile);
 
 	void Show();
-	InputValues GetInputValues() const;
+	InitialData GetInitialData() const;
 	bool CanStartGame(); // returns true if game can be started
 	bool NeedStartGame() const;
 	void ActivateStartMenu();
