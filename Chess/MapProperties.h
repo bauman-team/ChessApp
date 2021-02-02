@@ -3,8 +3,8 @@
 
 class MapProperties
 {
-	uint8_t playAreaTopLeftY;
 	uint8_t playAreaTopLeftX;
+	uint8_t playAreaTopLeftY;
 	uint8_t squareSize;
 	int gameWindowHeight;
 	int sideMenuWidth;
@@ -24,7 +24,7 @@ public:
 
 	void SetGameWindowHeight(int windowHeight);
 	void SetSideMenuWidth(int menuWidth);
-	void SetSquareSize(uint8_t size) { squareSize = size; }
+	void SetSquareSize(uint8_t size);
 	void SetPlayAreaTopLeft(uint8_t _playAreaTopLeftX, uint8_t _playAreaTopLeftY);
 	void SetScale(float scale);
 };

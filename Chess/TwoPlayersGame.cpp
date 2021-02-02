@@ -13,19 +13,21 @@ void TwoPlayersGame::Show()
 	mut1.lock();
 	drawer.ShowMap(map);
 	mut1.unlock();
+
 	mut3.lock();
 	drawer.ShowGuiElems(gameGui);
 	mut3.unlock();
+
 	if (isTimeLimited && !activePlayer->GetIsBot())
-		drawer.ShowTimer(activePlayer->GetRemainingTime(), activePlayer->GetColor());
+		drawer.ShowTimer(activePlayer->GetRemainingTime());
 	if (activePlayer->HasTime())
 	{
 		mut1.lock();
 		Pos chosenPos = activePlayer->GetChosenPosition();
 		if (chosenPos != Pos::NULL_POS)
 		{
-			drawer.ShowActiveFigure(map, chosenPos);
-			drawer.ShowPossibleMoves(map, chosenPos);
+			drawer.ShowActiveFigure(chosenPos, map);
+			drawer.ShowPossibleMoves(chosenPos, map);
 		}
 		mut1.unlock();
 	}
@@ -37,13 +39,16 @@ void TwoPlayersGame::ChangeActivePlayer()
 {
 	bool stopTime = isTimeLimited;
 	isTimeLimited = false; // stop game timer
+
 	mut3.lock();
 	UpdateSideMenu(); // TODO: add info about current move to side menu
 	mut3.unlock();
+
 	mut1.lock();
-	map.RunClearPossibleMoves();
+	map.ClearPossibleMoves();
 	activePlayer->SetChosenPosition(Pos::NULL_POS);
 	mut1.unlock();
+
 	sf::sleep(sf::seconds(2));
 
 	activePlayer = (activePlayer == player2) ? player1 : player2;
@@ -61,7 +66,7 @@ void TwoPlayersGame::ChangeActivePlayer()
 		}
 	}
 	sf::Time time = clock.getElapsedTime();*/
-	map.RunFindMoves(activePlayer->GetColor());
+	map.FindAllPossibleMoves(activePlayer->GetColor());
 	drawer.RotateBoard();
 	status = CheckGameFinal();
 	if (stopTime)
@@ -84,7 +89,7 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 			{
 				if (activePlayer->GetChosenPosition() != Pos::NULL_POS && // if chosen position exists and
 					activePlayer->GetColor() != map.GetColor(position) &&  // position and activePlayer colors aren't same
-					map.RunMakeMove(activePlayer->GetChosenPosition(), position)) // try to move
+					map.MakeMove(activePlayer->GetChosenPosition(), position)) // try to move
 						ChangeActivePlayer();
 				else // select position
 					activePlayer->SetChosenPosition(position);
@@ -98,19 +103,19 @@ GameStatus TwoPlayersGame::CheckGameFinal()
 	Pos kingPos = Pos::NULL_POS;
 	for (int i = 0; i != 64 && kingPos == Pos::NULL_POS; ++i) // find King position
 		if (map.GetColor(Pos::IndexToPosition(i)) == activePlayer->GetColor() &&
-			(map.GetFigureType(Pos::IndexToPosition(i)) == FigureType::King_black ||
+		   (map.GetFigureType(Pos::IndexToPosition(i)) == FigureType::King_black ||
 			map.GetFigureType(Pos::IndexToPosition(i)) == FigureType::King_white))
 			kingPos = Pos::IndexToPosition(i);
-	if (map.CheckingShah(kingPos))
+	if (map.IsShahFor(kingPos))
 	{
-		map.SetCastling(activePlayer->GetColor()); // if King is attacked => castling disabled
-		if (!map.GetFigureWithAccessMoves().empty())
+		map.DisableCastlingForKing(activePlayer->GetColor()); // if King is attacked => castling disabled
+		if (!map.GetAllPossibleMoves().empty())
 			return GameStatus::Shah;
 		return GameStatus::Mat;
 	}
 	else
 	{
-		if (!map.GetFigureWithAccessMoves().empty())
+		if (!map.GetAllPossibleMoves().empty())
 			return GameStatus::Play;
 		return GameStatus::Pat;
 	}
@@ -118,7 +123,7 @@ GameStatus TwoPlayersGame::CheckGameFinal()
 
 void TwoPlayersGame::StartGame()
 {
-	map.RunFindMoves(activePlayer->GetColor());
+	map.FindAllPossibleMoves(activePlayer->GetColor());
 	if (isTimeLimited)
 		activePlayer->StartTimer();
 }
@@ -130,4 +135,14 @@ void TwoPlayersGame::SetPlayers(std::string name1, std::string name2, sf::Time t
 	player1 = new Player(Color::White, name1, timeLimit);
 	player2 = new Player(Color::Black, name2, timeLimit);
 	activePlayer = player1;
+}
+
+inline void TwoPlayersGame::SpeedTestingOnProcessorThread(Map& map, Color activeColor, int count, std::atomic<int>& crucialCount)
+{
+	for (int i = 0; i < count; ++i)
+	{
+		map.FindAllPossibleMoves(activeColor);
+		map.ClearPossibleMoves();
+	}
+	++crucialCount;
 }

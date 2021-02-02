@@ -9,8 +9,8 @@ class Pos
 public:
 	Pos(uint8_t x = 0, uint8_t y = 0);
 
-	uint8_t GetX() const { return xy >> 4; }
-	uint8_t GetY() const { return xy & 15; }
+	uint8_t GetX() const;
+	uint8_t GetY() const;
 
 	uint8_t ToIndex() const;
 	uint64_t ToBitboard() const;
@@ -23,8 +23,8 @@ public:
 
 	Pos Add(int8_t x, int8_t y) const;
 
-	static Pos BitboardToPosition(uint64_t);
-	static Pos IndexToPosition(uint8_t);
+	static Pos BitboardToPosition(uint64_t bitboard);
+	static Pos IndexToPosition(uint8_t index);
 
 	const static Pos NULL_POS;
 };

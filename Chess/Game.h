@@ -18,22 +18,22 @@ protected:
 	tgui::Gui gameGui;
 
 	GameStatus virtual CheckGameFinal() = 0;
+	void UpdateSideMenu();
+	void SetExitStatus(); // private?
 public:
 	Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties);
 
 	void virtual StartGame() = 0;
 	void virtual Show() = 0;
 	void virtual ChangeActivePlayer() = 0;
-	void virtual SetPlayerChosenCell(int, int) = 0;
+	void virtual SetPlayerChosenCell(int mouseX, int mouseY) = 0; // TODO: rename
 	void virtual SetPlayers(std::string name1, std::string name2, sf::Time timeLimit = sf::seconds(0)) = 0;
 
-	volatile GameStatus GetStatus() const { return status; }
+	volatile GameStatus GetStatus() const;
 
-	void Save();
+	void Save() const;
 	void HandleEvent(sf::Event& event);
-	void SetExitStatus() { status = GameStatus::Exit; };
-	void ReturnGameToInitialSettings(Menu& menu);
-	void UpdateSideMenu();
+	void ActivateMenuSettings(Menu& menu);
 
 	virtual ~Game(){}
 };

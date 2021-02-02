@@ -3,8 +3,6 @@
 #include <assert.h>
 #include "Figure.h"
 
-#define FIGURE_TYPES 12 // 6 whites + 6 black figures
-
 class Resources
 {
 	std::string pathToMapImage;

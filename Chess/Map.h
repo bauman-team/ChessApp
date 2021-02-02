@@ -10,56 +10,58 @@ class MoveInfo;
 class Figure;
 class PlayerWithAIGame;
 
-struct PossibleMoves
+struct OneFigureMoves
 {
-	Pos figurePosition;
-	std::vector<Pos> possibleMoves; 
+	Pos from;
+	std::vector<Pos> to;
 };
+
 
 class Map
 {
 	friend class PlayerWithAIGame;
 
-	uint64_t map[12]; // 12 types of figure
+	uint64_t map[12];
 	std::vector<MoveInfo> movesHistory;
-	std::vector<PossibleMoves> figureWithAccessMoves;
+	std::vector<OneFigureMoves> allPossibleMoves;
 	bool possibleCastling[4];
 
+	void Move(const Pos& from, const Pos& to);
+	void SetToEmpty(const Pos& target);
+	void PawnToQueen(const Pos& target);
+	void RookCastling(const Pos& from, const Pos& to);
 public:
 	Map(); 
-	Map(const Map&);
+	Map(const Map& map);
 
-	std::vector<Pos> GetPossibleMoves(const Pos&) const;
-	const std::vector<PossibleMoves>& GetFigureWithAccessMoves() const { return figureWithAccessMoves; }
+	std::vector<Pos> GetPossibleMovesFrom(const Pos& figurePosition) const;
+	const std::vector<OneFigureMoves>& GetAllPossibleMoves() const { return allPossibleMoves; }
 
-	void RunFindMoves(const Color& activeColor);
-	bool RunMakeMove(const Pos& previousPosition, const Pos& nextPosition);
-	void RunClearPossibleMoves();
+	void FindAllPossibleMoves(const Color& activeColor);
 
-	void Move(const Pos& from, const Pos& to);
+	bool MakeMove(const Pos& previousPosition, const Pos& nextPosition);
+	void ClearPossibleMoves();
+	
 	void UndoMove();
 
 	// functions for bot to easy do and undo different moves
 	void DoImitationMove(const Pos& from, const Pos& to);
 	void UndoImitationMove(const Pos& from, const Pos& to, FigureType eatenType);
 
-	void SetToEmpty(const Pos& target);
-	void PawnToQueen(const Pos& target);
-	void Castling(const Pos& from, const Pos& to);
+	int8_t CheckEmpty(const Pos& from, const Pos& to) const;
 
-	bool CheckingShah(const Pos& kingPos) const;
-	void CheckingPossibleMove(PossibleMoves&);
+	bool IsShahFor(const Pos& kingPos) const;
+	void EraseForbiddenMoves(OneFigureMoves& figureMoves);
+
+	// castling methods
+	bool IsCastlingAllowedForKing(const Pos& kingPos) const;
+	bool IsCastlingAllowedWithRook(const Pos& rookPos) const;
+	void DisableCastlingForKing(const Color& kingColor);
+	void DisableCastlingWithRook(const Pos& rookPos, const Color& rookColor);
 
 	Color GetColor(const Pos& pos) const;
 	Color GetColor(const FigureType type) const;
 	FigureType GetFigureType(const Pos& pos) const;
-	bool GetCastling(const Color& selectedColor) const;
-	bool GetCastling(const Color& selectedColor, const Pos& selectedPos) const;
-
-	void SetCastling(const Color& selectedColor);
-	void SetCastling(const Color& selectedColor, const Pos& selectedPos);
-
-	int8_t CheckEmpty(const Pos& from, const Pos& to) const;
 
 	const MoveInfo* GetLastMoveInfo() const;
 	const std::vector<MoveInfo>& GetMovesHistory() const;

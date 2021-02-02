@@ -25,6 +25,11 @@ void MapProperties::SetSideMenuWidth(int menuWidth)
 	sideMenuWidth = menuWidth;
 }
 
+void MapProperties::SetSquareSize(uint8_t size)
+{
+	squareSize = size;
+}
+
 void MapProperties::SetScale(float scale)
 {
 	playAreaTopLeftX *= scale;
