@@ -185,14 +185,14 @@ std::vector<Pos> Figure::FindPossibleMovesPawn(const Pos& coords, const Map& ptr
 	if (ptrMap.CheckEmpty(coords, nextPosition) == 2)
 		possibleMoves.push_back(nextPosition);
 
-	const MoveInfo* lastMove = ptrMap.GetLastMoveInfo();
-	if (lastMove)
+	const MoveInfo lastMove = ptrMap.GetLastMoveInfo();
+	if (lastMove != MoveInfo::NULL_INFO)
 	{
-		FigureType activeType = lastMove->GetTypeActiveFigure();
+		FigureType activeType = lastMove.GetTypeActiveFigure();
 		if (activeType == FigureType::Pawn_black || activeType == FigureType::Pawn_white)
 		{
-			Pos posBefore = lastMove->GetPosBeforeMove();
-			Pos posAfter = lastMove->GetPosAfterMove();
+			Pos posBefore = lastMove.GetPosBeforeMove();
+			Pos posAfter = lastMove.GetPosAfterMove();
 			if (abs(posAfter.GetY() - posBefore.GetY()) == 2 && (posAfter.GetY() == coords.GetY()) && abs(posAfter.GetX() - coords.GetX()) == 1)
 				possibleMoves.push_back(Pos(posAfter.GetX(), coords.GetY() + (posAfter.GetY() > posBefore.GetY() ? -1 : 1)));
 		}

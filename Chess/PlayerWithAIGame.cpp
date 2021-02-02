@@ -127,18 +127,18 @@ const float PlayerWithAIGame::bitboards[12][8][8] = {
 		 {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}
 };
 
-const int PlayerWithAIGame::DEPTH = 1;//4
-
+const int PlayerWithAIGame::DEPTH = 2;
 
 PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 {
 	/*if (activePlayer->GetColor() != Color::Black)
 	{*/
-		std::vector<Move> startedAccessMovesPositions;
+		int bestIndex = 0;
+		std::vector<Move> startedAccessMovesPositions; // fill array all possible moves
 		for (auto it1 = map.GetFigureWithAccessMoves().begin(); it1 != map.GetFigureWithAccessMoves().end(); ++it1)
 			for (auto it2 = (*it1).possibleMoves.begin(); it2 != (*it1).possibleMoves.end(); ++it2)
 				startedAccessMovesPositions.push_back(Move((*it1).figurePosition, *it2));
-		volatile TheWhorstCalculatedScoreOnDepth* const startedMovesScore = new volatile TheWhorstCalculatedScoreOnDepth[startedAccessMovesPositions.size()];
+		volatile int* const MovesScore = new volatile int[startedAccessMovesPositions.size()];
 		bool* isThreadCompleted = new bool[startedAccessMovesPositions.size()]();
 		Color AIColor = activePlayer->GetColor();
 		for (int i = 0; i != startedAccessMovesPositions.size(); ++i)
@@ -150,30 +150,26 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 			mut2.unlock();
 			listOfMaps.back().Move(startedAccessMovesPositions[i].from, startedAccessMovesPositions[i].to);
 			//isThreadCompleted[i] = PlayerWithAIGame::CalculationScoreOfMoveInThread(listOfMaps, startedMovesScore[i], false, AIColor);
-			std::thread th([i, startedMovesScore, listOfMaps, AIColor, isThreadCompleted]() {
-				isThreadCompleted[i] = PlayerWithAIGame::CalculationScoreOfMoveInThread(listOfMaps, startedMovesScore[i], false, AIColor);
+			std::thread th([i, MovesScore, listOfMaps, AIColor, isThreadCompleted]() {
+				isThreadCompleted[i] = PlayerWithAIGame::CalculationScoreOfMoveInThread(listOfMaps, MovesScore[i], false, AIColor);
 				});
 			th.detach();
 		}
 
 		sf::sleep(sf::seconds(timeForWaiting));
 
-		if (timeForWaiting == 0)
+		if (timeForWaiting == 0) // TODO: maybe atomic int count of threads?
 			while (!IsAllThreadsOfMovesCompleted(isThreadCompleted, startedAccessMovesPositions.size()))
 				sf::sleep(sf::seconds(0.1));
 
-		int bestIndex = 0;
 		mut2.lock();
 		for (int i = 1; i != startedAccessMovesPositions.size(); ++i)
-			if (startedMovesScore[i].score > startedMovesScore[bestIndex].score)
-				bestIndex = i;
-			else if (startedMovesScore[i].score == startedMovesScore[bestIndex].score
-				&& startedMovesScore[i].depth < startedMovesScore[bestIndex].depth)
+			if (MovesScore[i] > MovesScore[bestIndex])
 				bestIndex = i;
 		mut2.unlock();
 
 		delete[] isThreadCompleted;
-		delete[] startedMovesScore;
+		delete[] MovesScore;
 
 		return startedAccessMovesPositions[bestIndex];
 	/*}
@@ -199,7 +195,7 @@ int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color
 	return score;
 }
 
-bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps, volatile TheWhorstCalculatedScoreOnDepth& startedMoves, bool isAIMoveNow, const Color AIColor)
+bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps, volatile int &startedMoves, bool isAIMoveNow, const Color AIColor)
 {
 	int depth = 0, countOfMapsInList, countNewCreatedMap = 30; // if change countNewCreatedMap look to the func end 
 	while (depth != DEPTH)

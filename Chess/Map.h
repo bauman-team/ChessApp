@@ -61,7 +61,7 @@ public:
 
 	int8_t CheckEmpty(const Pos& from, const Pos& to) const;
 
-	const MoveInfo* GetLastMoveInfo() const;
+	const MoveInfo GetLastMoveInfo() const;
 	const std::vector<MoveInfo>& GetMovesHistory() const;
 	int GetMovesCount() const { return movesHistory.size(); }
 

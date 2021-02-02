@@ -25,4 +25,9 @@ public:
 	bool *GetCastlingInfo() { return castling; }
 
 	void SetEatenFigure(FigureType _eatenFigure) { eatenFigure = _eatenFigure; }
+
+	bool operator==(const MoveInfo& comp) const;
+	bool operator!=(const MoveInfo& comp) const;
+
+	const static MoveInfo NULL_INFO;
 };

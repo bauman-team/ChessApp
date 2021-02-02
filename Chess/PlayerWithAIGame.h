@@ -25,19 +25,9 @@ protected:
 		}
 	};
 
-	struct TheWhorstCalculatedScoreOnDepth
-	{
-		int depth; // depth of score
-		int score;
-		TheWhorstCalculatedScoreOnDepth()
-		{
-			depth = -1;
-			score = 0;
-		}
-	};
 	Move StartAI(double timeForWaiting = 0);
 	static int CalculatePositionScore(const Map& selectedMap, const Color AIColor);
-	static bool CalculationScoreOfMoveInThread(std::list<Map> listOfMaps, volatile TheWhorstCalculatedScoreOnDepth &startedMoves, bool isAIMoveNow, const Color AIColor); 
+	static bool CalculationScoreOfMoveInThread(std::list<Map> listOfMaps, volatile int &startedMoves, bool isAIMoveNow, const Color AIColor); 
 	static bool IsAllThreadsOfMovesCompleted(bool* threadsInfo, int range);
 
 public:

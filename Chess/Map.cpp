@@ -133,15 +133,16 @@ void Map::Move(const Pos& from, const Pos& to)
 
 void Map::UndoMove()
 {
-	MoveInfo info(*GetLastMoveInfo());
+	MoveInfo info(GetLastMoveInfo());
 	movesHistory.pop_back();
-	if (GetLastMoveInfo() && GetColor(GetLastMoveInfo()->GetTypeActiveFigure()) == GetColor(info.GetTypeActiveFigure()))
+	if (GetLastMoveInfo() != MoveInfo::NULL_INFO &&
+		GetColor(GetLastMoveInfo().GetTypeActiveFigure()) == GetColor(info.GetTypeActiveFigure()))
 	{
 		if (info.GetTypeEatenFigure() != FigureType::Empty)
 			map[static_cast<int>(info.GetTypeEatenFigure())] += info.GetPosAfterMove().ToBitboard();
 		map[static_cast<int>(info.GetTypeActiveFigure())] -= info.GetPosAfterMove().ToBitboard();
 		map[static_cast<int>(info.GetTypeActiveFigure())] += info.GetPosBeforeMove().ToBitboard();
-		info = *GetLastMoveInfo();
+		info = GetLastMoveInfo();
 		movesHistory.pop_back();
 	}
 	if (info.GetTypeEatenFigure() != FigureType::Empty)
@@ -426,9 +427,9 @@ int8_t Map::CheckEmpty(const Pos& from, const Pos& to) const
 	return 0; // if Pos contains the figure with same color or output border
 }
 
-const MoveInfo* Map::GetLastMoveInfo() const
+const MoveInfo Map::GetLastMoveInfo() const
 {
-	return (!movesHistory.empty()) ? &movesHistory.back() : nullptr; // TODO: fix nullptr
+	return (!movesHistory.empty()) ? movesHistory.back() : MoveInfo::NULL_INFO;
 }
 
 const std::vector<MoveInfo>& Map::GetMovesHistory() const
