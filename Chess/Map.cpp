@@ -372,17 +372,12 @@ void Map::EraseForbiddenMoves(OneFigureMoves& figureMoves)
 
 Color Map::GetColor(const Pos& pos) const
 {
-	FigureType type = GetFigureType(pos);
-	if (type != FigureType::Empty)
-		return Figure::GetFigureTypeColor(type);
-	return Color::None;
+	return Figure::GetFigureTypeColor(GetFigureType(pos));
 }
 
 Color Map::GetColor(const FigureType type) const
 {
-	if (type != FigureType::Empty)
-		return Figure::GetFigureTypeColor(type);
-	return Color::None;
+	return Figure::GetFigureTypeColor(type);
 }
 
 FigureType Map::GetFigureType(const Pos& pos) const

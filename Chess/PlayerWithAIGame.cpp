@@ -4,7 +4,7 @@ extern std::mutex mut1;
 extern std::mutex mut2;
 extern std::mutex mut3;
 
-const int PlayerWithAIGame::figureWeight[12] = { 900, 90, 30, 30, 50, 30, 900, 90, 30, 30, 50, 10 };
+const int PlayerWithAIGame::figureWeight[12] = { 900, 90, 30, 30, 50, 10, 900, 90, 30, 30, 50, 10 };
 
 const float PlayerWithAIGame::bitboards[12][8][8] = {
 		{{-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0}, //King_black
@@ -202,18 +202,17 @@ int PlayerWithAIGame::MiniMax(Map map, std::atomic<int> &countOfThreads, bool is
 	{
 		map.FindAllPossibleMoves(playerColor == Color::White ? Color::Black : Color::White, true);
 		int bestMove = -9999;
-		std::vector<Move> movesPositions; // fill vector all possible moves
 		for (auto it1 = map.GetAllPossibleMoves().begin(); it1 != map.GetAllPossibleMoves().end(); ++it1)
-			for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
-				movesPositions.push_back(Move((*it1).from, *it2));
-		for (auto it = movesPositions.begin(); it != movesPositions.end(); ++it)
 		{
-			map.Move((*it).from, (*it).to);
-			bestMove = std::max(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, playerColor, depth, alpha, beta));
-			map.UndoMove();
-			alpha = std::max(bestMove, alpha);
-			if (beta <= alpha)
-				return bestMove;
+			for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
+			{
+				map.Move((*it1).from, *it2);
+				bestMove = std::max(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, playerColor, depth, alpha, beta));
+				map.UndoMove();
+				alpha = std::max(bestMove, alpha);
+				if (beta <= alpha)
+					return bestMove;
+			}	
 		}
 		return bestMove;
 	}
@@ -221,25 +220,24 @@ int PlayerWithAIGame::MiniMax(Map map, std::atomic<int> &countOfThreads, bool is
 	{
 		map.FindAllPossibleMoves(playerColor, true);
 		int bestMove = 9999;
-		std::vector<Move> movesPositions; // fill vector all possible moves
 		for (auto it1 = map.GetAllPossibleMoves().begin(); it1 != map.GetAllPossibleMoves().end(); ++it1)
-			for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
-				movesPositions.push_back(Move((*it1).from, *it2));
-		for (auto it = movesPositions.begin(); it != movesPositions.end(); ++it)
 		{
-			map.Move((*it).from, (*it).to);
-			bestMove = std::min(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, playerColor, depth - 1, alpha, beta));
-			map.UndoMove();
-			beta = std::min(bestMove, beta);
-			if (beta <= alpha)
+			for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
 			{
-				if (depth == DEPTH)
+				map.Move((*it1).from, *it2);
+				bestMove = std::min(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, playerColor, depth - 1, alpha, beta));
+				map.UndoMove();
+				beta = std::min(bestMove, beta);
+				if (beta <= alpha)
 				{
-					mut2.lock();
-					--countOfThreads;
-					mut2.unlock();
+					if (depth == DEPTH)
+					{
+						mut2.lock();
+						--countOfThreads;
+						mut2.unlock();
+					}
+					return bestMove;
 				}
-				return bestMove;
 			}
 		}
 		if (depth == DEPTH)
