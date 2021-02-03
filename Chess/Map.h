@@ -10,7 +10,7 @@ class MoveInfo;
 class Figure;
 class PlayerWithAIGame;
 
-struct OneFigureMoves
+struct OneFigureMoves // TODO: struct Move same PlayerWithAIGame
 {
 	Pos from;
 	std::vector<Pos> to;
@@ -37,7 +37,7 @@ public:
 	std::vector<Pos> GetPossibleMovesFrom(const Pos& figurePosition) const;
 	const std::vector<OneFigureMoves>& GetAllPossibleMoves() const { return allPossibleMoves; }
 
-	void FindAllPossibleMoves(const Color& activeColor);
+	void FindAllPossibleMoves(const Color& activeColor, const bool isThreading = false);
 
 	bool MakeMove(const Pos& previousPosition, const Pos& nextPosition);
 	void ClearPossibleMoves();

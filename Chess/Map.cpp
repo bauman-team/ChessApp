@@ -48,7 +48,7 @@ std::vector<Pos> Map::GetPossibleMovesFrom(const Pos& figurePosition) const
 	return {}; // returns empty vector
 }
 
-void Map::FindAllPossibleMoves(const Color& activeColor)
+void Map::FindAllPossibleMoves(const Color& activeColor, const bool isThreading)
 {
 	int start = (activeColor == Color::Black ? 0 : 6); // used fixed enum order
 	for (int i = start; i != start + 6; ++i)
@@ -61,12 +61,13 @@ void Map::FindAllPossibleMoves(const Color& activeColor)
 				OneFigureMoves moves;
 				moves.from = Pos::BitboardToPosition(j);
 				moves.to = Figure::FindPossibleMoves(moves.from, (FigureType)i, *this); // find figure possible moves without checking shah 
-
-				mut1.lock();
+				if (!isThreading)
+					mut1.lock();
 				EraseForbiddenMoves(moves); // TODO: maybe call eraseForbiddenMoves() in FindPossibleMoves() ?
 				if (!moves.to.empty())
 					allPossibleMoves.push_back(std::move(moves));
-				mut1.unlock();
+				if (!isThreading)
+					mut1.unlock();
 			}
 			j <<= 1;
 		}

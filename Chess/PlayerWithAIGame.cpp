@@ -127,7 +127,7 @@ const float PlayerWithAIGame::bitboards[12][8][8] = {
 		 {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}
 };
 
-const int PlayerWithAIGame::DEPTH = 2;
+const int PlayerWithAIGame::DEPTH = 3;
 
 PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 {
@@ -200,7 +200,7 @@ int PlayerWithAIGame::MiniMax(Map map, std::atomic<int> &countOfThreads, bool is
 	}
 	if (isAIMoveNow)
 	{
-		map.FindAllPossibleMoves(playerColor == Color::White ? Color::Black : Color::White);
+		map.FindAllPossibleMoves(playerColor == Color::White ? Color::Black : Color::White, true);
 		int bestMove = -9999;
 		std::vector<Move> movesPositions; // fill vector all possible moves
 		for (auto it1 = map.GetAllPossibleMoves().begin(); it1 != map.GetAllPossibleMoves().end(); ++it1)
@@ -219,7 +219,7 @@ int PlayerWithAIGame::MiniMax(Map map, std::atomic<int> &countOfThreads, bool is
 	}
 	else
 	{
-		map.FindAllPossibleMoves(playerColor);
+		map.FindAllPossibleMoves(playerColor, true);
 		int bestMove = 9999;
 		std::vector<Move> movesPositions; // fill vector all possible moves
 		for (auto it1 = map.GetAllPossibleMoves().begin(); it1 != map.GetAllPossibleMoves().end(); ++it1)
