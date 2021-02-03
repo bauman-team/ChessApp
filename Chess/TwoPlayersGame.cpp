@@ -1,7 +1,6 @@
 #include "TwoPlayersGame.h"
 
 std::mutex mut1;
-std::mutex mut2;
 std::mutex mut3;
 std::mutex mut4;
 

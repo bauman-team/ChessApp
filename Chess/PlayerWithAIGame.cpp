@@ -1,7 +1,6 @@
 #include "PlayerWithAIGame.h"
 
 extern std::mutex mut1;
-extern std::mutex mut2;
 extern std::mutex mut3;
 
 const int PlayerWithAIGame::figureWeight[12] = { 900, 90, 30, 30, 50, 30, 900, 90, 30, 30, 50, 10 };
@@ -143,9 +142,7 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 		Color playerColor = activePlayer->GetColor() == Color::White ? Color::Black : Color::White; // TODO: maybe static const?
 		for (int i = 0; i != movesPositions.size(); ++i)
 		{
-			mut2.lock();
 			Map copyMap(map);
-			mut2.unlock();
 			copyMap.Move(movesPositions[i].from, movesPositions[i].to);
 			//movesScore[i] = PlayerWithAIGame::MiniMax(copyMap, countOfThreads, false, playerColor, DEPTH, -10'000, 10'000);
 			std::thread th([i, movesScore, copyMap, playerColor, &countOfThreads]() {
@@ -160,11 +157,9 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 			while (countOfThreads != 0)
 				sf::sleep(sf::seconds(0.1));
 
-		mut2.lock();
 		for (int i = 1; i != movesPositions.size(); ++i) // TODO: add error rate
 			if (movesScore[i] > movesScore[bestIndex])
 				bestIndex = i;
-		mut2.unlock();
 
 		delete[] movesScore;
 
@@ -234,20 +229,12 @@ int PlayerWithAIGame::MiniMax(Map map, std::atomic<int> &countOfThreads, bool is
 			if (beta <= alpha)
 			{
 				if (depth == DEPTH)
-				{
-					mut2.lock();
 					--countOfThreads;
-					mut2.unlock();
-				}
 				return bestMove;
 			}
 		}
 		if (depth == DEPTH)
-		{
-			mut2.lock();
 			--countOfThreads;
-			mut2.unlock();
-		}
 		return bestMove;
 	}
 }
