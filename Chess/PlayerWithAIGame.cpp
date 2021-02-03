@@ -131,58 +131,55 @@ const int PlayerWithAIGame::DEPTH = 2;
 
 PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 {
-	/*if (activePlayer->GetColor() != Color::Black)
-	{*/
+	//if (activePlayer->GetColor() != Color::Black)
+	//{
 		int bestIndex = 0;
-		std::vector<Move> startedAccessMovesPositions; // fill array all possible moves
-		for (auto it1 = map.GetFigureWithAccessMoves().begin(); it1 != map.GetFigureWithAccessMoves().end(); ++it1)
-			for (auto it2 = (*it1).possibleMoves.begin(); it2 != (*it1).possibleMoves.end(); ++it2)
-				startedAccessMovesPositions.push_back(Move((*it1).figurePosition, *it2));
-		volatile int* const MovesScore = new volatile int[startedAccessMovesPositions.size()];
-		bool* isThreadCompleted = new bool[startedAccessMovesPositions.size()]();
-		Color AIColor = activePlayer->GetColor();
-		for (int i = 0; i != startedAccessMovesPositions.size(); ++i)
+		std::vector<Move> movesPositions; // fill vector all possible moves
+		for (auto it1 = map.GetAllPossibleMoves().begin(); it1 != map.GetAllPossibleMoves().end(); ++it1)
+			for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
+				movesPositions.push_back(Move((*it1).from, *it2));
+		int* const movesScore = new int[movesPositions.size()];
+		std::atomic<int> countOfThreads = movesPositions.size();
+		Color playerColor = activePlayer->GetColor() == Color::White ? Color::Black : Color::White; // TODO: maybe static const?
+		for (int i = 0; i != movesPositions.size(); ++i)
 		{
-			//isThreadCompleted[i] = false;
-			std::list<Map> listOfMaps;
 			mut2.lock();
-			listOfMaps.push_back(map);
+			Map copyMap(map);
 			mut2.unlock();
-			listOfMaps.back().Move(startedAccessMovesPositions[i].from, startedAccessMovesPositions[i].to);
-			//isThreadCompleted[i] = PlayerWithAIGame::CalculationScoreOfMoveInThread(listOfMaps, startedMovesScore[i], false, AIColor);
-			std::thread th([i, MovesScore, listOfMaps, AIColor, isThreadCompleted]() {
-				isThreadCompleted[i] = PlayerWithAIGame::CalculationScoreOfMoveInThread(listOfMaps, MovesScore[i], false, AIColor);
+			copyMap.Move(movesPositions[i].from, movesPositions[i].to);
+			//movesScore[i] = PlayerWithAIGame::MiniMax(copyMap, countOfThreads, false, playerColor, DEPTH, -10'000, 10'000);
+			std::thread th([i, movesScore, copyMap, playerColor, &countOfThreads]() {
+				movesScore[i] = PlayerWithAIGame::MiniMax(copyMap, countOfThreads, false, playerColor, DEPTH, -10'000, 10'000);
 				});
 			th.detach();
 		}
 
 		sf::sleep(sf::seconds(timeForWaiting));
 
-		if (timeForWaiting == 0) // TODO: maybe atomic int count of threads?
-			while (!IsAllThreadsOfMovesCompleted(isThreadCompleted, startedAccessMovesPositions.size()))
+		if (timeForWaiting == 0) 
+			while (countOfThreads != 0)
 				sf::sleep(sf::seconds(0.1));
 
 		mut2.lock();
-		for (int i = 1; i != startedAccessMovesPositions.size(); ++i)
-			if (MovesScore[i] > MovesScore[bestIndex])
+		for (int i = 1; i != movesPositions.size(); ++i) // TODO: add error rate
+			if (movesScore[i] > movesScore[bestIndex])
 				bestIndex = i;
 		mut2.unlock();
 
-		delete[] isThreadCompleted;
-		delete[] MovesScore;
+		delete[] movesScore;
 
-		return startedAccessMovesPositions[bestIndex];
+		return movesPositions[bestIndex];
 	/*}
 	else
 	{
 		srand(std::time(NULL));
-		int rand1 = rand() % map.GetFigureWithAccessMoves().size();
+		int rand1 = rand() % map.GetAllPossibleMoves().size();
 		sf::sleep(sf::seconds(0.5));
-		return Move(*map.GetFigureWithAccessMoves().at(rand1).figurePosition, map.GetFigureWithAccessMoves().at(rand1).possibleMoves->at(rand() % map.GetFigureWithAccessMoves().at(rand1).possibleMoves->size()));
+		return Move(map.GetAllPossibleMoves().at(rand1).from, map.GetAllPossibleMoves().at(rand1).to.at(rand() % map.GetAllPossibleMoves().at(rand1).to.size()));
 	}*/
 }
 
-int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color AIColor)
+int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color playerColor)
 {
 	int score = 0;
 	FigureType selected;
@@ -190,107 +187,69 @@ int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color
 	{
 		selected = selectedMap.GetFigureType(Pos::IndexToPosition(i));
 		if (selected != FigureType::Empty)
-			score += figureWeight[static_cast<int>(selected)] * (selectedMap.GetColor(selected) == AIColor ? 1 : -1); // * bitboards[static_cast<int>(selected)][i % 8][i / 8] 
+			score += figureWeight[static_cast<int>(selected)] * (selectedMap.GetColor(selected) == playerColor ? 1 : -1) * bitboards[static_cast<int>(selected)][i % 8][i / 8];
 	}
 	return score;
 }
 
-bool PlayerWithAIGame::CalculationScoreOfMoveInThread(std::list<Map> listOfMaps, volatile int &startedMoves, bool isAIMoveNow, const Color AIColor)
+int PlayerWithAIGame::MiniMax(Map map, std::atomic<int> &countOfThreads, bool isAIMoveNow, const Color playerColor, int depth, int alpha, int beta)
 {
-	int depth = 0, countOfMapsInList, countNewCreatedMap = 30; // if change countNewCreatedMap look to the func end 
-	while (depth != DEPTH)
+	if (depth == 0)
 	{
-		countOfMapsInList = listOfMaps.size();
-		for (int k = 0; k != countOfMapsInList; ++k)
+		return -CalculatePositionScore(map, playerColor);
+	}
+	if (isAIMoveNow)
+	{
+		map.FindAllPossibleMoves(playerColor == Color::White ? Color::Black : Color::White);
+		int bestMove = -9999;
+		std::vector<Move> movesPositions; // fill vector all possible moves
+		for (auto it1 = map.GetAllPossibleMoves().begin(); it1 != map.GetAllPossibleMoves().end(); ++it1)
+			for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
+				movesPositions.push_back(Move((*it1).from, *it2));
+		for (auto it = movesPositions.begin(); it != movesPositions.end(); ++it)
 		{
-			Map* itMap = &listOfMaps.front();
-			itMap->FindAllPossibleMoves(isAIMoveNow ? AIColor : (AIColor == Color::Black ? Color::White : Color::Black));
-
-			if (!itMap->GetAllPossibleMoves().empty())
+			map.Move((*it).from, (*it).to);
+			bestMove = std::max(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, playerColor, depth, alpha, beta));
+			map.UndoMove();
+			alpha = std::max(bestMove, alpha);
+			if (beta <= alpha)
+				return bestMove;
+		}
+		return bestMove;
+	}
+	else
+	{
+		map.FindAllPossibleMoves(playerColor);
+		int bestMove = 9999;
+		std::vector<Move> movesPositions; // fill vector all possible moves
+		for (auto it1 = map.GetAllPossibleMoves().begin(); it1 != map.GetAllPossibleMoves().end(); ++it1)
+			for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
+				movesPositions.push_back(Move((*it1).from, *it2));
+		for (auto it = movesPositions.begin(); it != movesPositions.end(); ++it)
+		{
+			map.Move((*it).from, (*it).to);
+			bestMove = std::min(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, playerColor, depth - 1, alpha, beta));
+			map.UndoMove();
+			beta = std::min(bestMove, beta);
+			if (beta <= alpha)
 			{
-				std::vector<int> movesScores;
-				for (auto it1 = itMap->GetAllPossibleMoves().begin(); it1 != itMap->GetAllPossibleMoves().end(); ++it1) // calculate score
-					for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
-					{
-						FigureType eatenFigure = itMap->GetFigureType(*it2);
-						itMap->DoImitationMove((*it1).from, *it2);
-						movesScores.push_back(CalculatePositionScore(*itMap, AIColor));
-						itMap->UndoImitationMove((*it1).from, *it2, eatenFigure);
-					}
-
-				int sizeOfArrayIndexOfMoves = ((countNewCreatedMap > movesScores.size()) ? movesScores.size() : countNewCreatedMap);
-				int* indexOfMovesWithBestScore = new int[sizeOfArrayIndexOfMoves]; //index of maps which create later
-
-				if (isAIMoveNow)
+				if (depth == DEPTH)
 				{
-					for (int i = 0; i != sizeOfArrayIndexOfMoves; ++i) // max score for bot
-					{
-						indexOfMovesWithBestScore[i] = 0;
-						for (int j = 1; j != movesScores.size(); ++j)
-						{
-							if (movesScores[j] > movesScores[indexOfMovesWithBestScore[i]])
-								indexOfMovesWithBestScore[i] = j;
-						}
-						movesScores[indexOfMovesWithBestScore[i]] = INT32_MIN;
-					}
-				}
-				else
-				{
-					int minScore;
-					for (int i = 0; i != sizeOfArrayIndexOfMoves; ++i) // min score for opponent
-					{
-						indexOfMovesWithBestScore[i] = 0;
-						for (int j = 1; j != movesScores.size(); ++j)
-						{
-							if (movesScores[j] < movesScores[indexOfMovesWithBestScore[i]])
-								indexOfMovesWithBestScore[i] = j;
-						}
-						if (i == 0) // why 0
-							minScore = movesScores[indexOfMovesWithBestScore[i]];
-						movesScores[indexOfMovesWithBestScore[i]] = INT32_MAX;
-					}
 					mut2.lock();
-					if (startedMoves.depth == -1 || startedMoves.score > minScore)
-					{
-						startedMoves.depth = depth + 1;
-						startedMoves.score = minScore;
-					}
+					--countOfThreads;
 					mut2.unlock();
 				}
-
-				int j = 0;
-				if (depth + 1 < DEPTH || depth + 1 == DEPTH && isAIMoveNow) // create maps
-					for (auto it1 = itMap->GetAllPossibleMoves().begin(); it1 != itMap->GetAllPossibleMoves().end(); ++it1)
-						for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2, ++j)
-							for (int i = 0; i != sizeOfArrayIndexOfMoves; ++i)
-								if (j == indexOfMovesWithBestScore[i])
-								{
-									listOfMaps.push_back(*itMap);
-									listOfMaps.back().Move((*it1).from, *it2);
-								}
-				delete[] indexOfMovesWithBestScore;
-				itMap->ClearPossibleMoves();
+				return bestMove;
 			}
-			listOfMaps.pop_front();
 		}
-		depth += isAIMoveNow ? 0 : 1;
-		/*if (!isAIMoveNow)
-			countNewCreatedMap = countNewCreatedMap > 3 ? countNewCreatedMap / 3 : 1;*/
-		isAIMoveNow = !isAIMoveNow;
+		if (depth == DEPTH)
+		{
+			mut2.lock();
+			--countOfThreads;
+			mut2.unlock();
+		}
+		return bestMove;
 	}
-	mut2.lock();
-	if (startedMoves.depth == -1) // if bot win (add checking PAT)
-		startedMoves.score = INT32_MAX;
-	mut2.unlock();
-	return true;
-}
-
-bool PlayerWithAIGame::IsAllThreadsOfMovesCompleted(bool* threadsInfo, int range)
-{
-	for (int i = 0; i != range; ++i)
-		if (!threadsInfo[i])
-			return false;
-	return true;
 }
 
 void PlayerWithAIGame::SetPlayers(std::string name1, std::string name2, sf::Time timeLimit)
@@ -319,7 +278,11 @@ void PlayerWithAIGame::ChangeActivePlayer()
 	status = CheckGameFinal();
 	if (status != GameStatus::Pat && status != GameStatus::Mat)
 	{
+		std::cout << "Start!\n";
+		sf::Clock clock;
 		Move bestMove = StartAI();
+		sf::Time time = clock.getElapsedTime();
+		std::cout << "End! Time of calculating (in milliseconds): " << time.asMilliseconds() << "\n";
 		map.MakeMove(bestMove.from, bestMove.to);
 		mut3.lock();
 		UpdateSideMenu();

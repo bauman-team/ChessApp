@@ -2,7 +2,7 @@
 #include "TwoPlayersGame.h"
 #include "Menu.h"
 #include <list>
-//#include <iostream>
+#include <iostream>
 //#include <iomanip>
 
 class PlayerWithAIGame : public TwoPlayersGame
@@ -27,8 +27,7 @@ protected:
 
 	Move StartAI(double timeForWaiting = 0);
 	static int CalculatePositionScore(const Map& selectedMap, const Color AIColor);
-	static bool CalculationScoreOfMoveInThread(std::list<Map> listOfMaps, volatile int &startedMoves, bool isAIMoveNow, const Color AIColor); 
-	static bool IsAllThreadsOfMovesCompleted(bool* threadsInfo, int range);
+	static int MiniMax(Map map, std::atomic<int> &countOfThreads, bool isAIMoveNow, const Color playerColor, int depth, int alpha, int beta);
 
 public:
 	PlayerWithAIGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties) 
