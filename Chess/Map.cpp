@@ -149,10 +149,11 @@ void Map::UndoMove()
 	if (GetLastMoveInfo() != MoveInfo::NULL_INFO &&
 		GetColor(GetLastMoveInfo().GetTypeActiveFigure()) == GetColor(info.GetTypeActiveFigure()))
 	{
-		if (info.GetTypeEatenFigure() != FigureType::Empty)
+		if (info.GetTypeEatenFigure() != FigureType::Empty) // Pawn to Queen
 			map[static_cast<int>(info.GetTypeEatenFigure())] += info.GetPosAfterMove().ToBitboard();
+		else // Castling
+			map[static_cast<int>(info.GetTypeActiveFigure())] += info.GetPosBeforeMove().ToBitboard();
 		map[static_cast<int>(info.GetTypeActiveFigure())] -= info.GetPosAfterMove().ToBitboard();
-		map[static_cast<int>(info.GetTypeActiveFigure())] += info.GetPosBeforeMove().ToBitboard();
 		info = GetLastMoveInfo();
 		movesHistory.pop_back();
 	}
@@ -224,16 +225,22 @@ void Map::RookCastling(const Pos& kingFrom, const Pos& kingTo)
 bool Map::IsShahFor(const Pos& kingPos) const
 {
 	FigureType king = GetFigureType(kingPos);
-	uint64_t defendStraight, defendDiagonal, attackedStraight, attackedDiagonal, attackedKnight,
+	uint64_t defendStraight, defendDiagonal, attackedStraight, attackedDiagonal, attackedKingKnight,
 		mapSpareBorder, kingBitdoard = map[static_cast<int>(king)];
+	// King
+	attackedKingKnight = ~mapRightBorder & (kingBitdoard << offsetHorizontal | kingBitdoard << offsetMainDiag | kingBitdoard >> offsetSideDiag)
+		| ~mapLeftBorder & (kingBitdoard >> offsetHorizontal | kingBitdoard >> offsetMainDiag | kingBitdoard << offsetSideDiag)
+		| kingBitdoard << offsetVertical | kingBitdoard >> offsetVertical;
+	if (attackedKingKnight & map[static_cast<int>(king == FigureType::Knight_black ? FigureType::Knight_white : FigureType::Knight_black)])
+		return true;
 	// Knight
-	attackedKnight = knightBorderGH & (kingBitdoard << 6 | kingBitdoard >> 10)
+	attackedKingKnight = knightBorderGH & (kingBitdoard << 6 | kingBitdoard >> 10)
 		| ~mapRightBorder & (kingBitdoard << 15 | kingBitdoard >> 17)
 		| ~mapLeftBorder & (kingBitdoard << 17 | kingBitdoard >> 15)
 		| knightBorderAB & (kingBitdoard << 10 | kingBitdoard >> 6);
 	if (king == FigureType::King_black)
 	{
-		if (attackedKnight & map[static_cast<int>(FigureType::Knight_white)])
+		if (attackedKingKnight & map[static_cast<int>(FigureType::Knight_white)])
 			return true;
 		// Pawn
 		if (!(kingBitdoard & mapDownBorder))
@@ -248,18 +255,19 @@ bool Map::IsShahFor(const Pos& kingPos) const
 		defendStraight = map[static_cast<int>(FigureType::Queen_black)]
 			| map[static_cast<int>(FigureType::Bishop_black)] | map[static_cast<int>(FigureType::Knight_black)]
 			| map[static_cast<int>(FigureType::Rook_black)] | map[static_cast<int>(FigureType::Pawn_black)]
-			| map[static_cast<int>(FigureType::Pawn_white)] | map[static_cast<int>(FigureType::Knight_white)];
+			| map[static_cast<int>(FigureType::Pawn_white)] | map[static_cast<int>(FigureType::Knight_white)]
+			| map[static_cast<int>(FigureType::King_white)];
 		defendDiagonal = defendStraight | map[static_cast<int>(FigureType::Rook_white)];
 		defendStraight |= map[static_cast<int>(FigureType::Bishop_white)];
 
-		attackedStraight = map[static_cast<int>(FigureType::Queen_white)] | map[static_cast<int>(FigureType::King_white)];
+		attackedStraight = map[static_cast<int>(FigureType::Queen_white)];
 		attackedDiagonal = attackedStraight;
 		attackedDiagonal |= map[static_cast<int>(FigureType::Bishop_white)];
 		attackedStraight |= map[static_cast<int>(FigureType::Rook_white)];
 	}
 	else
 	{
-		if (attackedKnight & map[static_cast<int>(FigureType::Knight_black)])
+		if (attackedKingKnight & map[static_cast<int>(FigureType::Knight_black)])
 			return true;
 		// Pawn
 		if (!(kingBitdoard & mapUpBorder))
@@ -274,11 +282,12 @@ bool Map::IsShahFor(const Pos& kingPos) const
 		defendStraight = map[static_cast<int>(FigureType::Queen_white)]
 			| map[static_cast<int>(FigureType::Bishop_white)] | map[static_cast<int>(FigureType::Knight_white)]
 			| map[static_cast<int>(FigureType::Rook_white)] | map[static_cast<int>(FigureType::Pawn_white)]
-			| map[static_cast<int>(FigureType::Pawn_black)] | map[static_cast<int>(FigureType::Knight_black)];
+			| map[static_cast<int>(FigureType::Pawn_black)] | map[static_cast<int>(FigureType::Knight_black)]
+			| map[static_cast<int>(FigureType::King_black)];
 		defendDiagonal = defendStraight | map[static_cast<int>(FigureType::Rook_black)];
 		defendStraight |= map[static_cast<int>(FigureType::Bishop_black)];
 
-		attackedStraight = map[static_cast<int>(FigureType::Queen_black)] | map[static_cast<int>(FigureType::King_black)];
+		attackedStraight = map[static_cast<int>(FigureType::Queen_black)];
 		attackedDiagonal = attackedStraight;
 		attackedDiagonal |= map[static_cast<int>(FigureType::Bishop_black)];
 		attackedStraight |= map[static_cast<int>(FigureType::Rook_black)];

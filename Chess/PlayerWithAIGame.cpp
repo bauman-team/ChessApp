@@ -204,6 +204,11 @@ int PlayerWithAIGame::MiniMax(Map map, std::atomic<int> &countOfThreads, bool is
 		{
 			for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
 			{
+				/*if (map.GetFigureType((*it1).from) == FigureType::Empty)
+				{
+					int q = 0;
+					q += 1;
+				}*/
 				map.Move((*it1).from, *it2);
 				bestMove = std::max(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, playerColor, depth, alpha, beta));
 				map.UndoMove();
@@ -222,6 +227,11 @@ int PlayerWithAIGame::MiniMax(Map map, std::atomic<int> &countOfThreads, bool is
 		{
 			for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
 			{
+				/*if (map.GetFigureType((*it1).from) == FigureType::Empty)
+				{
+					int q = 0;
+					q += 1;
+				}*/
 				map.Move((*it1).from, *it2);
 				bestMove = std::min(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, playerColor, depth - 1, alpha, beta));
 				map.UndoMove();

@@ -28,9 +28,9 @@ bool MoveInfo::isEatenFigureExists() const
 
 bool MoveInfo::operator==(const MoveInfo& comp) const
 {
-	if (activeFigure != comp.activeFigure &&
-		eatenFigure != comp.eatenFigure &&
-		from != comp.from &&
+	if (activeFigure != comp.activeFigure ||
+		eatenFigure != comp.eatenFigure ||
+		from != comp.from ||
 		to != comp.to)
 		return false;
 	for (int i = 0; i != 4; ++i)
