@@ -395,9 +395,9 @@ bool Map::IsCastlingAllowedForKing(const Pos& kingPos) const // is castling poss
 	return possibleCastling[static_cast<int>(kingColor)] || possibleCastling[static_cast<int>(kingColor) + 1];
 }
 
-bool Map::IsCastlingAllowedWithRook(const Pos& rookPos) const // is castling possible with selected Rook
+bool Map::IsCastlingAllowedWithRook(const Pos& rookPos, const Color& rookColor) const // is castling possible with selected Rook
 {
-	int kingCoeff = 2 * static_cast<int>(GetColor(rookPos));
+	int kingCoeff = 2 * static_cast<int>(rookColor);
 	if (rookPos == Pos(0, 0) || rookPos == Pos(0, 7))
 		return possibleCastling[kingCoeff];
 	if (rookPos == Pos(7, 0) || rookPos == Pos(7, 7))
@@ -412,7 +412,7 @@ void Map::DisableCastlingForKing(const Color& kingColor) // if made a King move 
 	possibleCastling[kingCoeff + 1] = false;
 }
 
-void Map::DisableCastlingWithRook(const Pos& rookPos, const Color & rookColor) // if made a Rook move disable possible castling with selected Rook
+void Map::DisableCastlingWithRook(const Pos& rookPos, const Color& rookColor) // if made a Rook move disable possible castling with selected Rook
 {
 	int kingCoeff = 2 * static_cast<int>(rookColor);
 	if (rookPos == Pos(0, 0) || rookPos == Pos(0, 7))

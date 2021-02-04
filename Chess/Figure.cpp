@@ -89,10 +89,11 @@ std::vector<Pos> Figure::FindPossibleMovesKing(const Pos& coord, Map& map)
 	// castling
 	if (map.IsCastlingAllowedForKing(coord))
 	{
-		int y = (map.GetColor(coord) == Color::White) ? 0 : 7;
+		Color activeColor = map.GetColor(coord);
+		int y = (activeColor == Color::White) ? 0 : 7;
 
 		// checking long castling
-		if (map.IsCastlingAllowedWithRook(Pos(0, y)) &&
+		if (map.IsCastlingAllowedWithRook(Pos(0, y), activeColor) &&
 			map.CheckEmpty(coord, Pos(1, y)) == 1 &&
 			map.CheckEmpty(coord, Pos(2, y)) == 1 &&
 			map.CheckEmpty(coord, Pos(3, y)) == 1)
@@ -107,7 +108,7 @@ std::vector<Pos> Figure::FindPossibleMovesKing(const Pos& coord, Map& map)
 		}
 
 		// checking short castling
-		if (map.IsCastlingAllowedWithRook(Pos(7, y)) &&
+		if (map.IsCastlingAllowedWithRook(Pos(7, y), activeColor) &&
 			map.CheckEmpty(coord, Pos(6, y)) == 1 &&
 			map.CheckEmpty(coord, Pos(5, y)) == 1)
 		{

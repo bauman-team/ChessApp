@@ -29,7 +29,7 @@ class Map
 	void Move(const Pos& from, const Pos& to);
 	void SetToEmpty(const Pos& target);
 	void PawnToQueen(const Pos& target);
-	void RookCastling(const Pos& from, const Pos& to);
+	void RookCastling(const Pos& kingFrom, const Pos& kingTo);
 public:
 	Map(); 
 	Map(const Map& map);
@@ -55,7 +55,7 @@ public:
 
 	// castling methods
 	bool IsCastlingAllowedForKing(const Pos& kingPos) const;
-	bool IsCastlingAllowedWithRook(const Pos& rookPos) const;
+	bool IsCastlingAllowedWithRook(const Pos& rookPos, const Color& rookColor) const;
 	void DisableCastlingForKing(const Color& kingColor);
 	void DisableCastlingWithRook(const Pos& rookPos, const Color& rookColor);
 
