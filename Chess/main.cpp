@@ -41,7 +41,7 @@ int main()
 
 	std::thread *thSetCell = nullptr;
 	bool thSetCellIsFinished = true;
-	
+
 	//((PlayerWithAIGame*)game)->output();
 	while (window.isOpen())
 	{

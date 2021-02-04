@@ -126,7 +126,9 @@ const float PlayerWithAIGame::bitboards[12][8][8] = {
 		 {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}
 };
 
-const int PlayerWithAIGame::DEPTH = 3;
+const int PlayerWithAIGame::DEPTH{ 3 };
+
+std::atomic<int> positionsCount{ 0 }; // debug counter
 
 PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 {
@@ -189,6 +191,7 @@ int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color
 
 int PlayerWithAIGame::MiniMax(Map map, std::atomic<int> &countOfThreads, bool isAIMoveNow, const Color playerColor, int depth, int alpha, int beta)
 {
+	++positionsCount;
 	if (depth == 0)
 	{
 		return -CalculatePositionScore(map, playerColor);
@@ -266,10 +269,12 @@ void PlayerWithAIGame::ChangeActivePlayer()
 	if (status != GameStatus::Pat && status != GameStatus::Mat)
 	{
 		std::cout << "Start!\n";
+		positionsCount = 0;
 		sf::Clock clock;
 		Move bestMove = StartAI();
 		sf::Time time = clock.getElapsedTime();
-		std::cout << "End! Time of calculating (in milliseconds): " << time.asMilliseconds() << "\n";
+		std::cout << "End!\nTime of calculating (in milliseconds): " << time.asMilliseconds()
+			<< "\n Count of calculated positions: " << positionsCount << "\n";
 		map.MakeMove(bestMove.from, bestMove.to);
 		mut3.lock();
 		UpdateSideMenu();

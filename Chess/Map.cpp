@@ -4,9 +4,13 @@
 #include <SFML/Window.hpp>
 
 extern std::mutex mut1; // TODO: extern, but is not connection with TwoPlayersGame, why it works
+const uint8_t Map::offsetHorizontal{ 1 }, Map::offsetVertical{ 8 }, Map::offsetMainDiag{ 7 }, Map::offsetSideDiag{ 9 };
+const uint64_t Map::knightBorderAB{ 18'229'723'555'195'321'596 }, Map::knightBorderGH{ 4'557'430'888'798'830'399 },
+Map::mapLeftBorder{ 72'340'172'838'076'673 }, Map::mapRightBorder{ 9'259'542'123'273'814'144 },
+Map::mapUpBorder{ 18'374'686'479'671'623'680 }, Map::mapDownBorder{ 255 };
 
 Map::Map()
-{
+{ // 0 - left down
 	map[static_cast<int>(FigureType::Rook_black)] = 9'295'429'630'892'703'744;
 	map[static_cast<int>(FigureType::Knight_black)] = 4'755'801'206'503'243'776;
 	map[static_cast<int>(FigureType::Bishop_black)] = 2'594'073'385'365'405'696;
@@ -219,6 +223,149 @@ void Map::RookCastling(const Pos& kingFrom, const Pos& kingTo)
 
 bool Map::IsShahFor(const Pos& kingPos) const
 {
+	FigureType king = GetFigureType(kingPos);
+	uint64_t defendStraight, defendDiagonal, attackedStraight, attackedDiagonal, attackedKnight,
+		mapSpareBorder, kingBitdoard = map[static_cast<int>(king)];
+	// Knight
+	attackedKnight = knightBorderGH & (kingBitdoard << 6 | kingBitdoard >> 10)
+		| ~mapRightBorder & (kingBitdoard << 15 | kingBitdoard >> 17)
+		| ~mapLeftBorder & (kingBitdoard << 17 | kingBitdoard >> 15)
+		| knightBorderAB & (kingBitdoard << 10 | kingBitdoard >> 6);
+	if (king == FigureType::King_black)
+	{
+		if (attackedKnight & map[static_cast<int>(FigureType::Knight_white)])
+			return true;
+		// Pawn
+		if (!(kingBitdoard & mapDownBorder))
+		{
+			if (!(kingBitdoard & mapLeftBorder))
+				if (kingBitdoard >> offsetSideDiag & map[static_cast<int>(FigureType::Pawn_white)])
+					return true;
+			if (!(kingBitdoard & mapRightBorder))
+				if (kingBitdoard >> offsetMainDiag & map[static_cast<int>(FigureType::Pawn_white)])
+					return true;
+		}
+		defendStraight = map[static_cast<int>(FigureType::Queen_black)]
+			| map[static_cast<int>(FigureType::Bishop_black)] | map[static_cast<int>(FigureType::Knight_black)]
+			| map[static_cast<int>(FigureType::Rook_black)] | map[static_cast<int>(FigureType::Pawn_black)]
+			| map[static_cast<int>(FigureType::Pawn_white)] | map[static_cast<int>(FigureType::Knight_white)];
+		defendDiagonal = defendStraight | map[static_cast<int>(FigureType::Rook_white)];
+		defendStraight |= map[static_cast<int>(FigureType::Bishop_white)];
+
+		attackedStraight = map[static_cast<int>(FigureType::Queen_white)] | map[static_cast<int>(FigureType::King_white)];
+		attackedDiagonal = attackedStraight;
+		attackedDiagonal |= map[static_cast<int>(FigureType::Bishop_white)];
+		attackedStraight |= map[static_cast<int>(FigureType::Rook_white)];
+	}
+	else
+	{
+		if (attackedKnight & map[static_cast<int>(FigureType::Knight_black)])
+			return true;
+		// Pawn
+		if (!(kingBitdoard & mapUpBorder))
+		{
+			if (!(kingBitdoard & mapLeftBorder))
+				if (kingBitdoard << offsetMainDiag & map[static_cast<int>(FigureType::Pawn_black)])
+					return true;
+			if (!(kingBitdoard & mapRightBorder))
+				if (kingBitdoard << offsetSideDiag & map[static_cast<int>(FigureType::Pawn_black)])
+					return true;
+		}
+		defendStraight = map[static_cast<int>(FigureType::Queen_white)]
+			| map[static_cast<int>(FigureType::Bishop_white)] | map[static_cast<int>(FigureType::Knight_white)]
+			| map[static_cast<int>(FigureType::Rook_white)] | map[static_cast<int>(FigureType::Pawn_white)]
+			| map[static_cast<int>(FigureType::Pawn_black)] | map[static_cast<int>(FigureType::Knight_black)];
+		defendDiagonal = defendStraight | map[static_cast<int>(FigureType::Rook_black)];
+		defendStraight |= map[static_cast<int>(FigureType::Bishop_black)];
+
+		attackedStraight = map[static_cast<int>(FigureType::Queen_black)] | map[static_cast<int>(FigureType::King_black)];
+		attackedDiagonal = attackedStraight;
+		attackedDiagonal |= map[static_cast<int>(FigureType::Bishop_black)];
+		attackedStraight |= map[static_cast<int>(FigureType::Rook_black)];
+	}
+	// Rook + Queen
+	/*
+		* | 0 | *
+		---------
+		3 | K | 1
+		---------
+		* | 2 | *
+	*/
+	mapSpareBorder = mapUpBorder | defendStraight;
+	while (!(kingBitdoard & mapSpareBorder)) // 0
+	{
+		kingBitdoard <<= offsetVertical;
+		if (kingBitdoard & attackedStraight)
+			return true;
+	}
+	kingBitdoard = map[static_cast<int>(king)];
+	mapSpareBorder = mapRightBorder | defendStraight;
+	while (!(kingBitdoard & mapSpareBorder)) // 1
+	{
+		kingBitdoard <<= offsetHorizontal;
+		if (kingBitdoard & attackedStraight)
+			return true;
+	}
+	kingBitdoard = map[static_cast<int>(king)];
+	mapSpareBorder = mapDownBorder | defendStraight;
+	while (!(kingBitdoard & mapSpareBorder)) // 2
+	{
+		kingBitdoard >>= offsetVertical;
+		if (kingBitdoard & attackedStraight)
+			return true;
+	}
+	kingBitdoard = map[static_cast<int>(king)];
+	mapSpareBorder = mapLeftBorder | defendStraight;
+	while (!(kingBitdoard & mapSpareBorder)) // 3
+	{
+		kingBitdoard >>= offsetHorizontal;
+		if (kingBitdoard & attackedStraight)
+			return true;
+	}
+	kingBitdoard = map[static_cast<int>(king)];
+
+	// Bishop + Queen
+	/*
+		0 | * | 1
+		---------
+		* | K | *
+		---------
+		3 | * | 2
+	*/
+	mapSpareBorder = mapLeftBorder | mapUpBorder | defendDiagonal; // angle
+	while (!(kingBitdoard & mapSpareBorder)) // 0
+	{
+		kingBitdoard <<= offsetMainDiag;
+		if (kingBitdoard & attackedDiagonal)
+			return true;
+	}
+	kingBitdoard = map[static_cast<int>(king)];
+	mapSpareBorder = mapUpBorder | mapRightBorder | defendDiagonal;
+	while (!(kingBitdoard & mapSpareBorder)) // 1
+	{
+		kingBitdoard <<= offsetSideDiag;
+		if (kingBitdoard & attackedDiagonal)
+			return true;
+	}
+	kingBitdoard = map[static_cast<int>(king)];
+	mapSpareBorder = mapRightBorder | mapDownBorder | defendDiagonal;
+	while (!(kingBitdoard & mapSpareBorder)) // 2
+	{
+		kingBitdoard >>= offsetMainDiag;
+		if (kingBitdoard & attackedDiagonal)
+			return true;
+	}
+	kingBitdoard = map[static_cast<int>(king)];
+	mapSpareBorder = mapDownBorder | mapLeftBorder | defendDiagonal;
+	while (!(kingBitdoard & mapSpareBorder)) // 3
+	{
+		kingBitdoard >>= offsetSideDiag;
+		if (kingBitdoard & attackedDiagonal)
+			return true;
+	}
+	return false;
+
+	/*
 	Color kingColor = GetColor(kingPos);
 	Pos selectedPosition;
 	bool isChecked;
@@ -231,13 +378,13 @@ bool Map::IsShahFor(const Pos& kingPos) const
 		isChecked = false;
 		do 
 		{
-			/*
-				0 | 7 | 6
-				---------
-				1 | K | 5
-				---------
-				2 | 3 | 4
-			*/
+			
+				//0 | 7 | 6
+				//---------
+				//1 | K | 5
+				//---------
+				//2 | 3 | 4
+			
 			if (i == 0 || i == 1 || i == 2) // 0 - up && left; 1 - left; 2 - down && left; ... (counter-clockwise)
 				--x;
 			else if (i == 4 || i == 5 || i == 6)
@@ -339,6 +486,7 @@ bool Map::IsShahFor(const Pos& kingPos) const
 		}
 	}
 	return false;
+	*/
 }
 
 void Map::EraseForbiddenMoves(OneFigureMoves& figureMoves)
@@ -388,7 +536,7 @@ Color Map::GetColor(const FigureType type) const
 FigureType Map::GetFigureType(const Pos& pos) const
 {
 	uint64_t bitboard = 1ULL << pos.ToIndex();
-	for (int i = 0; i != 12; ++i)
+	for (int i = 0; i != 12; ++i) // TODO: const count types of figures (12)
 		if (map[i] & bitboard)
 			return (FigureType)i;
 	return FigureType::Empty;

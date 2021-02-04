@@ -68,4 +68,7 @@ public:
 	int GetMovesCount() const { return movesHistory.size(); }
 
 	~Map(){}
+
+	static const uint8_t offsetHorizontal, offsetVertical, offsetMainDiag, offsetSideDiag;
+	static const uint64_t knightBorderAB, knightBorderGH, mapLeftBorder, mapRightBorder, mapUpBorder, mapDownBorder;
 };
