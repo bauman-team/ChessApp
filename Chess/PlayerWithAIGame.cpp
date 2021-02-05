@@ -198,50 +198,63 @@ int PlayerWithAIGame::MiniMax(Map map, std::atomic<int> &countOfThreads, bool is
 	}
 	if (isAIMoveNow)
 	{
-		map.FindAllPossibleMoves(playerColor == Color::White ? Color::Black : Color::White, true);
-		int bestMove = -9999;
-		for (auto it1 = map.GetAllPossibleMoves().begin(); it1 != map.GetAllPossibleMoves().end(); ++it1)
+		Color AIColor = playerColor == Color::Black ? Color::White : Color::Black;
+		int bestMove = -9999, start = (AIColor == Color::Black ? 0 : 6); // used fixed enum order
+		for (int i = start; i != start + 6; ++i)
 		{
-			for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
+			uint64_t j = 1;
+			while (j) // check all positions
 			{
-				/*if (map.GetFigureType((*it1).from) == FigureType::Empty)
+				if (j & map.map[i]) // is selected figure position
 				{
-					int q = 0;
-					q += 1;
-				}*/
-				map.Move((*it1).from, *it2);
-				bestMove = std::max(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, playerColor, depth, alpha, beta));
-				map.UndoMove();
-				alpha = std::max(bestMove, alpha);
-				if (beta <= alpha)
-					return bestMove;
-			}	
+					OneFigureMoves moves;
+					moves.from = Pos::BitboardToPosition(j);
+					moves.to = Figure::FindPossibleMoves(moves.from, (FigureType)i, map); // find figure possible moves without checking shah 
+					for (auto posItr = moves.to.begin(); posItr != moves.to.end(); ++posItr)
+					{
+						map.Move(moves.from, *posItr);
+						if (!map.IsShahFor(AIColor))
+							bestMove = std::max(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, playerColor, depth, alpha, beta));
+						map.UndoMove();
+						alpha = std::max(bestMove, alpha);
+						if (beta <= alpha)
+							return bestMove;
+					}
+				}
+				j <<= 1;
+			}
 		}
 		return bestMove;
 	}
 	else
 	{
-		map.FindAllPossibleMoves(playerColor, true);
-		int bestMove = 9999;
-		for (auto it1 = map.GetAllPossibleMoves().begin(); it1 != map.GetAllPossibleMoves().end(); ++it1)
+		int bestMove = 9999, start = (playerColor == Color::Black ? 0 : 6); // used fixed enum order
+		for (int i = start; i != start + 6; ++i)
 		{
-			for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
+			uint64_t j = 1;
+			while (j) // check all positions
 			{
-				/*if (map.GetFigureType((*it1).from) == FigureType::Empty)
+				if (j & map.map[i]) // is selected figure position
 				{
-					int q = 0;
-					q += 1;
-				}*/
-				map.Move((*it1).from, *it2);
-				bestMove = std::min(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, playerColor, depth - 1, alpha, beta));
-				map.UndoMove();
-				beta = std::min(bestMove, beta);
-				if (beta <= alpha)
-				{
-					if (depth == DEPTH)
-						--countOfThreads;
-					return bestMove;
+					OneFigureMoves moves;
+					moves.from = Pos::BitboardToPosition(j);
+					moves.to = Figure::FindPossibleMoves(moves.from, (FigureType)i, map); // find figure possible moves without checking shah 
+					for (auto posItr = moves.to.begin(); posItr != moves.to.end(); ++posItr)
+					{
+						map.Move(moves.from, *posItr);
+						if (!map.IsShahFor(playerColor))
+							bestMove = std::min(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, playerColor, depth - 1, alpha, beta));
+						map.UndoMove();
+						beta = std::min(bestMove, beta);
+						if (beta <= alpha)
+						{
+							if (depth == DEPTH)
+								--countOfThreads;
+							return bestMove;
+						}
+					}
 				}
+				j <<= 1;
 			}
 		}
 		if (depth == DEPTH)

@@ -49,7 +49,7 @@ public:
 
 	int8_t CheckEmpty(const Pos& from, const Pos& to) const;
 
-	bool IsShahFor(const Pos& kingPos) const;
+	bool IsShahFor(const Color kingColor) const;
 	void EraseForbiddenMoves(OneFigureMoves& figureMoves);
 
 	// castling methods

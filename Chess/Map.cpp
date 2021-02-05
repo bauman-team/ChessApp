@@ -170,7 +170,7 @@ void Map::UndoMove()
 	}
 	if (info.GetTypeEatenFigure() != FigureType::Empty)
 	{
-		if (info.GetAdditionalInfo() & get)
+		if (info.GetAdditionalInfo() & get) // if Pawn eat on passage
 			map[static_cast<int>(info.GetTypeEatenFigure())] +=
 				Pos(info.GetPosAfterMove().GetX(), info.GetPosBeforeMove().GetY()).ToBitboard();
 		else
@@ -185,7 +185,7 @@ void Map::UndoMove()
 	}
 }
 
-void Map::DoImitationMove(const Pos& from, const Pos& to)
+void Map::DoImitationMove(const Pos& from, const Pos& to) // TODO: fix bug with Pawn eat on passage
 {
 	FigureType moved = GetFigureType(from);
 	FigureType eaten = GetFigureType(to);
@@ -242,9 +242,9 @@ void Map::RookCastling(const Pos& kingFrom, const Pos& kingTo)
 	Move(rookFrom, rookTo);
 }
 
-bool Map::IsShahFor(const Pos& kingPos) const
+bool Map::IsShahFor(const Color kingColor) const
 {
-	FigureType king = GetFigureType(kingPos);
+	FigureType king = kingColor == Color::Black ? FigureType::King_black : FigureType::King_white;
 	uint64_t defendStraight, defendDiagonal, attackedStraight, attackedDiagonal, attackedKingKnight,
 		mapSpareBorder, kingBitdoard = map[static_cast<int>(king)];
 	// King
@@ -522,22 +522,15 @@ void Map::EraseForbiddenMoves(OneFigureMoves& figureMoves)
 	{
 		FigureType activeFigureType = GetFigureType(figureMoves.from), eatenFigureType;
 		std::vector<Pos>::iterator posItr = figureMoves.to.begin();
-		Pos kingPos;
 		bool isShah;
-
-		// finding king position
-		if (activeFigureType == FigureType::King_black || activeFigureType == FigureType::King_white)
-			kingPos = figureMoves.from; // chosen figure is king
-		else
-			kingPos = Pos::BitboardToPosition(map[static_cast<int>(Figure::GetFigureTypeColor(activeFigureType) == Color::Black ? FigureType::King_black : FigureType::King_white)]);
 
 		// imitating all moves to find and erase moves after which the king is attacked
 		for (; posItr != figureMoves.to.end();)
 		{
 			eatenFigureType = GetFigureType(*posItr);
-			Move(figureMoves.from, *posItr);
-			isShah = IsShahFor(kingPos == figureMoves.from ? *posItr : kingPos);
-			UndoMove();
+			DoImitationMove(figureMoves.from, *posItr);
+			isShah = IsShahFor(GetColor(activeFigureType));
+			UndoImitationMove(figureMoves.from, *posItr,eatenFigureType);
 			if (isShah)
 				posItr = figureMoves.to.erase(posItr);
 			else ++posItr;

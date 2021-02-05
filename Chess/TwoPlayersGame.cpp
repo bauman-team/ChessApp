@@ -99,13 +99,7 @@ void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
 
 GameStatus TwoPlayersGame::CheckGameFinal()
 {
-	Pos kingPos = Pos::NULL_POS;
-	for (int i = 0; i != 64 && kingPos == Pos::NULL_POS; ++i) // find King position
-		if (map.GetColor(Pos::IndexToPosition(i)) == activePlayer->GetColor() &&
-		   (map.GetFigureType(Pos::IndexToPosition(i)) == FigureType::King_black ||
-			map.GetFigureType(Pos::IndexToPosition(i)) == FigureType::King_white))
-			kingPos = Pos::IndexToPosition(i);
-	if (map.IsShahFor(kingPos))
+	if (map.IsShahFor(activePlayer->GetColor()))
 	{
 		map.DisableCastlingForKing(activePlayer->GetColor()); // if King is attacked => castling disabled
 		if (!map.GetAllPossibleMoves().empty())
