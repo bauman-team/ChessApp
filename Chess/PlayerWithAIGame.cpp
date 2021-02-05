@@ -126,7 +126,7 @@ const float PlayerWithAIGame::bitboards[12][8][8] = {
 		 {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}
 };
 
-const int PlayerWithAIGame::DEPTH{ 3 };
+const int PlayerWithAIGame::DEPTH{ 4 };
 
 std::atomic<int> positionsCount{ 0 }; // debug counter
 

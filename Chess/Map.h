@@ -36,7 +36,7 @@ public:
 	std::vector<Pos> GetPossibleMovesFrom(const Pos& figurePosition) const;
 	const std::vector<OneFigureMoves>& GetAllPossibleMoves() const { return allPossibleMoves; }
 
-	void FindAllPossibleMoves(const Color& activeColor, const bool isThreading = false);
+	void FindAllPossibleMoves(const Color& activeColor);
 
 	bool MakeMove(const Pos& previousPosition, const Pos& nextPosition);
 	void ClearPossibleMoves();
