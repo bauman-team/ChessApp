@@ -1,6 +1,5 @@
 #pragma once
 #include "Figure.h"
-#include "Pos.h"
 #include "MoveInfo.h"
 
 enum class FigureType;

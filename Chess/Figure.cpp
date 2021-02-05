@@ -198,7 +198,7 @@ std::vector<Pos> Figure::FindPossibleMovesPawn(const Pos& coord, const Map& map)
 		possibleMoves.push_back(nextPosition);
 
 	// checking capture en passant
-	/*const MoveInfo lastMove = map.GetLastMoveInfo();
+	const MoveInfo lastMove = map.GetLastMoveInfo();
 	if (lastMove != MoveInfo::NULL_INFO)
 	{
 		FigureType activeType = lastMove.GetTypeActiveFigure();
@@ -209,7 +209,7 @@ std::vector<Pos> Figure::FindPossibleMovesPawn(const Pos& coord, const Map& map)
 			if (abs(posAfter.GetY() - posBefore.GetY()) == 2 && (posAfter.GetY() == coord.GetY()) && abs(posAfter.GetX() - coord.GetX()) == 1)
 				possibleMoves.push_back(Pos(posAfter.GetX(), coord.GetY() + (posAfter.GetY() > posBefore.GetY() ? -1 : 1)));
 		}
-	}*/
+	}
 	return possibleMoves;
 }
 

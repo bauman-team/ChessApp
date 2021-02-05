@@ -1,15 +1,6 @@
 #include "MoveInfo.h"
 
-const MoveInfo MoveInfo::NULL_INFO(Pos::NULL_POS, Pos::NULL_POS, FigureType::Empty, FigureType::Empty, nullptr);
-
-MoveInfo::MoveInfo(const Pos& _from, const Pos& _to, FigureType _activeFigure, FigureType _eatenFigure, bool* _castling)
-	: activeFigure(_activeFigure), eatenFigure(_eatenFigure), from(_from), to(_to)
-{
-	if (_castling)
-		for (int i = 0; i != 4; ++i)
-			castling[i] = _castling[i];
-}
-
+const MoveInfo MoveInfo::NULL_INFO(Pos::NULL_POS, Pos::NULL_POS, FigureType::Empty, FigureType::Empty, NULL);
 
 MoveInfo::MoveInfo(const MoveInfo& copy)
 {
@@ -17,8 +8,7 @@ MoveInfo::MoveInfo(const MoveInfo& copy)
 	eatenFigure = copy.eatenFigure;
 	from = copy.from;
 	to = copy.to;
-	for (int i = 0; i != 4; ++i)
-		castling[i] = copy.castling[i];
+	additionalInfo = copy.additionalInfo;
 }
 
 bool MoveInfo::isEatenFigureExists() const
@@ -28,14 +18,12 @@ bool MoveInfo::isEatenFigureExists() const
 
 bool MoveInfo::operator==(const MoveInfo& comp) const
 {
-	if (activeFigure != comp.activeFigure ||
-		eatenFigure != comp.eatenFigure ||
-		from != comp.from ||
-		to != comp.to)
+	if (activeFigure != comp.activeFigure
+		|| eatenFigure != comp.eatenFigure
+		|| from != comp.from 
+		|| to != comp.to
+		|| additionalInfo != comp.additionalInfo)
 		return false;
-	for (int i = 0; i != 4; ++i)
-		if (castling[i] != comp.castling[i])
-			return false;
 	return true;
 }
 

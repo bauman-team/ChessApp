@@ -107,7 +107,14 @@ void Map::ClearPossibleMoves()
 void Map::Move(const Pos& from, const Pos& to)
 {
 	FigureType activeFigureType = GetFigureType(from), eatenFigureType = GetFigureType(to);
-	MoveInfo info(from, to, activeFigureType, eatenFigureType, possibleCastling); 
+	uint8_t add = 1, additionalInfo = 0;
+	for (int i = 0; i != 4; ++i)
+	{
+		if (possibleCastling[i])
+			additionalInfo |= add;
+		add <<= 1;
+	}
+	MoveInfo info(from, to, activeFigureType, eatenFigureType, additionalInfo);
 	movesHistory.push_back(info); // save info about move
 	if (eatenFigureType != FigureType::Empty)
 	{
@@ -123,7 +130,10 @@ void Map::Move(const Pos& from, const Pos& to)
 		bool isCaptureEnPassant = abs(from.GetX() - to.GetX()) == 1 && abs(from.GetY() - to.GetY()) == 1;
 		int lastCoordY = from.GetY();
 		if (eatenFigureType == FigureType::Empty && isCaptureEnPassant) // if Pawn eat on passage
+		{
 			SetToEmpty(Pos(to.GetX(), lastCoordY));
+			movesHistory.back().SetCaptureEnPassant();
+		}
 
 		// checking transform pawn to queen
 		if (Figure::GetFigureTypeColor(activeFigureType) == Color::Black && to.GetY() == 0 ||
@@ -145,6 +155,7 @@ void Map::Move(const Pos& from, const Pos& to)
 void Map::UndoMove()
 {
 	MoveInfo info(GetLastMoveInfo());
+	uint8_t get = 16;
 	movesHistory.pop_back();
 	if (GetLastMoveInfo() != MoveInfo::NULL_INFO &&
 		GetColor(GetLastMoveInfo().GetTypeActiveFigure()) == GetColor(info.GetTypeActiveFigure()))
@@ -158,11 +169,20 @@ void Map::UndoMove()
 		movesHistory.pop_back();
 	}
 	if (info.GetTypeEatenFigure() != FigureType::Empty)
-		map[static_cast<int>(info.GetTypeEatenFigure())] += info.GetPosAfterMove().ToBitboard();
+	{
+		if (info.GetAdditionalInfo() & get)
+			map[static_cast<int>(info.GetTypeEatenFigure())] +=
+				Pos(info.GetPosAfterMove().GetX(), info.GetPosBeforeMove().GetY()).ToBitboard();
+		else
+			map[static_cast<int>(info.GetTypeEatenFigure())] += info.GetPosAfterMove().ToBitboard();
+	}
 	map[static_cast<int>(info.GetTypeActiveFigure())] -= info.GetPosAfterMove().ToBitboard();
 	map[static_cast<int>(info.GetTypeActiveFigure())] += info.GetPosBeforeMove().ToBitboard();
-	for (int i = 0; i != 4; ++i)
-		possibleCastling[i] = info.GetCastlingInfo()[i];
+	for (int i = 3; i >= 0; --i)
+	{
+		get >>= 1;
+		possibleCastling[i] = get & info.GetAdditionalInfo();
+	}
 }
 
 void Map::DoImitationMove(const Pos& from, const Pos& to)
@@ -198,7 +218,7 @@ void Map::PawnToQueen(const Pos& target)
 {
 	FigureType figureType = GetFigureType(target);
 	FigureType Queen = Figure::GetFigureTypeColor(figureType) == Color::White ? FigureType::Queen_white : FigureType::Queen_black;
-	MoveInfo info(target, target, Queen, figureType, possibleCastling);
+	MoveInfo info(target, target, Queen, figureType, NULL); // NULL because info about it move not used
 	movesHistory.push_back(info);
 	map[static_cast<int>(figureType)] -= target.ToBitboard();
 	map[static_cast<int>(Queen)] += target.ToBitboard();
@@ -231,7 +251,7 @@ bool Map::IsShahFor(const Pos& kingPos) const
 	attackedKingKnight = ~mapRightBorder & (kingBitdoard << offsetHorizontal | kingBitdoard << offsetMainDiag | kingBitdoard >> offsetSideDiag)
 		| ~mapLeftBorder & (kingBitdoard >> offsetHorizontal | kingBitdoard >> offsetMainDiag | kingBitdoard << offsetSideDiag)
 		| kingBitdoard << offsetVertical | kingBitdoard >> offsetVertical;
-	if (attackedKingKnight & map[static_cast<int>(king == FigureType::Knight_black ? FigureType::Knight_white : FigureType::Knight_black)])
+	if (attackedKingKnight & map[static_cast<int>(king == FigureType::King_black ? FigureType::King_white : FigureType::King_black)])
 		return true;
 	// Knight
 	attackedKingKnight = knightBorderGH & (kingBitdoard << 6 | kingBitdoard >> 10)
@@ -261,8 +281,7 @@ bool Map::IsShahFor(const Pos& kingPos) const
 		defendStraight |= map[static_cast<int>(FigureType::Bishop_white)];
 
 		attackedStraight = map[static_cast<int>(FigureType::Queen_white)];
-		attackedDiagonal = attackedStraight;
-		attackedDiagonal |= map[static_cast<int>(FigureType::Bishop_white)];
+		attackedDiagonal = attackedStraight | map[static_cast<int>(FigureType::Bishop_white)];
 		attackedStraight |= map[static_cast<int>(FigureType::Rook_white)];
 	}
 	else
@@ -288,8 +307,7 @@ bool Map::IsShahFor(const Pos& kingPos) const
 		defendStraight |= map[static_cast<int>(FigureType::Bishop_black)];
 
 		attackedStraight = map[static_cast<int>(FigureType::Queen_black)];
-		attackedDiagonal = attackedStraight;
-		attackedDiagonal |= map[static_cast<int>(FigureType::Bishop_black)];
+		attackedDiagonal = attackedStraight | map[static_cast<int>(FigureType::Bishop_black)];
 		attackedStraight |= map[static_cast<int>(FigureType::Rook_black)];
 	}
 	// Rook + Queen
@@ -517,9 +535,9 @@ void Map::EraseForbiddenMoves(OneFigureMoves& figureMoves)
 		for (; posItr != figureMoves.to.end();)
 		{
 			eatenFigureType = GetFigureType(*posItr);
-			DoImitationMove(figureMoves.from, *posItr);
+			Move(figureMoves.from, *posItr);
 			isShah = IsShahFor(kingPos == figureMoves.from ? *posItr : kingPos);
-			UndoImitationMove(figureMoves.from, *posItr, eatenFigureType);
+			UndoMove();
 			if (isShah)
 				posItr = figureMoves.to.erase(posItr);
 			else ++posItr;
