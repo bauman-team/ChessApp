@@ -133,6 +133,8 @@ void Map::Move(const Pos& from, const Pos& to)
 	{
 		map[static_cast<int>(eatenFigureType)] -= to.ToBitboard();
 		// TODO: decrease numOfFigures
+		if (eatenFigureType == FigureType::Rook_black || eatenFigureType == FigureType::Rook_white)
+			DisableCastlingWithRook(to, GetColor(eatenFigureType)); // disable opportunity of castling for Rook
 	}
 	map[static_cast<int>(activeFigureType)] -= from.ToBitboard();
 	map[static_cast<int>(activeFigureType)] += to.ToBitboard();
@@ -449,6 +451,15 @@ Color Map::GetColor(const FigureType type) const
 FigureType Map::GetFigureType(const Pos& pos) const
 {
 	uint64_t bitboard = 1ULL << pos.ToIndex();
+	for (int i = 0; i != 12; ++i) // TODO: const count types of figures (12)
+		if (map[i] & bitboard)
+			return (FigureType)i;
+	return FigureType::Empty;
+}
+
+FigureType Map::GetFigureType(const int index) const
+{
+	uint64_t bitboard = 1ULL << index;
 	for (int i = 0; i != 12; ++i) // TODO: const count types of figures (12)
 		if (map[i] & bitboard)
 			return (FigureType)i;

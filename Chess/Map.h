@@ -61,6 +61,7 @@ public:
 	Color GetColor(const Pos& pos) const;
 	Color GetColor(const FigureType type) const;
 	FigureType GetFigureType(const Pos& pos) const;
+	FigureType GetFigureType(const int index) const;
 
 	const MoveInfo GetLastMoveInfo() const;
 	const std::vector<MoveInfo>& GetMovesHistory() const;

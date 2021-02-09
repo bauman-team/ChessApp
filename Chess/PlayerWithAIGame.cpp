@@ -2,6 +2,7 @@
 
 extern std::mutex mut1;
 extern std::mutex mut3;
+std::mutex mut2;
 
 const int PlayerWithAIGame::figureWeight[12] = { 900, 90, 30, 30, 50, 10, 900, 90, 30, 30, 50, 10 };
 
@@ -126,7 +127,7 @@ const float PlayerWithAIGame::bitboards[12][8][8] = {
 		 {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}
 };
 
-const int PlayerWithAIGame::DEPTH{ 4 };
+const int PlayerWithAIGame::DEPTH{ 3 };
 
 std::atomic<int> positionsCount{ 0 }; // debug counter
 
@@ -140,7 +141,7 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 			for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
 				movesPositions.push_back(Move((*it1).from, *it2));
 		int* const movesScore = new int[movesPositions.size()];
-		std::atomic<int> countOfThreads = movesPositions.size();
+		uint16_t countOfThreads = movesPositions.size();
 		Color playerColor = activePlayer->GetColor() == Color::White ? Color::Black : Color::White; // TODO: maybe static const?
 		for (int i = 0; i != movesPositions.size(); ++i)
 		{
@@ -182,14 +183,14 @@ int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color
 	FigureType selected;
 	for (int i = 0; i != 64; ++i)
 	{
-		selected = selectedMap.GetFigureType(Pos::IndexToPosition(i));
+		selected = selectedMap.GetFigureType(i);
 		if (selected != FigureType::Empty)
-			score += figureWeight[static_cast<int>(selected)] * (selectedMap.GetColor(selected) == playerColor ? 1 : -1) * bitboards[static_cast<int>(selected)][i % 8][i / 8];
+			score += figureWeight[static_cast<int>(selected)] * (selectedMap.GetColor(selected) == playerColor ? 1 : -1) * bitboards[static_cast<int>(selected)][i / 8][i % 8];
 	}
 	return score;
 }
 
-int PlayerWithAIGame::MiniMax(Map map, std::atomic<int> &countOfThreads, bool isAIMoveNow, const Color playerColor, int depth, int alpha, int beta)
+int PlayerWithAIGame::MiniMax(Map map, uint16_t &countOfThreads, bool isAIMoveNow, const Color playerColor, int depth, int alpha, int beta)
 {
 	++positionsCount;
 	if (depth == 0)
@@ -249,7 +250,11 @@ int PlayerWithAIGame::MiniMax(Map map, std::atomic<int> &countOfThreads, bool is
 						if (beta <= alpha)
 						{
 							if (depth == DEPTH)
+							{
+								mut2.lock();
 								--countOfThreads;
+								mut2.unlock();
+							}
 							return bestMove;
 						}
 					}
@@ -258,7 +263,11 @@ int PlayerWithAIGame::MiniMax(Map map, std::atomic<int> &countOfThreads, bool is
 			}
 		}
 		if (depth == DEPTH)
+		{
+			mut2.lock();
 			--countOfThreads;
+			mut2.unlock();
+		}
 		return bestMove;
 	}
 }

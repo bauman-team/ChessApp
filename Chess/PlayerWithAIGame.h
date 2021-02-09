@@ -27,7 +27,7 @@ protected:
 
 	Move StartAI(double timeForWaiting = 0);
 	static int CalculatePositionScore(const Map& selectedMap, const Color AIColor);
-	static int MiniMax(Map map, std::atomic<int> &countOfThreads, bool isAIMoveNow, const Color playerColor, int depth, int alpha, int beta);
+	static int MiniMax(Map map, uint16_t &countOfThreads, bool isAIMoveNow, const Color playerColor, int depth, int alpha, int beta);
 
 public:
 	PlayerWithAIGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties) 
