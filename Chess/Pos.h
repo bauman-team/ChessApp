@@ -7,7 +7,8 @@ class Pos
 {
 	uint8_t xy;
 public:
-	Pos(uint8_t x = 0, uint8_t y = 0);
+	Pos() : xy(255) {}; // TODO: check on error
+	Pos(uint8_t x, uint8_t y);
 
 	uint8_t GetX() const;
 	uint8_t GetY() const;

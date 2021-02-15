@@ -3,7 +3,7 @@
 #include <mutex>
 #include <SFML/Window.hpp>
 
-extern std::mutex mut1; // TODO: extern, but is not connection with TwoPlayersGame, why it works
+extern std::mutex mut1;
 const uint8_t Map::offsetHorizontal{ 1 }, Map::offsetVertical{ 8 }, Map::offsetMainDiag{ 7 }, Map::offsetSideDiag{ 9 };
 const uint64_t Map::knightBorderAB{ 18'229'723'555'195'321'596 }, Map::knightBorderGH{ 4'557'430'888'798'830'399 },
 Map::mapLeftBorder{ 72'340'172'838'076'673 }, Map::mapRightBorder{ 9'259'542'123'273'814'144 },
@@ -120,14 +120,7 @@ void Map::ClearPossibleMoves()
 void Map::Move(const Pos& from, const Pos& to)
 {
 	FigureType activeFigureType = GetFigureType(from), eatenFigureType = GetFigureType(to);
-	uint8_t add = 1, additionalInfo = 0;
-	for (int i = 0; i != 4; ++i)
-	{
-		if (possibleCastling[i])
-			additionalInfo |= add;
-		add <<= 1;
-	}
-	MoveInfo info(from, to, activeFigureType, eatenFigureType, additionalInfo);
+	MoveInfo info(from, to, activeFigureType, eatenFigureType, possibleCastling, false);
 	movesHistory.push_back(info); // save info about move
 	if (eatenFigureType != FigureType::Empty)
 	{
@@ -185,7 +178,7 @@ void Map::UndoMove()
 	}
 	if (info.GetTypeEatenFigure() != FigureType::Empty)
 	{
-		if (info.GetAdditionalInfo() & get) // if Pawn eat on passage
+		if (info.GetCaptureEnPassant()) // if Pawn eat on passage
 			map[static_cast<int>(info.GetTypeEatenFigure())] 
 			+= Pos(info.GetPosAfterMove().GetX(), info.GetPosBeforeMove().GetY()).ToBitboard();
 		else
@@ -193,14 +186,10 @@ void Map::UndoMove()
 	}
 	map[static_cast<int>(info.GetTypeActiveFigure())] -= info.GetPosAfterMove().ToBitboard();
 	map[static_cast<int>(info.GetTypeActiveFigure())] += info.GetPosBeforeMove().ToBitboard();
-	for (int i = 3; i >= 0; --i)
-	{
-		get >>= 1;
-		possibleCastling[i] = get & info.GetAdditionalInfo();
-	}
+	possibleCastling = info.GetPossibleCastling();
 }
 
-void Map::DoImitationMove(const Pos& from, const Pos& to) // TODO: fix bug with Pawn eat on passage
+void Map::DoImitationMove(const Pos& from, const Pos& to) 
 {
 	FigureType moved = GetFigureType(from);
 	FigureType eaten = GetFigureType(to);
@@ -241,7 +230,7 @@ void Map::PawnToQueen(const Pos& target)
 {
 	FigureType figureType = GetFigureType(target);
 	FigureType Queen = Figure::GetFigureTypeColor(figureType) == Color::White ? FigureType::Queen_white : FigureType::Queen_black;
-	MoveInfo info(target, target, Queen, figureType, NULL); // NULL because info about it move not used
+	MoveInfo info(target, target, Queen, figureType, AdditionalInfo::NULL_INFO); // NULL because info about it move not used
 	movesHistory.push_back(info);
 	map[static_cast<int>(figureType)] -= target.ToBitboard();
 	map[static_cast<int>(Queen)] += target.ToBitboard();
@@ -416,7 +405,7 @@ bool Map::IsShahFor(const Color kingColor) const
 	return false;
 }
 
-void Map::EraseForbiddenMoves(OneFigureMoves& figureMoves) // TODO: maybe delete from FindPossibleMovesKing
+void Map::EraseForbiddenMoves(OneFigureMoves& figureMoves) 
 {
 	if (!figureMoves.to.empty())
 	{
@@ -498,21 +487,21 @@ void Map::DisableCastlingWithRook(const Pos& rookPos, const Color& rookColor) //
 		possibleCastling[kingCoeff + 1] = false;
 }
 
-int8_t Map::CheckEmpty(const Pos& from, const Pos& to) const
+BoardPos Map::CheckEmpty(const Pos& from, const Pos& to) const
 {
 	if (to.IsValid())
 	{
 		if (GetFigureType(to) == FigureType::Empty)
-			return 1; // if Pos to is Empty
+			return BoardPos::Empty; // if Pos to is Empty
 		if (GetColor(from) != GetColor(to))
-			return 2; // if Pos contains the figure with opposite color
+			return BoardPos::Opposite; // if Pos contains the figure with opposite color
 	}
-	return 0; // if Pos contains the figure with same color or output border
+	return BoardPos::Lock; // if Pos contains the figure with same color or output border
 }
 
 const MoveInfo Map::GetLastMoveInfo() const
 {
-	return (!movesHistory.empty()) ? movesHistory.back() : MoveInfo::NULL_INFO;
+	return (!movesHistory.empty()) ? movesHistory.back() : MoveInfo::NULL_INFO; // TODO: {}
 }
 
 const std::vector<MoveInfo>& Map::GetMovesHistory() const

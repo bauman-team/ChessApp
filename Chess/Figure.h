@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <array>
 #include "Pos.h"
 #include "Map.h"
 
@@ -25,6 +26,8 @@ enum class FigureType // used current fixed order
 };
 
 enum class Color { White, Black, None }; // None color for Empty figure
+
+enum class BoardPos { Lock, Empty, Opposite };
 
 class Map;
 

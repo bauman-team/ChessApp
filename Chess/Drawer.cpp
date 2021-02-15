@@ -164,7 +164,7 @@ Pos Drawer::TransformMousePosition(int mouseX, int mouseY) const
 		int coordY = 7 - (mouseY - mapProps.GetPlayAreaTopLeftY()) / mapProps.GetSquareSize();
 		return Pos(coordX, coordY);
 	}
-	return Pos::NULL_POS;
+	return {};
 }
 
 void Drawer::ShowPossibleMoves(const Pos& chosenPos, const Map& map)

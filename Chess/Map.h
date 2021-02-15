@@ -4,12 +4,13 @@
 
 enum class FigureType;
 enum class Color;
+enum class BoardPos;
 
 class MoveInfo;
 class Figure;
 class PlayerWithAIGame;
 
-struct OneFigureMoves // TODO: struct Move same PlayerWithAIGame
+struct OneFigureMoves 
 {
 	Pos from;
 	std::vector<Pos> to;
@@ -23,7 +24,7 @@ class Map
 	uint64_t map[12];
 	std::vector<MoveInfo> movesHistory;
 	std::vector<OneFigureMoves> allPossibleMoves;
-	bool possibleCastling[4];
+	std::array<bool, 4> possibleCastling;
 
 	void Move(const Pos& from, const Pos& to);
 	void SetToEmpty(const Pos& target);
@@ -47,7 +48,7 @@ public:
 	void DoImitationMove(const Pos& from, const Pos& to);
 	void UndoImitationMove(const Pos& from, const Pos& to, FigureType eatenType);
 
-	int8_t CheckEmpty(const Pos& from, const Pos& to) const;
+	BoardPos CheckEmpty(const Pos& from, const Pos& to) const;
 
 	bool IsShahFor(const Color kingColor) const;
 	void EraseForbiddenMoves(OneFigureMoves& figureMoves);

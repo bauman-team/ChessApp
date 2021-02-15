@@ -1,6 +1,28 @@
 #include "MoveInfo.h"
 
-const MoveInfo MoveInfo::NULL_INFO(Pos::NULL_POS, Pos::NULL_POS, FigureType::Empty, FigureType::Empty, NULL);
+const AdditionalInfo AdditionalInfo::NULL_INFO({}, false);
+const MoveInfo MoveInfo::NULL_INFO(Pos::NULL_POS, Pos::NULL_POS, FigureType::Empty, FigureType::Empty, AdditionalInfo::NULL_INFO);
+
+inline bool AdditionalInfo::operator==(const AdditionalInfo comp) const
+{
+	if (castling != comp.castling
+		|| isCaptureEnPassant != comp.isCaptureEnPassant)
+		return false;
+	return true;
+}
+
+inline AdditionalInfo::AdditionalInfo(std::array<bool, 4> _castling, bool _isCaptureEnPassant) : castling(0), isCaptureEnPassant(0)
+{
+	uint8_t add = 1;
+	if (_isCaptureEnPassant)
+		isCaptureEnPassant = add;
+	for (int i = 0; i != 4; ++i)
+	{
+		if (_castling[i])
+			castling |= add;
+		add <<= 1;
+	}
+}
 
 MoveInfo::MoveInfo(const MoveInfo& copy)
 {
