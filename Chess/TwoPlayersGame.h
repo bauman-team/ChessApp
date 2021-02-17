@@ -25,7 +25,7 @@ public:
 	void virtual Show() override;
 	void virtual ChangeActivePlayer() override;
 
-	void virtual SetPlayerChosenCell(int mouseX, int mouseY) override;
+	void virtual SetPosition(int mouseX, int mouseY) override;
 
 	void virtual StartGame() override;
 

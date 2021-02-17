@@ -1,10 +1,11 @@
 #pragma once
+
+#define FIGURE_TYPES 12  // 6 whites + 6 black figures;
+
 #include <vector>
 #include <array>
 #include "Pos.h"
 #include "Map.h"
-
-#define FIGURE_TYPES 12 // 6 whites + 6 black figures;
 
 enum class FigureType // used current fixed order
 {

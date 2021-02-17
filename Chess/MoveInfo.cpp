@@ -24,6 +24,8 @@ inline AdditionalInfo::AdditionalInfo(std::array<bool, 4> _castling, bool _isCap
 	}
 }
 
+MoveInfo::MoveInfo() : from(Pos::NULL_POS), to(Pos::NULL_POS), activeFigure(FigureType::Empty), eatenFigure(FigureType::Empty), additionalInfo(AdditionalInfo::NULL_INFO) {}
+
 MoveInfo::MoveInfo(const MoveInfo& copy)
 {
 	activeFigure = copy.activeFigure;

@@ -26,7 +26,7 @@ public:
 	void virtual StartGame() = 0;
 	void virtual Show() = 0;
 	void virtual ChangeActivePlayer() = 0;
-	void virtual SetPlayerChosenCell(int mouseX, int mouseY) = 0; // TODO: rename
+	void virtual SetPosition(int mouseX, int mouseY) = 0; 
 	void virtual SetPlayers(std::string name1, std::string name2, sf::Time timeLimit = sf::seconds(0)) = 0;
 
 	volatile GameStatus GetStatus() const;

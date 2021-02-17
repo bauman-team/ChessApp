@@ -29,7 +29,7 @@ Map::Map()
 
 Map::Map(const Map& baseMap)
 {
-	for (int i = 0; i != 12; ++i)
+	for (int i = 0; i != FIGURE_TYPES; ++i)
 	{
 		map[i] = baseMap.map[i];
 		if (i < 4)
@@ -136,10 +136,9 @@ void Map::Move(const Pos& from, const Pos& to)
 	{
 		// checking capture en passant
 		bool isCaptureEnPassant = abs(from.GetX() - to.GetX()) == 1 && abs(from.GetY() - to.GetY()) == 1;
-		int lastCoordY = from.GetY(); // TODO: need?
 		if (eatenFigureType == FigureType::Empty && isCaptureEnPassant) // if Pawn eat on passage
 		{
-			SetToEmpty(Pos(to.GetX(), lastCoordY));
+			SetToEmpty(Pos(to.GetX(), from.GetY()));
 			movesHistory.back().SetCaptureEnPassant();
 		}
 
@@ -440,7 +439,7 @@ Color Map::GetColor(const FigureType type) const
 FigureType Map::GetFigureType(const Pos& pos) const
 {
 	uint64_t bitboard = 1ULL << pos.ToIndex();
-	for (int i = 0; i != 12; ++i) // TODO: const count types of figures (12)
+	for (int i = 0; i != FIGURE_TYPES; ++i)
 		if (map[i] & bitboard)
 			return (FigureType)i;
 	return FigureType::Empty;
@@ -449,7 +448,7 @@ FigureType Map::GetFigureType(const Pos& pos) const
 FigureType Map::GetFigureType(const int index) const
 {
 	uint64_t bitboard = 1ULL << index;
-	for (int i = 0; i != 12; ++i) // TODO: const count types of figures (12)
+	for (int i = 0; i != FIGURE_TYPES; ++i)
 		if (map[i] & bitboard)
 			return (FigureType)i;
 	return FigureType::Empty;
@@ -501,7 +500,9 @@ BoardPos Map::CheckEmpty(const Pos& from, const Pos& to) const
 
 const MoveInfo Map::GetLastMoveInfo() const
 {
-	return (!movesHistory.empty()) ? movesHistory.back() : MoveInfo::NULL_INFO; // TODO: {}
+	if (!movesHistory.empty())
+		return movesHistory.back();
+	return {};
 }
 
 const std::vector<MoveInfo>& Map::GetMovesHistory() const

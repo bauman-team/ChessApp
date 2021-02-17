@@ -73,7 +73,7 @@ void TwoPlayersGame::ChangeActivePlayer()
 	isTimeLimited = stopTime; 
 }
 
-void TwoPlayersGame::SetPlayerChosenCell(int mouseX, int mouseY)
+void TwoPlayersGame::SetPosition(int mouseX, int mouseY)
 {
 	if (activePlayer->HasTime())
 	{

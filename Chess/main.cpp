@@ -65,7 +65,7 @@ int main()
 						thSetCellIsFinished = false;
 						Game* ptrGame = game;
 						thSetCell = new std::thread([&ptrGame, &thSetCellIsFinished, mousePos]() {
-							ptrGame->SetPlayerChosenCell(mousePos.x, mousePos.y);
+							ptrGame->SetPosition(mousePos.x, mousePos.y);
 							thSetCellIsFinished = true; });
 						thSetCell->detach();
 					}

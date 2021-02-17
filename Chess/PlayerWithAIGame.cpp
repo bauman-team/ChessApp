@@ -4,9 +4,10 @@ extern std::mutex mut1;
 extern std::mutex mut3;
 std::mutex mut2;
 
-const int PlayerWithAIGame::figureWeight[12] = { 900, 90, 30, 30, 50, 10, 900, 90, 30, 30, 50, 10 };
+const int PlayerWithAIGame::figureWeight[FIGURE_TYPES] = { 900, 90, 30, 30, 50, 10, 900, 90, 30, 30, 50, 10 };
+bool PlayerWithAIGame::isPlayerMoveFirst{ false };
 
-const float PlayerWithAIGame::bitboards[12][8][8] = {
+const float PlayerWithAIGame::bitboards[FIGURE_TYPES][8][8] = {
 		{{-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0}, //King_black
 		 {-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0},
 		 {-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0},
@@ -142,14 +143,14 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 				movesPositions.push_back(Move((*it1).from, *it2));
 		int* const movesScore = new int[movesPositions.size()];
 		uint16_t countOfThreads = movesPositions.size();
-		Color playerColor = activePlayer->GetColor() == Color::White ? Color::Black : Color::White; // TODO: maybe static const?
+		Color playerColor = isPlayerMoveFirst ? Color::White : Color::Black; 
 		for (int i = 0; i != movesPositions.size(); ++i)
 		{
 			Map copyMap(map);
 			copyMap.Move(movesPositions[i].from, movesPositions[i].to);
 			//movesScore[i] = PlayerWithAIGame::MiniMax(copyMap, countOfThreads, false, playerColor, DEPTH, -10'000, 10'000);
 			std::thread th([i, movesScore, copyMap, playerColor, &countOfThreads]() {
-				movesScore[i] = PlayerWithAIGame::MiniMax(copyMap, countOfThreads, false, playerColor, DEPTH, -10'000, 10'000);
+				movesScore[i] = PlayerWithAIGame::MiniMax(copyMap, countOfThreads, false, DEPTH, -10'000, 10'000);
 				});
 			th.detach();
 		}
@@ -190,16 +191,16 @@ int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color
 	return score;
 }
 
-int PlayerWithAIGame::MiniMax(Map map, uint16_t &countOfThreads, bool isAIMoveNow, const Color playerColor, int depth, int alpha, int beta)
+int PlayerWithAIGame::MiniMax(Map map, uint16_t &countOfThreads, bool isAIMoveNow, int depth, int alpha, int beta)
 {
 	++positionsCount;
 	if (depth == 0)
 	{
-		return -CalculatePositionScore(map, playerColor);
+		return -CalculatePositionScore(map, isPlayerMoveFirst ? Color::White : Color::Black);
 	}
 	if (isAIMoveNow)
 	{
-		Color AIColor = playerColor == Color::Black ? Color::White : Color::Black;
+		Color AIColor = isPlayerMoveFirst ? Color::Black : Color::White;
 		int bestMove = -9999, start = (AIColor == Color::Black ? 0 : 6); // used fixed enum order
 		for (int i = start; i != start + 6; ++i)
 		{
@@ -215,7 +216,7 @@ int PlayerWithAIGame::MiniMax(Map map, uint16_t &countOfThreads, bool isAIMoveNo
 					{
 						map.Move(moves.from, *posItr);
 						if (!map.IsShahFor(AIColor))
-							bestMove = std::max(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, playerColor, depth, alpha, beta));
+							bestMove = std::max(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, depth, alpha, beta));
 						map.UndoMove();
 						alpha = std::max(bestMove, alpha);
 						if (beta <= alpha)
@@ -229,6 +230,7 @@ int PlayerWithAIGame::MiniMax(Map map, uint16_t &countOfThreads, bool isAIMoveNo
 	}
 	else
 	{
+		Color playerColor = isPlayerMoveFirst ? Color::White : Color::Black;
 		int bestMove = 9999, start = (playerColor == Color::Black ? 0 : 6); // used fixed enum order
 		for (int i = start; i != start + 6; ++i)
 		{
@@ -244,7 +246,7 @@ int PlayerWithAIGame::MiniMax(Map map, uint16_t &countOfThreads, bool isAIMoveNo
 					{
 						map.Move(moves.from, *posItr);
 						if (!map.IsShahFor(playerColor))
-							bestMove = std::min(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, playerColor, depth - 1, alpha, beta));
+							bestMove = std::min(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, depth - 1, alpha, beta));
 						map.UndoMove();
 						beta = std::min(bestMove, beta);
 						if (beta <= alpha)

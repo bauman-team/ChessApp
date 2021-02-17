@@ -21,7 +21,7 @@ class Map
 {
 	friend class PlayerWithAIGame;
 
-	uint64_t map[12];
+	uint64_t map[FIGURE_TYPES];
 	std::vector<MoveInfo> movesHistory;
 	std::vector<OneFigureMoves> allPossibleMoves;
 	std::array<bool, 4> possibleCastling;

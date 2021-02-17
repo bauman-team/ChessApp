@@ -27,6 +27,8 @@ class MoveInfo
 	Pos to;
 	AdditionalInfo additionalInfo;
 public:
+	MoveInfo();
+
 	MoveInfo(const Pos& _from, const Pos& _to, FigureType _activeFigure, FigureType _eatenFigure, std::array<bool, 4> _castling, bool _isCaptureEnPassant)
 		: activeFigure(_activeFigure), eatenFigure(_eatenFigure), from(_from), to(_to), additionalInfo(_castling, _isCaptureEnPassant) { }
 

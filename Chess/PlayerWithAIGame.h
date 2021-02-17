@@ -8,10 +8,10 @@
 class PlayerWithAIGame : public TwoPlayersGame
 {
 private:
-	const static int figureWeight[12];
-	const static float bitboards[12][8][8];
+	const static int figureWeight[FIGURE_TYPES];
+	const static float bitboards[FIGURE_TYPES][8][8];
 protected:
-	bool isPlayerMoveFirst;
+	static bool isPlayerMoveFirst;
 	const static int DEPTH;
 	
 	struct Move
@@ -27,11 +27,11 @@ protected:
 
 	Move StartAI(double timeForWaiting = 0);
 	static int CalculatePositionScore(const Map& selectedMap, const Color AIColor);
-	static int MiniMax(Map map, uint16_t &countOfThreads, bool isAIMoveNow, const Color playerColor, int depth, int alpha, int beta);
+	static int MiniMax(Map map, uint16_t &countOfThreads, bool isAIMoveNow, int depth, int alpha, int beta);
 
 public:
 	PlayerWithAIGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties) 
-		: TwoPlayersGame(window, resource, _mapProperties), isPlayerMoveFirst(true) {}
+		: TwoPlayersGame(window, resource, _mapProperties) {}
 
 	void virtual SetPlayers(std::string name1, std::string name2, sf::Time timeLimit = sf::seconds(0));
 
@@ -39,6 +39,7 @@ public:
 	void virtual StartGame() override;
 
 	bool GetIsPlayerMoveFirst() { return isPlayerMoveFirst; }
+
 	/*void output()
 	{
 		for (int i = 0; i != 6; ++i)
