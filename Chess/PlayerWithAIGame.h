@@ -1,8 +1,10 @@
 #pragma once
 #include "TwoPlayersGame.h"
 #include "Menu.h"
-#include <list>
+//#include <list>
 #include <iostream>
+#include <map>
+
 //#include <iomanip>
 
 class PlayerWithAIGame : public TwoPlayersGame
@@ -27,7 +29,7 @@ protected:
 
 	Move StartAI(double timeForWaiting = 0);
 	static int CalculatePositionScore(const Map& selectedMap, const Color AIColor);
-	static int MiniMax(Map map, uint16_t &countOfThreads, bool isAIMoveNow, int depth, int alpha, int beta);
+	static int MiniMax(Map map, std::atomic<uint16_t> &countOfThreads, bool isAIMoveNow, int depth, int alpha, int beta);
 
 public:
 	PlayerWithAIGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties) 

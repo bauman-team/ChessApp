@@ -4,7 +4,7 @@ extern std::mutex mut1;
 extern std::mutex mut3;
 std::mutex mut2;
 
-const int PlayerWithAIGame::figureWeight[FIGURE_TYPES] = { 900, 90, 30, 30, 50, 10, 900, 90, 30, 30, 50, 10 };
+const int PlayerWithAIGame::figureWeight[FIGURE_TYPES] = { 9, 90, 3, 3, 5, 1, 9, 90, 3, 3, 5, 1 };
 bool PlayerWithAIGame::isPlayerMoveFirst{ false };
 
 const float PlayerWithAIGame::bitboards[FIGURE_TYPES][8][8] = {
@@ -14,17 +14,19 @@ const float PlayerWithAIGame::bitboards[FIGURE_TYPES][8][8] = {
 		 {-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0},
 		 {-2.0, -3.0, -3.0, -4.0, -4.0, -3.0, -3.0, -2.0},
 		 {-1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0},
-		 {2.0, 2.0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.0},
-		 {2.0, 3.0, 1.0, 0.0, 0.0, 1.0, 3.0, 2.0}},
+		 { 2.0,  2.0,  0.0,  0.0,  0.0,  0.0,  2.0,  2.0},
+		 { 2.0,  3.0,  1.0,  0.0,  0.0,  1.0,  3.0,  2.0}},
 
+		 // TODO: format arrays
+		 // TODO: replace = for {}
 
 		{{-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0}, //Queen_black
-		 {-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0},
-		 {-1.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -1.0},
-		 {-0.5, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -0.5},
-		 {-0.5, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, 0.0},
-		 {-1.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.5, -1.0},
-		 {-1.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, -1.0},
+		 {-1.0,  0.0,  0.0, 0.0, 0.0, 0.0, 0.0, -1.0},
+		 {-1.0,  0.0,  0.5, 0.5, 0.5, 0.5, 0.0, -1.0},
+		 {-0.5,  0.0,  0.5, 0.5, 0.5, 0.5, 0.0, -0.5},
+		 {-0.5,  0.0,  0.5, 0.5, 0.5, 0.5, 0.0, 0.0},
+		 {-1.0,  0.0,  0.5, 0.5, 0.5, 0.5, 0.5, -1.0},
+		 {-1.0,  0.0,  0.0, 0.0, 0.0, 0.5, 0.0, -1.0},
 		 {-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0}},
 
 
@@ -89,43 +91,43 @@ const float PlayerWithAIGame::bitboards[FIGURE_TYPES][8][8] = {
 
 
 		 {{-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0}, //Bishop_white
-		 {-1.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, -1.0},
-		 {-1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0},
-		 {-1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, -1.0},
-		 {-1.0, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, -1.0},
-		 {-1.0, 0.0, 0.5, 1.0, 1.0, 0.5, 0.0, -1.0},
-		 {-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0},
-		 {-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0}},
+		  {-1.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, -1.0},
+		  {-1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0},
+		  {-1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, -1.0},
+		  {-1.0, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, -1.0},
+		  {-1.0, 0.0, 0.5, 1.0, 1.0, 0.5, 0.0, -1.0},
+		  {-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0},
+		  {-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0}},
 
 
 		 {{-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0}, //Knight_white
-		 {-4.0, -2.0, 0.0, 0.5, 0.5, 0.0, -2.0, -4.0},
-		 {-3.0, 0.5, 1.0, 1.5, 1.5, 1.0, 0.5, -3.0},
-		 {-3.0, 0.0, 1.5, 2.0, 2.0, 1.5, 0.0, -3.0},
-		 {-3.0, 0.5, 1.5, 2.0, 2.0, 1.5, 0.5, -3.0},
-		 {-3.0, 0.0, 1.0, 1.5, 1.5, 1.0, 0.0, -3.0},
-		 {-4.0, -2.0, 0.0, 0.0, 0.0, 0.0, -2.0, -4.0},
-		 {-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0}},
+		  {-4.0, -2.0, 0.0, 0.5, 0.5, 0.0, -2.0, -4.0},
+		  {-3.0, 0.5, 1.0, 1.5, 1.5, 1.0, 0.5, -3.0},
+		  {-3.0, 0.0, 1.5, 2.0, 2.0, 1.5, 0.0, -3.0},
+		  {-3.0, 0.5, 1.5, 2.0, 2.0, 1.5, 0.5, -3.0},
+		  {-3.0, 0.0, 1.0, 1.5, 1.5, 1.0, 0.0, -3.0},
+		  {-4.0, -2.0, 0.0, 0.0, 0.0, 0.0, -2.0, -4.0},
+		  {-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0}},
 
 
 		 {{0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0}, //Rook_white
-		 {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
-		 {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
-		 {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
-		 {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
-		 {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
-		 {0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5},
-		 {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
+		  {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+		  {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+		  {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+		  {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+		  {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
+		  {0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5},
+		  {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
 
 
 		 {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}, //Pawn_white
-		 {0.5, 1.0, 1.0, -2.0, -2.0, 1.0, 1.0, 0.5},
-		 {0.5, -0.5, -1.0, 0.0, 0.0, -1.0, -0.5, 0.5},
-		 {0.0, 0.0, 0.0, 2.0, 2.0, 0.0, 0.0, 0.0},
-		 {0.5, 0.5, 1.0, 2.5, 2.5, 1.0, 0.5, 0.5},
-		 {1.0, 1.0, 2.0, 3.0, 3.0, 2.0, 1.0, 1.0},
-		 {5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
-		 {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}
+		  {0.5, 1.0, 1.0, -2.0, -2.0, 1.0, 1.0, 0.5},
+		  {0.5, -0.5, -1.0, 0.0, 0.0, -1.0, -0.5, 0.5},
+		  {0.0, 0.0, 0.0, 2.0, 2.0, 0.0, 0.0, 0.0},
+		  {0.5, 0.5, 1.0, 2.5, 2.5, 1.0, 0.5, 0.5},
+		  {1.0, 1.0, 2.0, 3.0, 3.0, 2.0, 1.0, 1.0},
+		  {5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
+		  {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}
 };
 
 const int PlayerWithAIGame::DEPTH{ 3 };
@@ -134,23 +136,27 @@ std::atomic<int> positionsCount{ 0 }; // debug counter
 
 PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 {
-	//if (activePlayer->GetColor() != Color::Black)
-	//{
+	std::vector<std::pair<int, int>> movesScore;
+	/*if (activePlayer->GetColor() == Color::Black)
+	{*/
 		int bestIndex = 0;
 		std::vector<Move> movesPositions; // fill vector all possible moves
 		for (auto it1 = map.GetAllPossibleMoves().begin(); it1 != map.GetAllPossibleMoves().end(); ++it1)
 			for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
 				movesPositions.push_back(Move((*it1).from, *it2));
-		int* const movesScore = new int[movesPositions.size()];
-		uint16_t countOfThreads = movesPositions.size();
+		std::atomic<uint16_t> countOfThreads = movesPositions.size();
 		Color playerColor = isPlayerMoveFirst ? Color::White : Color::Black; 
+		// TODO: make 8 threads
 		for (int i = 0; i != movesPositions.size(); ++i)
 		{
 			Map copyMap(map);
 			copyMap.Move(movesPositions[i].from, movesPositions[i].to);
 			//movesScore[i] = PlayerWithAIGame::MiniMax(copyMap, countOfThreads, false, playerColor, DEPTH, -10'000, 10'000);
-			std::thread th([i, movesScore, copyMap, playerColor, &countOfThreads]() {
-				movesScore[i] = PlayerWithAIGame::MiniMax(copyMap, countOfThreads, false, DEPTH, -10'000, 10'000);
+			std::thread th([i, &movesScore, copyMap, playerColor, &countOfThreads]() {
+				std::pair<int, int> score = std::pair<int, int>(i, PlayerWithAIGame::MiniMax(copyMap, countOfThreads, false, DEPTH, -10'000, 10'000));
+				mut2.lock();
+				movesScore.push_back(score);
+				mut2.unlock();
 				});
 			th.detach();
 		}
@@ -159,15 +165,14 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 
 		if (timeForWaiting == 0) 
 			while (countOfThreads != 0)
-				sf::sleep(sf::seconds(0.1));
+				sf::sleep(sf::seconds(0.03));
 
-		for (int i = 1; i != movesPositions.size(); ++i) // TODO: add error rate
-			if (movesScore[i] > movesScore[bestIndex])
-				bestIndex = i;
-
-		delete[] movesScore;
-
-		return movesPositions[bestIndex];
+		std::sort(movesScore.begin(), movesScore.end(), [](const std::pair<int, int>& left, const std::pair<int, int>& right)
+			{
+				return left.second > right.second;
+			});
+		srand(time(NULL));
+		return (rand() % 100 < 90) ? movesPositions[(*(movesScore.begin() + rand() % 5)).first] : movesPositions[(*movesScore.begin()).first];
 	/*}
 	else
 	{
@@ -191,7 +196,7 @@ int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color
 	return score;
 }
 
-int PlayerWithAIGame::MiniMax(Map map, uint16_t &countOfThreads, bool isAIMoveNow, int depth, int alpha, int beta)
+int PlayerWithAIGame::MiniMax(Map map, std::atomic<uint16_t> &countOfThreads, bool isAIMoveNow, int depth, int alpha, int beta)
 {
 	++positionsCount;
 	if (depth == 0)
@@ -252,11 +257,7 @@ int PlayerWithAIGame::MiniMax(Map map, uint16_t &countOfThreads, bool isAIMoveNo
 						if (beta <= alpha)
 						{
 							if (depth == DEPTH)
-							{
-								mut2.lock();
 								--countOfThreads;
-								mut2.unlock();
-							}
 							return bestMove;
 						}
 					}
@@ -265,11 +266,7 @@ int PlayerWithAIGame::MiniMax(Map map, uint16_t &countOfThreads, bool isAIMoveNo
 			}
 		}
 		if (depth == DEPTH)
-		{
-			mut2.lock();
 			--countOfThreads;
-			mut2.unlock();
-		}
 		return bestMove;
 	}
 }

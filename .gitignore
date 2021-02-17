@@ -205,6 +205,7 @@ AppPackages/
 BundleArtifacts/
 Package.StoreAssociation.xml
 _pkginfo.txt
+
 *.appx
 
 # Visual Studio cache files
@@ -340,5 +341,4 @@ ASALocalRun/
 healthchecksdb
 
 Chess.vcxproj
-
-LastGame.txt
+LastGame.log

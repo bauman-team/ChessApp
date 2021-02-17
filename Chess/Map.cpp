@@ -125,7 +125,6 @@ void Map::Move(const Pos& from, const Pos& to)
 	if (eatenFigureType != FigureType::Empty)
 	{
 		map[static_cast<int>(eatenFigureType)] -= to.ToBitboard();
-		// TODO: decrease numOfFigures
 		if (eatenFigureType == FigureType::Rook_black || eatenFigureType == FigureType::Rook_white)
 			DisableCastlingWithRook(to, GetColor(eatenFigureType)); // disable opportunity of castling for Rook
 	}

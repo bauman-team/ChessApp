@@ -29,7 +29,7 @@ volatile GameStatus Game::GetStatus() const
 void Game::Save() const
 {
 	std::vector<MoveInfo> movesHistory = map.GetMovesHistory();
-	std::ofstream out("LastGame.txt");
+	std::ofstream out("LastGame.log");
 	Pos posBefore;
 	Pos posAfter;
 	out << "   \n";
@@ -58,6 +58,7 @@ void Game::HandleEvent(sf::Event& event)
 
 void Game::SetExitStatus()
 {
+	Save();
 	status = GameStatus::Exit;
 }
 
