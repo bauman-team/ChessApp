@@ -21,57 +21,57 @@ const float PlayerWithAIGame::bitboards[FIGURE_TYPES][8][8] = {
 		 // TODO: replace = for {}
 
 		{{-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0}, //Queen_black
-		 {-1.0,  0.0,  0.0, 0.0, 0.0, 0.0, 0.0, -1.0},
-		 {-1.0,  0.0,  0.5, 0.5, 0.5, 0.5, 0.0, -1.0},
-		 {-0.5,  0.0,  0.5, 0.5, 0.5, 0.5, 0.0, -0.5},
-		 {-0.5,  0.0,  0.5, 0.5, 0.5, 0.5, 0.0, 0.0},
-		 {-1.0,  0.0,  0.5, 0.5, 0.5, 0.5, 0.5, -1.0},
-		 {-1.0,  0.0,  0.0, 0.0, 0.0, 0.5, 0.0, -1.0},
+		 {-1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0},
+		 {-1.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0},
+		 {-0.5,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5},
+		 {-0.5,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0,  0.0},
+		 {-1.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.5, -1.0},
+		 {-1.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.0, -1.0},
 		 {-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0}},
 
 
 		{{-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0}, //Bishop_black
-		 {-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0},
-		 {-1.0, 0.0, 0.5, 1.0, 1.0, 0.5, 0.0, -1.0},
-		 {-1.0, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, -1.0},
-		 {-1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, -1.0},
-		 {-1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0},
-		 {-1.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, -1.0},
+		 {-1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0},
+		 {-1.0,  0.0,  0.5,  1.0,  1.0,  0.5,  0.0, -1.0},
+		 {-1.0,  0.5,  0.5,  1.0,  1.0,  0.5,  0.5, -1.0},
+		 {-1.0,  0.0,  1.0,  1.0,  1.0,  1.0,  0.0, -1.0},
+		 {-1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0},
+		 {-1.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.5, -1.0},
 		 {-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0}},
 
 
 		{{-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0}, //Knight_black
-		 {-4.0, -2.0, 0.0, 0.0, 0.0, 0.0, -2.0, -4.0},
-		 {-3.0, 0.0, 1.0, 1.5, 1.5, 1.0, 0.0, -3.0},
-		 {-3.0, 0.5, 1.5, 2.0, 2.0, 1.5, 0.5, -3.0},
-		 {-3.0, 0.0, 1.5, 2.0, 2.0, 1.5, 0.0, -3.0},
-		 {-3.0, 0.5, 1.0, 1.5, 1.5, 1.0, 0.5, -3.0},
-		 {-4.0, -2.0, 0.0, 0.5, 0.5, 0.0, -2.0, -4.0},
+		 {-4.0, -2.0,  0.0,  0.0,  0.0,  0.0, -2.0, -4.0},
+		 {-3.0,  0.0,  1.0,  1.5,  1.5,  1.0,  0.0, -3.0},
+		 {-3.0,  0.5,  1.5,  2.0,  2.0,  1.5,  0.5, -3.0},
+		 {-3.0,  0.0,  1.5,  2.0,  2.0,  1.5,  0.0, -3.0},
+		 {-3.0,  0.5,  1.0,  1.5,  1.5,  1.0,  0.5, -3.0},
+		 {-4.0, -2.0,  0.0,  0.5,  0.5,  0.0, -2.0, -4.0},
 		 {-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0}},
 
 
-		{{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}, //Rook_black
-		 {0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5},
-		 {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
-		 {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
-		 {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
-		 {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
-		 {-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5},
-		 {0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0}},
+		{{ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, //Rook_black
+		 { 0.5,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  0.5},
+		 {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
+		 {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
+		 {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
+		 {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
+		 {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
+		 { 0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0}},
 
 
-		{{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}, //Pawn_black
-		 {5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
-		 {1.0, 1.0, 2.0, 3.0, 3.0, 2.0, 1.0, 1.0},
-		 {0.5, 0.5, 1.0, 2.5, 2.5, 1.0, 0.5, 0.5},
-		 {0.0, 0.0, 0.0, 2.0, 2.0, 0.0, 0.0, 0.0},
-		 {0.5, -0.5, -1.0, 0.0, 0.0, -1.0, -0.5, 0.5},
-		 {0.5, 1.0, 1.0, -2.0, -2.0, 1.0, 1.0, 0.5},
-		 {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
+		{{ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, //Pawn_black
+		 { 5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0},
+		 { 1.0,  1.0,  2.0,  3.0,  3.0,  2.0,  1.0,  1.0},
+		 { 0.5,  0.5,  1.0,  2.5,  2.5,  1.0,  0.5,  0.5},
+		 { 0.0,  0.0,  0.0,  2.0,  2.0,  0.0,  0.0,  0.0},
+		 { 0.5, -0.5, -1.0,  0.0,  0.0, -1.0, -0.5,  0.5},
+		 { 0.5,  1.0,  1.0, -2.0, -2.0,  1.0,  1.0,  0.5},
+		 { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}},
 
 
-		{{2.0, 3.0, 1.0, 0.0, 0.0, 1.0, 3.0, 2.0}, //King_white
-		 {2.0, 2.0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.0},
+		{{ 2.0,  3.0,  1.0,  0.0,  0.0,  1.0,  3.0,  2.0}, //King_white
+		 { 2.0,  2.0,  0.0,  0.0,  0.0,  0.0,  2.0,  2.0},
 		 {-1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0},
 		 {-2.0, -3.0, -3.0, -4.0, -4.0, -3.0, -3.0, -2.0},
 		 {-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0},
@@ -131,32 +131,39 @@ const float PlayerWithAIGame::bitboards[FIGURE_TYPES][8][8] = {
 };
 
 const int PlayerWithAIGame::DEPTH{ 3 };
+const int PlayerWithAIGame::countOfThreads{ 8 };
 
 std::atomic<int> positionsCount{ 0 }; // debug counter
 
 PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 {
-	std::vector<std::pair<int, int>> movesScore;
 	/*if (activePlayer->GetColor() == Color::Black)
 	{*/
-		int bestIndex = 0;
+		std::vector<std::pair<int, int>> movesScore;
 		std::vector<Move> movesPositions; // fill vector all possible moves
 		for (auto it1 = map.GetAllPossibleMoves().begin(); it1 != map.GetAllPossibleMoves().end(); ++it1)
 			for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
 				movesPositions.push_back(Move((*it1).from, *it2));
-		std::atomic<uint16_t> countOfThreads = movesPositions.size();
-		Color playerColor = isPlayerMoveFirst ? Color::White : Color::Black; 
-		// TODO: make 8 threads
-		for (int i = 0; i != movesPositions.size(); ++i)
+		std::atomic<uint16_t> countWorkingThreads{ 0 };
+		int countOfMovesInThread, from, countOfMoves = movesPositions.size();
+		for (int i = countOfThreads; i >= 0 && countOfMoves > 0; --i)
 		{
-			Map copyMap(map);
-			copyMap.Move(movesPositions[i].from, movesPositions[i].to);
-			//movesScore[i] = PlayerWithAIGame::MiniMax(copyMap, countOfThreads, false, playerColor, DEPTH, -10'000, 10'000);
-			std::thread th([i, &movesScore, copyMap, playerColor, &countOfThreads]() {
-				std::pair<int, int> score = std::pair<int, int>(i, PlayerWithAIGame::MiniMax(copyMap, countOfThreads, false, DEPTH, -10'000, 10'000));
-				mut2.lock();
-				movesScore.push_back(score);
-				mut2.unlock();
+			++countWorkingThreads; // add to active process count
+			from = movesPositions.size() - countOfMoves; 
+			countOfMovesInThread = ceil(countOfMoves / i); // count checking of moves in this thread
+			countOfMoves -= countOfMovesInThread; // count checking of moves is left
+			Map MAP(map);
+			std::thread th([from, countOfMovesInThread, movesPositions, &movesScore, MAP, &countWorkingThreads]() {
+				for (int j = from; j != from + countOfMovesInThread; ++j)
+				{
+					Map copyMap(MAP);
+					copyMap.Move(movesPositions[j].from, movesPositions[j].to);
+					std::pair<int, int> score = std::pair<int, int>(j, PlayerWithAIGame::MiniMax(copyMap, false, DEPTH, -10'000, 10'000));
+					mut2.lock();
+					movesScore.push_back(score);
+					mut2.unlock();
+				}
+				--countWorkingThreads;
 				});
 			th.detach();
 		}
@@ -164,21 +171,21 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 		sf::sleep(sf::seconds(timeForWaiting));
 
 		if (timeForWaiting == 0) 
-			while (countOfThreads != 0)
+			while (countWorkingThreads != 0)
 				sf::sleep(sf::seconds(0.03));
 
 		std::sort(movesScore.begin(), movesScore.end(), [](const std::pair<int, int>& left, const std::pair<int, int>& right)
 			{
 				return left.second > right.second;
 			});
-		srand(time(NULL));
-		return (rand() % 100 < 90) ? movesPositions[(*(movesScore.begin() + rand() % 5)).first] : movesPositions[(*movesScore.begin()).first];
+		srand(time(NULL)); // TODO: Add error rate
+		return movesPositions[(*movesScore.begin()).first]; // (rand() % 100 < 90) ? movesPositions[(*(movesScore.begin() + rand() % 5)).first] : movesPositions[(*movesScore.begin()).first];
 	/*}
 	else
 	{
 		srand(std::time(NULL));
 		int rand1 = rand() % map.GetAllPossibleMoves().size();
-		sf::sleep(sf::seconds(0.5));
+		//sf::sleep(sf::seconds(0.5));
 		return Move(map.GetAllPossibleMoves().at(rand1).from, map.GetAllPossibleMoves().at(rand1).to.at(rand() % map.GetAllPossibleMoves().at(rand1).to.size()));
 	}*/
 }
@@ -196,7 +203,7 @@ int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color
 	return score;
 }
 
-int PlayerWithAIGame::MiniMax(Map map, std::atomic<uint16_t> &countOfThreads, bool isAIMoveNow, int depth, int alpha, int beta)
+int PlayerWithAIGame::MiniMax(Map map, bool isAIMoveNow, int depth, int alpha, int beta)
 {
 	++positionsCount;
 	if (depth == 0)
@@ -221,7 +228,7 @@ int PlayerWithAIGame::MiniMax(Map map, std::atomic<uint16_t> &countOfThreads, bo
 					{
 						map.Move(moves.from, *posItr);
 						if (!map.IsShahFor(AIColor))
-							bestMove = std::max(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, depth, alpha, beta));
+							bestMove = std::max(bestMove, MiniMax(map, !isAIMoveNow, depth, alpha, beta));
 						map.UndoMove();
 						alpha = std::max(bestMove, alpha);
 						if (beta <= alpha)
@@ -251,22 +258,16 @@ int PlayerWithAIGame::MiniMax(Map map, std::atomic<uint16_t> &countOfThreads, bo
 					{
 						map.Move(moves.from, *posItr);
 						if (!map.IsShahFor(playerColor))
-							bestMove = std::min(bestMove, MiniMax(map, countOfThreads, !isAIMoveNow, depth - 1, alpha, beta));
+							bestMove = std::min(bestMove, MiniMax(map, !isAIMoveNow, depth - 1, alpha, beta));
 						map.UndoMove();
 						beta = std::min(bestMove, beta);
 						if (beta <= alpha)
-						{
-							if (depth == DEPTH)
-								--countOfThreads;
 							return bestMove;
-						}
 					}
 				}
 				j <<= 1;
 			}
 		}
-		if (depth == DEPTH)
-			--countOfThreads;
 		return bestMove;
 	}
 }
