@@ -39,6 +39,23 @@ Map::Map(const Map& baseMap)
 		movesHistory = baseMap.movesHistory;
 }
 
+GameStatus Map::CheckGameFinal(const Color activePlayerColor)
+{
+	if (IsShahFor(activePlayerColor))
+	{
+		DisableCastlingForKing(activePlayerColor); // if King is attacked => castling disabled
+		if (!GetAllPossibleMoves().empty())
+			return GameStatus::Shah;
+		return GameStatus::Mat;
+	}
+	else
+	{
+		if (!GetAllPossibleMoves().empty())
+			return GameStatus::Play;
+		return GameStatus::Pat;
+	}
+}
+
 std::vector<Pos> Map::GetPossibleMovesFrom(const Pos& figurePosition) const
 {
 	assert(figurePosition != Pos::NULL_POS);

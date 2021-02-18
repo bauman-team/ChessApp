@@ -4,9 +4,8 @@
 #include "Menu.h"
 #include <mutex>
 
-enum class GameStatus { Play, Shah, Mat, Pat, TimeIsOver, Exit };
 enum class GameMode { TwoPlayers, PlayerAndBot };
-
+enum class GameStatus;
 class Menu;
 
 class Game
@@ -17,7 +16,6 @@ protected:
 	GameStatus status;
 	tgui::Gui gameGui;
 
-	GameStatus virtual CheckGameFinal() = 0;
 	void UpdateSideMenu();
 	void SetExitStatus(); // private?
 public:

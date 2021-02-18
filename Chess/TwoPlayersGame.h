@@ -17,8 +17,6 @@ protected:
 
 	bool isTimeLimited;
 
-	GameStatus virtual CheckGameFinal() override; // TODO: move to class Map
-
 public:
 	TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties);
 

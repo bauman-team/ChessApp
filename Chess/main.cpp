@@ -109,11 +109,11 @@ int main()
 			if (game)
 			{
 				game->HandleEvent(event); // for side menu
-				if (game->GetStatus() == GameStatus::Exit) // button exit is clicked (open start menu)
+				if (game->GetStatus() == GameStatus::Exit) // button exit is clicked (was opened start menu)
 				{
 					game->ActivateMenuSettings(menu);
 					if (thSetCellIsFinished)
-						delete game; // ??? MEMORY LEAK game delete (why memory clear, when theard don't finished?) 
+						delete game; // TODO: ??? MEMORY LEAK game delete (why memory clear, when theard don't finished?) 
 					game = nullptr;
 				}
 			}

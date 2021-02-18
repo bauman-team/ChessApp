@@ -1,7 +1,7 @@
 #include "Figure.h"
 
-constexpr auto DIAG_DIRECTIONS = 4;
-constexpr auto STRAIGHT_DIRECTIONS = 4;
+constexpr auto DIAG_DIRECTIONS{ 4 };
+constexpr auto STRAIGHT_DIRECTIONS{ 4 };
 
 std::vector<Pos> Figure::FindDiagonalMoves(const Pos& coord, const Map& map)
 {

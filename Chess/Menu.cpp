@@ -1,6 +1,6 @@
 #include "Menu.h"
 
-const std::string Menu::botName = "bot";
+const std::string Menu::botName{ "bot" };
 
 Menu::Menu(sf::RenderWindow& window, std::string widgetsFile) : menuGui(window)
 {

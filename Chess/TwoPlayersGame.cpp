@@ -67,7 +67,7 @@ void TwoPlayersGame::ChangeActivePlayer()
 	sf::Time time = clock.getElapsedTime();*/
 	map.FindAllPossibleMoves(activePlayer->GetColor());
 	drawer.RotateBoard();
-	status = CheckGameFinal();
+	status = map.CheckGameFinal(activePlayer->GetColor());
 	if (stopTime)
 		activePlayer->StartTimer(); // restart game(move) clock
 	isTimeLimited = stopTime; 
@@ -94,23 +94,6 @@ void TwoPlayersGame::SetPosition(int mouseX, int mouseY)
 					activePlayer->SetChosenPosition(position);
 			}
 		}
-	}
-}
-
-GameStatus TwoPlayersGame::CheckGameFinal()
-{
-	if (map.IsShahFor(activePlayer->GetColor()))
-	{
-		map.DisableCastlingForKing(activePlayer->GetColor()); // if King is attacked => castling disabled
-		if (!map.GetAllPossibleMoves().empty())
-			return GameStatus::Shah;
-		return GameStatus::Mat;
-	}
-	else
-	{
-		if (!map.GetAllPossibleMoves().empty())
-			return GameStatus::Play;
-		return GameStatus::Pat;
 	}
 }
 

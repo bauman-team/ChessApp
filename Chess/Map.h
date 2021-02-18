@@ -1,7 +1,7 @@
 #pragma once
-#include "Figure.h"
 #include "MoveInfo.h"
 
+enum class GameStatus { Play, Shah, Mat, Pat, TimeIsOver, Exit };
 enum class FigureType;
 enum class Color;
 enum class BoardPos;
@@ -33,6 +33,8 @@ class Map
 public:
 	Map(); 
 	Map(const Map& map);
+
+	GameStatus CheckGameFinal(const Color activePlayerColor);
 
 	std::vector<Pos> GetPossibleMovesFrom(const Pos& figurePosition) const;
 	const std::vector<OneFigureMoves>& GetAllPossibleMoves() const { return allPossibleMoves; }
