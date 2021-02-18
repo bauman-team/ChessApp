@@ -1,8 +1,8 @@
 #pragma once
-#include "Map.h"
-#include "Drawer.h"
+//#include "Map.h"
 #include "Menu.h"
-#include <mutex>
+#include "Drawer.h"
+#include <SFML/Window.hpp>
 
 enum class GameMode { TwoPlayers, PlayerAndBot };
 enum class GameStatus;

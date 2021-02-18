@@ -4,7 +4,7 @@
 class Figure;
 enum class FigureType;
 
-struct AdditionalInfo // fieldbite
+struct CHESSENGINE_API AdditionalInfo // fieldbite
 {
 	uint8_t castling : 4;
 	uint8_t isCaptureEnPassant : 1;
@@ -19,7 +19,8 @@ struct AdditionalInfo // fieldbite
 	const static AdditionalInfo NULL_INFO;
 };
 
-class MoveInfo
+
+class CHESSENGINE_API MoveInfo
 {
 	FigureType activeFigure;
 	FigureType eatenFigure;

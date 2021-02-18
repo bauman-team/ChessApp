@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Pos.h"
 
 const Pos Pos::NULL_POS(-1, -1);

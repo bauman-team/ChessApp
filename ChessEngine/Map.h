@@ -1,7 +1,7 @@
 #pragma once
 #include "MoveInfo.h"
 
-enum class GameStatus { Play, Shah, Mat, Pat, TimeIsOver, Exit };
+enum class CHESSENGINE_API GameStatus { Play, Shah, Mat, Pat, TimeIsOver, Exit };
 enum class FigureType;
 enum class Color;
 enum class BoardPos;
@@ -10,14 +10,15 @@ class MoveInfo;
 class Figure;
 class PlayerWithAIGame;
 
-struct OneFigureMoves 
+
+struct CHESSENGINE_API OneFigureMoves
 {
 	Pos from;
 	std::vector<Pos> to;
 };
 
 
-class Map
+class CHESSENGINE_API Map
 {
 	friend class PlayerWithAIGame;
 
@@ -72,6 +73,14 @@ public:
 
 	~Map(){}
 
-	static const uint8_t offsetHorizontal, offsetVertical, offsetMainDiag, offsetSideDiag;
-	static const uint64_t knightBorderAB, knightBorderGH, mapLeftBorder, mapRightBorder, mapUpBorder, mapDownBorder;
+	static const uint8_t offsetHorizontal;
+	static const uint8_t offsetVertical;
+	static const uint8_t offsetMainDiag;
+	static const uint8_t offsetSideDiag;
+	static const uint64_t knightBorderAB;
+	static const uint64_t knightBorderGH;
+	static const uint64_t mapLeftBorder;
+	static const uint64_t mapRightBorder;
+	static const uint64_t mapUpBorder;
+	static const uint64_t mapDownBorder;
 };

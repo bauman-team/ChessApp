@@ -2,8 +2,12 @@
 #include <stdint.h>
 #include <cassert>
 #include <string>
+#include <utility>
+#include <limits.h>
+#include "ChessEngine.h"
 
-class Pos
+
+class CHESSENGINE_API Pos
 {
 	uint8_t xy;
 public:

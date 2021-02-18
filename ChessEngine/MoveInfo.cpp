@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "MoveInfo.h"
 
 const AdditionalInfo AdditionalInfo::NULL_INFO({}, false);

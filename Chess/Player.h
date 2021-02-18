@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <SFML/Window.hpp>
-#include "Pos.h"
+#include <Pos.h>
 
 enum class Color;
 

@@ -7,7 +7,7 @@
 #include "Pos.h"
 #include "Map.h"
 
-enum class FigureType // used current fixed order
+enum class CHESSENGINE_API FigureType // used current fixed order
 {
 	King_black,
 	Queen_black,
@@ -26,13 +26,14 @@ enum class FigureType // used current fixed order
 	Empty,
 };
 
-enum class Color { White, Black, None }; // None color for Empty figure
+enum class CHESSENGINE_API Color { White, Black, None }; // None color for Empty figure
 
-enum class BoardPos { Lock, Empty, Opposite };
+enum class CHESSENGINE_API BoardPos { Lock, Empty, Opposite };
 
 class Map;
 
-class Figure
+
+class CHESSENGINE_API Figure
 {
 	static std::vector<Pos> FindPossibleMovesKing(const Pos& coord, Map& map);
 	static std::vector<Pos> FindPossibleMovesQueen(const Pos& coord, const Map& map);

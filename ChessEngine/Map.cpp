@@ -1,9 +1,8 @@
+#include "pch.h"
 #include "Map.h"
-#include <cassert>
 #include <mutex>
-#include <SFML/Window.hpp>
 
-extern std::mutex mut1;
+CHESSENGINE_API std::mutex mut1;
 const uint8_t Map::offsetHorizontal{ 1 }, Map::offsetVertical{ 8 }, Map::offsetMainDiag{ 7 }, Map::offsetSideDiag{ 9 };
 const uint64_t Map::knightBorderAB{ 18'229'723'555'195'321'596 }, Map::knightBorderGH{ 4'557'430'888'798'830'399 },
 Map::mapLeftBorder{ 72'340'172'838'076'673 }, Map::mapRightBorder{ 9'259'542'123'273'814'144 },

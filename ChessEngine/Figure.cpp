@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Figure.h"
 
 constexpr auto DIAG_DIRECTIONS{ 4 };

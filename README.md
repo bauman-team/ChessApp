@@ -17,8 +17,10 @@ In develop branch
 - Choose started figures positions of game
 
 Installing:
-- Used sources
-https://tgui.net/
-https://www.sfml-dev.org/
-Add *.dll files to executed file directory
-Add directory of files additionally libraries to the project properties
+- Used sources:
+	https://tgui.net/
+	https://www.sfml-dev.org/
+
+- Add *.dll files to executed file directory
+- Add directory of files additionally libraries to the project properties
+- Compile ChessEngine.dll at first

@@ -1,5 +1,4 @@
 #pragma once
-#include <TGUI/TGUI.hpp>
 #include "Game.h"
 #include "Player.h"
 
@@ -7,6 +6,8 @@
 #include <mutex>
 //#include <ctime>
 //#include <cstdlib>
+
+class Game;
 
 class TwoPlayersGame : public Game
 {

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <assert.h>
-#include "Figure.h"
+#include <Map.h>
 
 class Resources
 {

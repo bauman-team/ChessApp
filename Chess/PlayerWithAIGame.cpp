@@ -1,6 +1,6 @@
 #include "PlayerWithAIGame.h"
 
-extern std::mutex mut1;
+CHESSENGINE_API extern std::mutex mut1;
 extern std::mutex mut3;
 std::mutex mut2;
 
