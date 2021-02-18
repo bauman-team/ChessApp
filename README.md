@@ -1,17 +1,24 @@
-Program for palying chess for windows pc.
+Game chess for windows pc.
 
-In master fork
+For frontend used libraries TGUI, SFML.
+
+In master branch 
 - Good interface created
-- Game for two players working
-- There is an opportunity to choose time mode or not
+- Two players game is working (include time mode)
+- AI game is working (include time mode)
 
-In develop fork
-- Playing mode with pc AI
+In develop branch
+- Playing mode with NN (Nerual Network)
+- Improving side menu
+- Add pawn transform
+- Add scaling
 - Improving interface with statistics
 - Game completion menu when someone won
-- Button to offer a draw
+- Choose started figures positions of game
 
-In workingDevelop fork
-- Different storage method information of map and figures (before optimization)
-- Game for two players working
-- Time mode didn't working
+Installing:
+- Used sources
+https://tgui.net/
+https://www.sfml-dev.org/
+Add *.dll files to executed file directory
+Add directory of files additionally libraries to the project properties
