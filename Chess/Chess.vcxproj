@@ -92,8 +92,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-audio-d.lib;sfml-system-d.lib;tgui-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\lib;C:\TGUI-0.8\lib;C:\SFML-2.5.1\lib;C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-audio-d.lib;sfml-system-d.lib;tgui-d.lib;ChessEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\lib;C:\TGUI-0.8\lib;C:\SFML-2.5.1\lib;D:\MY_PROJECTS\VisualStudio\ChessApp\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

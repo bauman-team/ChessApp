@@ -274,8 +274,8 @@ bool Map::IsShahFor(const Color kingColor) const
 	uint64_t defendStraight, defendDiagonal, attackedStraight, attackedDiagonal, attackedKingKnight,
 		mapSpareBorder, kingBitdoard = map[static_cast<int>(king)];
 	// King
-	attackedKingKnight = ~mapRightBorder & (kingBitdoard << offsetHorizontal | kingBitdoard << offsetMainDiag | kingBitdoard >> offsetSideDiag)
-		| ~mapLeftBorder & (kingBitdoard >> offsetHorizontal | kingBitdoard >> offsetMainDiag | kingBitdoard << offsetSideDiag)
+	attackedKingKnight = ~mapLeftBorder & (kingBitdoard << offsetHorizontal | kingBitdoard >> offsetMainDiag | kingBitdoard << offsetSideDiag)
+		| ~mapRightBorder & (kingBitdoard >> offsetHorizontal | kingBitdoard << offsetMainDiag | kingBitdoard >> offsetSideDiag)
 		| kingBitdoard << offsetVertical | kingBitdoard >> offsetVertical;
 	if (attackedKingKnight & map[static_cast<int>(king == FigureType::King_black ? FigureType::King_white : FigureType::King_black)])
 		return true;

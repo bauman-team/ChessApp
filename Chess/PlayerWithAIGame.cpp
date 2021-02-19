@@ -1,5 +1,5 @@
 #include "PlayerWithAIGame.h"
-
+//#define RandBot
 CHESSENGINE_API extern std::mutex mut1;
 extern std::mutex mut3;
 std::mutex mut2;
@@ -16,7 +16,7 @@ const float PlayerWithAIGame::bitboards[FIGURE_TYPES][8][8] = {
 		 {-1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0},
 		 { 2.0,  2.0,  0.0,  0.0,  0.0,  0.0,  2.0,  2.0},
 		 { 2.0,  3.0,  1.0,  0.0,  0.0,  1.0,  3.0,  2.0}},
-		 // TODO: replace = for {}
+
 
 		{{-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0}, //Queen_black
 		 {-1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0},
@@ -135,8 +135,11 @@ std::atomic<int> positionsCount{ 0 }; // debug counter
 
 PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 {
-	/*if (activePlayer->GetColor() == Color::Black)
-	{*/
+#ifdef RandBot
+	if (activePlayer->GetColor() == Color::Black && isPlayerMoveFirst
+		|| activePlayer->GetColor() == Color::White && !isPlayerMoveFirst)
+	{
+#endif
 		std::vector<std::pair<int, int>> movesScore;
 		std::vector<Move> movesPositions; // fill vector all possible moves
 		for (auto it1 = map.GetAllPossibleMoves().begin(); it1 != map.GetAllPossibleMoves().end(); ++it1)
@@ -177,15 +180,24 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 				return left.second > right.second;
 			});
 		srand(time(NULL)); // Additional error rate
-		return (rand() % 100 < 90) ? movesPositions[(*(movesScore.begin() + rand() % std::min(3, static_cast<int>(movesPositions.size())))).first] : movesPositions[(*movesScore.begin()).first];
-	/*}
+		if (rand() % 100 < 0)
+		{
+			for (int i = 0; i != 3; ++i)
+				std::cout << "\n\t" + movesPositions[(*(movesScore.begin() + i)).first].from.ToString() + "  -->  " + movesPositions[(*(movesScore.begin() + i)).first].to.ToString();
+			return movesPositions[(*(movesScore.begin() + rand() % std::min(3, static_cast<int>(movesPositions.size())))).first];
+		}
+		return movesPositions[(*movesScore.begin()).first];
+		//return (rand() % 100 < 90) ? movesPositions[(*(movesScore.begin() + rand() % std::min(3, static_cast<int>(movesPositions.size())))).first] : movesPositions[(*movesScore.begin()).first];
+#ifdef RandBot
+	}
 	else
 	{
 		srand(std::time(NULL));
 		int rand1 = rand() % map.GetAllPossibleMoves().size();
 		//sf::sleep(sf::seconds(0.5));
 		return Move(map.GetAllPossibleMoves().at(rand1).from, map.GetAllPossibleMoves().at(rand1).to.at(rand() % map.GetAllPossibleMoves().at(rand1).to.size()));
-	}*/
+	}
+#endif
 }
 
 int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color playerColor)
@@ -296,13 +308,13 @@ void PlayerWithAIGame::ChangeActivePlayer()
 	status = map.CheckGameFinal(activePlayer->GetColor());
 	if (status != GameStatus::Pat && status != GameStatus::Mat)
 	{
-		std::cout << "Start!\n";
+		std::cout << "\n\tStart!";
 		positionsCount = 0;
 		sf::Clock clock;
 		Move bestMove = StartAI();
 		sf::Time time = clock.getElapsedTime();
-		std::cout << "End!\nTime of calculating (in milliseconds): " << time.asMilliseconds()
-			<< "\n Count of calculated positions: " << positionsCount << "\n";
+		std::cout << "\n\tTime of calculating (in milliseconds): " << time.asMilliseconds()
+			<< "\n\tCount of calculated positions: " << positionsCount << "\n\tEnd!";
 		map.MakeMove(bestMove.from, bestMove.to);
 		mut3.lock();
 		UpdateSideMenu();
@@ -316,11 +328,21 @@ void PlayerWithAIGame::ChangeActivePlayer()
 			activePlayer->StartTimer();
 		isTimeLimited = stopTime;
 	}
-	/*if (status != GameStatus::Pat && status != GameStatus::Mat)
+#ifdef RandBot
+	if (status != GameStatus::Pat && status != GameStatus::Mat)
 	{
 		activePlayer = (activePlayer == player2) ? player1 : player2;
 		ChangeActivePlayer();
-	}*/
+	}
+	else
+	{
+		std::cout << "\nFinish!\n\nStart new!";
+		mut1.lock();
+		map = Map();
+		mut1.unlock();
+		ChangeActivePlayer();
+	}
+#endif
 }
 
 void PlayerWithAIGame::StartGame()
