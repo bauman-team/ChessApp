@@ -71,15 +71,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)build\bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)build\bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -87,13 +95,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\include;C:\TGUI-0.8\include;C:\SFML-2.5.1\include;D:\MY_PROJECTS\VisualStudio\ChessApp\ChessEngine;%(AdditionalIncludeDirectories);D:\MY_PROJECTS\VisualStudio\ChessApp\ChessEngine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\include;C:\TGUI-0.8\include;C:\SFML-2.5.1\include;..\ChessEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-audio-d.lib;sfml-system-d.lib;tgui-d.lib;ChessEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\lib;C:\TGUI-0.8\lib;C:\SFML-2.5.1\lib;D:\MY_PROJECTS\VisualStudio\ChessApp\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-audio-d.lib;sfml-system-d.lib;tgui-d.lib;ChessEngine.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\lib;C:\TGUI-0.8\lib;C:\SFML-2.5.1\lib;$(SolutionDir)build\bin\$(Configuration)\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -102,13 +110,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\include;C:\TGUI-0.8\include;C:\SFML-2.5.1\include;C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\include;%(AdditionalIncludeDirectories);D:\MY_PROJECTS\VisualStudio\ChessApp\ChessEngine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\include;C:\TGUI-0.8\include;C:\SFML-2.5.1\include;..\ChessEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-audio-d.lib;sfml-system-d.lib;tgui-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\lib;C:\TGUI-0.8\lib;C:\SFML-2.5.1\lib;C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-audio-d.lib;sfml-system-d.lib;tgui-d.lib;ChessEngine.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\lib;C:\TGUI-0.8\lib;C:\SFML-2.5.1\lib;$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -119,7 +127,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\include;C:\TGUI-0.8\include;C:\SFML-2.5.1\include;D:\MY_PROJECTS\VisualStudio\ChessApp\ChessEngine;%(AdditionalIncludeDirectories);D:\MY_PROJECTS\VisualStudio\ChessApp\ChessEngine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\include;C:\TGUI-0.8\include;C:\SFML-2.5.1\include;..\ChessEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,7 +135,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>sfml-graphics.lib;sfml-window.lib;sfml-audio.lib;sfml-system.lib;tgui.lib;ChessEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\lib;C:\TGUI-0.8\lib;C:\SFML-2.5.1\lib;D:\MY_PROJECTS\VisualStudio\ChessApp\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\lib;C:\TGUI-0.8\lib;C:\SFML-2.5.1\lib;$(SolutionDir)build\bin\$(Configuration)\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -138,15 +146,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\include;C:\TGUI-0.8\include;..\ChessEngine;%(AdditionalIncludeDirectories);D:\MY_PROJECTS\VisualStudio\ChessApp\ChessEngine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\include;C:\TGUI-0.8\include;C:\SFML-2.5.1\include;..\ChessEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sfml-graphics.lib;sfml-window.lib;sfml-audio.lib;sfml-system.lib;tgui.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\lib;C:\TGUI-0.8\lib;C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-graphics.lib;sfml-window.lib;sfml-audio.lib;sfml-system.lib;tgui.lib;ChessEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Mi\Documents\SFML-2.5.1-windows-vc15-32-bit\SFML-2.5.1\lib;C:\TGUI-0.8\lib;C:\SFML-2.5.1\lib;$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
