@@ -1,8 +1,3 @@
-/* Bugs:
-	1) add transformation pawn to other figures (not only queen)
-	2) fix scaling window
-*/
-
 #include "PlayerWithAIGame.h"
 #include "Game.h"
 
@@ -15,20 +10,20 @@ int main()
 	sf::RenderWindow window;
 	window.create(sf::VideoMode(700, 550), "Chess");
 	Resources res;
-	res.SetMapImage("images/map.png");
-	res.SetFigureImage(FigureType::King_black, "images/King_black.png");
-	res.SetFigureImage(FigureType::Queen_black, "images/Queen_black.png");
-	res.SetFigureImage(FigureType::Rook_black, "images/Rook_black.png");
-	res.SetFigureImage(FigureType::Bishop_black, "images/Bishop_black.png");
-	res.SetFigureImage(FigureType::Knight_black, "images/Knight_black.png");
-	res.SetFigureImage(FigureType::Pawn_black, "images/Pawn_black.png");
-	res.SetFigureImage(FigureType::King_white, "images/King_white.png");
-	res.SetFigureImage(FigureType::Queen_white, "images/Queen_white.png");
-	res.SetFigureImage(FigureType::Rook_white, "images/Rook_white.png");
-	res.SetFigureImage(FigureType::Bishop_white, "images/Bishop_white.png");
-	res.SetFigureImage(FigureType::Knight_white, "images/Knight_white.png");
-	res.SetFigureImage(FigureType::Pawn_white, "images/Pawn_white.png");
-	res.SetFont("fonts/calibri.ttf");
+	res.SetMapImage("../res/images/map.png");
+	res.SetFigureImage(FigureType::King_black, "../res/images/King_black.png");
+	res.SetFigureImage(FigureType::Queen_black, "../res/images/Queen_black.png");
+	res.SetFigureImage(FigureType::Rook_black, "../res/images/Rook_black.png");
+	res.SetFigureImage(FigureType::Bishop_black, "../res/images/Bishop_black.png");
+	res.SetFigureImage(FigureType::Knight_black, "../res/images/Knight_black.png");
+	res.SetFigureImage(FigureType::Pawn_black, "../res/images/Pawn_black.png");
+	res.SetFigureImage(FigureType::King_white, "../res/images/King_white.png");
+	res.SetFigureImage(FigureType::Queen_white, "../res/images/Queen_white.png");
+	res.SetFigureImage(FigureType::Rook_white, "../res/images/Rook_white.png");
+	res.SetFigureImage(FigureType::Bishop_white, "../res/images/Bishop_white.png");
+	res.SetFigureImage(FigureType::Knight_white, "../res/images/Knight_white.png");
+	res.SetFigureImage(FigureType::Pawn_white, "../res/images/Pawn_white.png");
+	res.SetFont("../res/fonts/calibri.ttf");
 
 	MapProperties prop;
 	prop.SetPlayAreaTopLeft(60, 60);
@@ -37,7 +32,7 @@ int main()
 	prop.SetSideMenuWidth(300);
 
 	Game* game = nullptr;
-	Menu menu(window, "form.txt");
+	Menu menu(window, "../res/form.txt");
 
 	std::thread *thSetCell = nullptr;
 	bool thSetCellIsFinished = true;

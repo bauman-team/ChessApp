@@ -15,45 +15,45 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
+    <ClInclude Include="..\src\ChessEngine\Pos.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pch.h">
+    <ClInclude Include="..\src\ChessEngine\pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ChessEngine.h">
+    <ClInclude Include="..\src\ChessEngine\Map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Figure.h">
+    <ClInclude Include="..\src\ChessEngine\MoveInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Map.h">
+    <ClInclude Include="..\src\ChessEngine\framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MoveInfo.h">
+    <ClInclude Include="..\src\ChessEngine\Figure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Pos.h">
+    <ClInclude Include="..\src\ChessEngine\ChessEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
+    <ClCompile Include="..\src\ChessEngine\Pos.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="pch.cpp">
+    <ClCompile Include="..\src\ChessEngine\dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Figure.cpp">
+    <ClCompile Include="..\src\ChessEngine\Figure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Map.cpp">
+    <ClCompile Include="..\src\ChessEngine\Map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MoveInfo.cpp">
+    <ClCompile Include="..\src\ChessEngine\MoveInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Pos.cpp">
+    <ClCompile Include="..\src\ChessEngine\pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

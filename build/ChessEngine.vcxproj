@@ -72,23 +72,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)build\bin\$(Configuration)</OutDir>
-    <IntDir>$(SolutionDir)build\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)</OutDir>
+    <IntDir>$(SolutionDir)$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)build\bin\$(Configuration)</OutDir>
-    <IntDir>$(SolutionDir)build\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)</OutDir>
+    <IntDir>$(SolutionDir)$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -159,26 +159,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ChessEngine.h" />
-    <ClInclude Include="Figure.h" />
-    <ClInclude Include="framework.h" />
-    <ClInclude Include="Map.h" />
-    <ClInclude Include="MoveInfo.h" />
-    <ClInclude Include="pch.h" />
-    <ClInclude Include="Pos.h" />
+    <ClInclude Include="..\src\ChessEngine\ChessEngine.h" />
+    <ClInclude Include="..\src\ChessEngine\Figure.h" />
+    <ClInclude Include="..\src\ChessEngine\framework.h" />
+    <ClInclude Include="..\src\ChessEngine\Map.h" />
+    <ClInclude Include="..\src\ChessEngine\MoveInfo.h" />
+    <ClInclude Include="..\src\ChessEngine\pch.h" />
+    <ClInclude Include="..\src\ChessEngine\Pos.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Figure.cpp" />
-    <ClCompile Include="Map.cpp" />
-    <ClCompile Include="MoveInfo.cpp" />
-    <ClCompile Include="pch.cpp">
+    <ClCompile Include="..\src\ChessEngine\dllmain.cpp" />
+    <ClCompile Include="..\src\ChessEngine\Figure.cpp" />
+    <ClCompile Include="..\src\ChessEngine\Map.cpp" />
+    <ClCompile Include="..\src\ChessEngine\MoveInfo.cpp" />
+    <ClCompile Include="..\src\ChessEngine\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Pos.cpp" />
+    <ClCompile Include="..\src\ChessEngine\Pos.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

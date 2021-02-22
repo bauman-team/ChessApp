@@ -136,11 +136,11 @@ void Menu::SetConnections()
 void Menu::LoadIcons()
 {
 	tgui::Picture::Ptr firstPlayerIcon = menuGui.get<tgui::Picture>("FirstPlayerIcon");
-	tgui::Texture firstIconTexture("images/Pawn_white.png");
+	tgui::Texture firstIconTexture("../res/images/Pawn_white.png");
 	firstPlayerIcon->getRenderer()->setTexture(firstIconTexture);
 
 	tgui::Picture::Ptr secondPlayerIcon = menuGui.get<tgui::Picture>("SecondPlayerIcon");
-	tgui::Texture secondIconTexture("images/Pawn_black.png");
+	tgui::Texture secondIconTexture("../res/images/Pawn_black.png");
 	secondPlayerIcon->getRenderer()->setTexture(secondIconTexture);
 }
 
@@ -168,7 +168,7 @@ void Menu::ShowOnePlayerSettings()
 
 void Menu::ShowTwoPlayersSettings()
 {
-	tgui::Texture firstIconTexture("images/Pawn_white.png");
+	tgui::Texture firstIconTexture("../res/images/Pawn_white.png");
 	menuGui.get<tgui::Picture>("FirstPlayerIcon")->getRenderer()->setTexture(firstIconTexture);
 
 	menuGui.get("FirstPlayerIcon")->setVisible(true);
@@ -185,7 +185,7 @@ void Menu::ChangeChoosenTime()
 
 void Menu::ShowChoosenColor()
 {
-	std::string texturePath = (menuGui.get<tgui::Tabs>("ColorsTab")->getSelected() == "White") ? "images/Pawn_white.png" : "images/Pawn_black.png";
+	std::string texturePath = (menuGui.get<tgui::Tabs>("ColorsTab")->getSelected() == "White") ? "../res/images/Pawn_white.png" : "../res/images/Pawn_black.png";
 	tgui::Texture firstIconTexture(texturePath);
 	tgui::Picture::Ptr firstPlayerIcon = menuGui.get<tgui::Picture>("FirstPlayerIcon");
 	firstPlayerIcon->getRenderer()->setTexture(firstIconTexture);

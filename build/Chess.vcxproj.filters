@@ -15,54 +15,54 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="..\src\Chess\Drawer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Drawer.cpp">
+    <ClCompile Include="..\src\Chess\Game.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="TwoPlayersGame.cpp">
+    <ClCompile Include="..\src\Chess\main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
+    <ClCompile Include="..\src\Chess\MapProperties.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="MapProperties.cpp">
+    <ClCompile Include="..\src\Chess\Menu.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Game.cpp">
+    <ClCompile Include="..\src\Chess\PlayerWithAIGame.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Menu.cpp">
+    <ClCompile Include="..\src\Chess\TwoPlayersGame.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerWithAIGame.cpp">
+    <ClCompile Include="..\src\Chess\Player.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Resources.h">
+    <ClInclude Include="..\src\Chess\Drawer.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Drawer.h">
+    <ClInclude Include="..\src\Chess\Game.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Game.h">
+    <ClInclude Include="..\src\Chess\MapProperties.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="TwoPlayersGame.h">
+    <ClInclude Include="..\src\Chess\Menu.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="MapProperties.h">
+    <ClInclude Include="..\src\Chess\PlayerWithAIGame.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
+    <ClInclude Include="..\src\Chess\Resources.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Menu.h">
+    <ClInclude Include="..\src\Chess\TwoPlayersGame.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerWithAIGame.h">
+    <ClInclude Include="..\src\Chess\Player.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
