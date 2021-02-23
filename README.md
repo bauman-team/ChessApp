@@ -1,13 +1,13 @@
-Game chess for windows pc.
+# Game chess for windows pc.
 
-For frontend used libraries TGUI, SFML.
+### For frontend used libraries [TGUI](https://tgui.net/), [SFML](https://www.sfml-dev.org/).
 
-In master branch 
+### In master branch 
 - Good interface created
 - Two players game is working (include time mode)
 - AI game is working (include time mode)
 
-In develop branch
+### In develop branch
 - Playing mode with NN (Nerual Network)
 - Improving side menu
 - Add pawn transform
@@ -16,11 +16,15 @@ In develop branch
 - Game completion menu when someone won
 - Choose started figures positions of game
 
-Installing:
-- Used sources:
-	https://tgui.net/
-	https://www.sfml-dev.org/
+## Installing:
+- Project will be cross-platform, but now tested only Windows.
+- For building project needs Git, CMake and compiler.
 
-- Add *.dll files to executed file directory
-- Add directory of files additionally libraries to the project properties
-- Compile ChessEngine.dll at first
+```powershell
+git clone https://github.com/bauman-team/ChessApp.git
+cd ChessApp
+mkdir build
+cd build
+cmake ..
+cmake --build .
+```
