@@ -340,7 +340,9 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 
-lib
-bin
-build
+*.lib
+*.vcxproj
+*.vcxproj.filters
+*.sln
+
 LastGame.log
