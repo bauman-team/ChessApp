@@ -28,3 +28,17 @@ cd build
 cmake ..
 cmake --build .
 ```
+
+- On windows need:
+1.Add parameter command line:
+```powershell
+/D "CHESSENGINE_EXPORTS"
+```
+2.Put to the .exe directory this files:
+```powershell
+sfml-graphics.dll
+sfml-window.dll
+sfml-audio.dll
+sfml-system.dll
+tgui.dll
+```

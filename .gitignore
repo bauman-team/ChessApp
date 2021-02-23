@@ -340,6 +340,7 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 
+lib
 bin
 build
 LastGame.log
