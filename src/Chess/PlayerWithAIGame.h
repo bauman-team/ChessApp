@@ -7,8 +7,13 @@
 class PlayerWithAIGame : public TwoPlayersGame
 {
 private:
-	const static int figureWeight[FIGURE_TYPES];
+	const static float figureWeight[FIGURE_TYPES];
+	const static float figureWeightTest[FIGURE_TYPES]; // for testing
+	static int winWhite;
+	static int winBlack;
 	const static float bitboards[FIGURE_TYPES][8][8];
+	const static float infScore;
+	const static int errorRate;
 protected:
 	static bool isPlayerMoveFirst;
 	const static int DEPTH;
@@ -25,8 +30,8 @@ protected:
 	};
 
 	Move StartAI(double timeForWaiting = 0);
-	static int CalculatePositionScore(const Map& selectedMap, const Color AIColor);
-	static int MiniMax(Map map, bool isAIMoveNow, int depth, int alpha, int beta);
+	static float CalculatePositionScore(const Map& selectedMap, const Color AIColor);
+	static float MiniMax(Map map, bool isAIMoveNow, int depth, float alpha, float beta);
 
 public:
 	PlayerWithAIGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties) 

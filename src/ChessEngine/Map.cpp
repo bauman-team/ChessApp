@@ -43,12 +43,14 @@ GameStatus Map::CheckGameFinal(const Color activePlayerColor)
 	if (IsShahFor(activePlayerColor))
 	{
 		DisableCastlingForKing(activePlayerColor); // if King is attacked => castling disabled
+		FindAllPossibleMoves(activePlayerColor);
 		if (!GetAllPossibleMoves().empty())
 			return GameStatus::Shah;
 		return GameStatus::Mat;
 	}
 	else
 	{
+		FindAllPossibleMoves(activePlayerColor);
 		if (!GetAllPossibleMoves().empty())
 			return GameStatus::Play;
 		return GameStatus::Pat;

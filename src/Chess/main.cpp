@@ -6,6 +6,7 @@ extern std::mutex mut4;
 
 int main()
 {
+	srand(time(NULL));
 	setlocale(0, "ru");
 	sf::RenderWindow window;
 	window.create(sf::VideoMode(700, 550), "Chess");

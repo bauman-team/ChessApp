@@ -64,10 +64,9 @@ void TwoPlayersGame::ChangeActivePlayer()
 			th.detach();
 		}
 	}
-	sf::Time time = clock.getElapsedTime();*/
-	map.FindAllPossibleMoves(activePlayer->GetColor());
-	drawer.RotateBoard();
+	sf::Time time = clock.getElapsedTime();*/	
 	status = map.CheckGameFinal(activePlayer->GetColor());
+	drawer.RotateBoard();
 	if (stopTime)
 		activePlayer->StartTimer(); // restart game(move) clock
 	isTimeLimited = stopTime; 

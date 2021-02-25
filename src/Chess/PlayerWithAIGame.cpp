@@ -1,12 +1,18 @@
 #include "PlayerWithAIGame.h"
-//#define RandBot
+//#define RandBotTest
+//#define SmartBotTest
+//#define TestWeightAndBitboards
 CHESSENGINE_API extern std::mutex mut1;
 extern std::mutex mut3;
 std::mutex mut2;
+// TODO: delete test
+const float PlayerWithAIGame::figureWeight[FIGURE_TYPES] = { 900, 90, 30, 30, 50, 10, 900, 90, 30, 30, 50, 10 }; // black
+const float PlayerWithAIGame::figureWeightTest[FIGURE_TYPES] = { 900, 90, 30, 30, 60, 10, 900, 90, 30, 30, 60, 10 }; // white
+int PlayerWithAIGame::winWhite = 0;
+int PlayerWithAIGame::winBlack = 0;
 
-const int PlayerWithAIGame::figureWeight[FIGURE_TYPES] = { 9, 90, 3, 3, 5, 1, 9, 90, 3, 3, 5, 1 };
 bool PlayerWithAIGame::isPlayerMoveFirst{ false };
-
+// TODO: take test bitboards
 const float PlayerWithAIGame::bitboards[FIGURE_TYPES][8][8] = {
 		{{-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0}, //King_black
 		 {-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0},
@@ -88,59 +94,60 @@ const float PlayerWithAIGame::bitboards[FIGURE_TYPES][8][8] = {
 		 {-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0}},
 
 
-		 {{-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0}, //Bishop_white
-		  {-1.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.5, -1.0},
-		  {-1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0},
-		  {-1.0,  0.0,  1.0,  1.0,  1.0,  1.0,  0.0, -1.0},
-		  {-1.0,  0.5,  0.5,  1.0,  1.0,  0.5,  0.5, -1.0},
-		  {-1.0,  0.0,  0.5,  1.0,  1.0,  0.5,  0.0, -1.0},
-		  {-1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0},
-		  {-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0}},
+		{{-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0}, //Bishop_white
+		 {-1.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.5, -1.0},
+		 {-1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0},
+		 {-1.0,  0.0,  1.0,  1.0,  1.0,  1.0,  0.0, -1.0},
+		 {-1.0,  0.5,  0.5,  1.0,  1.0,  0.5,  0.5, -1.0},
+		 {-1.0,  0.0,  0.5,  1.0,  1.0,  0.5,  0.0, -1.0},
+		 {-1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0},
+		 {-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0}},
 
 
-		 {{-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0}, //Knight_white
-		  {-4.0, -2.0,  0.0,  0.5,  0.5,  0.0, -2.0, -4.0},
-		  {-3.0,  0.5,  1.0,  1.5,  1.5,  1.0,  0.5, -3.0},
-		  {-3.0,  0.0,  1.5,  2.0,  2.0,  1.5,  0.0, -3.0},
-		  {-3.0,  0.5,  1.5,  2.0,  2.0,  1.5,  0.5, -3.0},
-		  {-3.0,  0.0,  1.0,  1.5,  1.5,  1.0,  0.0, -3.0},
-		  {-4.0, -2.0,  0.0,  0.0,  0.0,  0.0, -2.0, -4.0},
-		  {-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0}},
+		{{-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0}, //Knight_white
+		 {-4.0, -2.0,  0.0,  0.5,  0.5,  0.0, -2.0, -4.0},
+		 {-3.0,  0.5,  1.0,  1.5,  1.5,  1.0,  0.5, -3.0},
+		 {-3.0,  0.0,  1.5,  2.0,  2.0,  1.5,  0.0, -3.0},
+		 {-3.0,  0.5,  1.5,  2.0,  2.0,  1.5,  0.5, -3.0},
+		 {-3.0,  0.0,  1.0,  1.5,  1.5,  1.0,  0.0, -3.0},
+		 {-4.0, -2.0,  0.0,  0.0,  0.0,  0.0, -2.0, -4.0},
+		 {-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0}},
 
 
-		 {{ 0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0}, //Rook_white
-		  {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
-		  {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
-		  {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
-		  {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
-		  {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
-		  { 0.5,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  0.5},
-		  { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}},
+		{{ 0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0}, //Rook_white
+		 {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
+		 {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
+		 {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
+		 {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
+		 {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
+		 { 0.5,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  0.5},
+		 { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}},
 
 
-		 {{ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, //Pawn_white
-		  { 0.5,  1.0,  1.0, -2.0, -2.0,  1.0,  1.0,  0.5},
-		  { 0.5, -0.5, -1.0,  0.0,  0.0, -1.0, -0.5,  0.5},
-		  { 0.0,  0.0,  0.0,  2.0,  2.0,  0.0,  0.0,  0.0},
-		  { 0.5,  0.5,  1.0,  2.5,  2.5,  1.0,  0.5,  0.5},
-		  { 1.0,  1.0,  2.0,  3.0,  3.0,  2.0,  1.0,  1.0},
-		  { 5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0},
-		  { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}}
+		{{ 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, //Pawn_white
+		 { 0.5,  1.0,  1.0, -2.0, -2.0,  1.0,  1.0,  0.5},
+		 { 0.5, -0.5, -1.0,  0.0,  0.0, -1.0, -0.5,  0.5},
+		 { 0.0,  0.0,  0.0,  2.0,  2.0,  0.0,  0.0,  0.0},
+		 { 0.5,  0.5,  1.0,  2.5,  2.5,  1.0,  0.5,  0.5},
+		 { 1.0,  1.0,  2.0,  3.0,  3.0,  2.0,  1.0,  1.0},
+		 { 5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0},
+		 { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}}
 };
-
-const int PlayerWithAIGame::DEPTH{ 3 }; // searching depth of move
+const float PlayerWithAIGame::infScore{ 9999 };
+const int PlayerWithAIGame::errorRate{ 20 };
+const int PlayerWithAIGame::DEPTH{ 2 }; // searching depth of move
 const int PlayerWithAIGame::countOfThreads{ 8 };
 
-std::atomic<int> positionsCount{ 0 }; // debug counter
+std::atomic<int> positionsCount{ 0 }; // TODO: delete debug counter
 
 PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 {
-#ifdef RandBot
+#ifdef RandBotTest
 	if (activePlayer->GetColor() == Color::Black && isPlayerMoveFirst
 		|| activePlayer->GetColor() == Color::White && !isPlayerMoveFirst)
 	{
 #endif
-		std::vector<std::pair<int, int>> movesScore;
+		std::vector<std::pair<int, float>> movesScore;
 		std::vector<Move> movesPositions; // fill vector all possible moves
 		for (auto it1 = map.GetAllPossibleMoves().begin(); it1 != map.GetAllPossibleMoves().end(); ++it1)
 			for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
@@ -159,7 +166,7 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 				{
 					Map copyMap(MAP);
 					copyMap.Move(movesPositions[j].from, movesPositions[j].to);
-					std::pair<int, int> score = std::pair<int, int>(j, PlayerWithAIGame::MiniMax(copyMap, false, DEPTH, -10'000, 10'000));
+					std::pair<int, float> score = std::pair<int, float>(j, PlayerWithAIGame::MiniMax(copyMap, false, DEPTH, -10'000, 10'000));
 					mut2.lock();
 					movesScore.push_back(score);
 					mut2.unlock();
@@ -175,24 +182,23 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 			while (countWorkingThreads != 0)
 				sf::sleep(sf::seconds(0.03));
 
-		std::sort(movesScore.begin(), movesScore.end(), [](const std::pair<int, int>& left, const std::pair<int, int>& right)
+		std::sort(movesScore.begin(), movesScore.end(), [](const std::pair<int, float>& left, const std::pair<int, float>& right)
 			{
 				return left.second > right.second;
 			});
-		srand(time(NULL)); // Additional error rate
-		if (rand() % 100 < 0)
+		// Additional error rate
+		if (rand() % 100 < errorRate && (*movesScore.begin()).second != infScore && movesScore.size() > 1)
 		{
-			for (int i = 0; i != 3; ++i)
+			for (int i = 0; i != std::min(3, static_cast<int>(movesScore.size())); ++i)
 				std::cout << "\n\t" + movesPositions[(*(movesScore.begin() + i)).first].from.ToString() + "  -->  " + movesPositions[(*(movesScore.begin() + i)).first].to.ToString();
-			return movesPositions[(*(movesScore.begin() + rand() % std::min(3, static_cast<int>(movesPositions.size())))).first];
+			return movesPositions[(*(movesScore.begin() + (rand() % std::min(3, static_cast<int>(movesPositions.size() - 1))) + 1)).first];
 		}
 		return movesPositions[(*movesScore.begin()).first];
-		//return (rand() % 100 < 90) ? movesPositions[(*(movesScore.begin() + rand() % std::min(3, static_cast<int>(movesPositions.size())))).first] : movesPositions[(*movesScore.begin()).first];
-#ifdef RandBot
+#ifdef RandBotTest
 	}
 	else
 	{
-		srand(std::time(NULL));
+		//srand(std::time(NULL));
 		int rand1 = rand() % map.GetAllPossibleMoves().size();
 		//sf::sleep(sf::seconds(0.5));
 		return Move(map.GetAllPossibleMoves().at(rand1).from, map.GetAllPossibleMoves().at(rand1).to.at(rand() % map.GetAllPossibleMoves().at(rand1).to.size()));
@@ -200,20 +206,40 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 #endif
 }
 
-int PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color playerColor)
+float PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color playerColor)
 {
-	int score = 0;
+	float score = 0;
 	FigureType selected;
-	for (int i = 0; i != 64; ++i)
+#ifdef TestWeightAndBitboards
+	if (isPlayerMoveFirst) // for testing
 	{
-		selected = selectedMap.GetFigureType(i);
-		if (selected != FigureType::Empty)
-			score += figureWeight[static_cast<int>(selected)] * (selectedMap.GetColor(selected) == playerColor ? 1 : -1) * bitboards[static_cast<int>(selected)][i / 8][i % 8];
+#endif
+		// black
+		for (int i = 0; i != 64; ++i)
+		{
+			selected = selectedMap.GetFigureType(i);
+			if (selected != FigureType::Empty)
+				score += (selectedMap.GetColor(selected) == playerColor ? 1.0 : -1.0)
+				* (figureWeight[static_cast<int>(selected)] + bitboards[static_cast<int>(selected)][i / 8][i % 8]);
+		}
+#ifdef TestWeightAndBitboards
 	}
+	else
+	{
+		// white
+		for (int i = 0; i != 64; ++i)
+		{
+			selected = selectedMap.GetFigureType(i);
+			if (selected != FigureType::Empty)
+				score += (selectedMap.GetColor(selected) == playerColor ? 1.0 : -1.0)
+				* (figureWeightTest[static_cast<int>(selected)] + bitboards[static_cast<int>(selected)][i / 8][i % 8]);
+		}
+	}
+#endif
 	return score;
 }
 
-int PlayerWithAIGame::MiniMax(Map map, bool isAIMoveNow, int depth, int alpha, int beta)
+float PlayerWithAIGame::MiniMax(Map map, bool isAIMoveNow, int depth, float alpha, float beta)
 {
 	++positionsCount;
 	if (depth == 0)
@@ -223,7 +249,10 @@ int PlayerWithAIGame::MiniMax(Map map, bool isAIMoveNow, int depth, int alpha, i
 	if (isAIMoveNow)
 	{
 		Color AIColor = isPlayerMoveFirst ? Color::Black : Color::White;
-		int bestMove = -9999, start = (AIColor == Color::Black ? 0 : 6); // used fixed enum order
+		float bestMove = -infScore;
+		int start = (AIColor == Color::Black ? 0 : 6); // used fixed enum order
+		if (map.IsShahFor(AIColor))
+			map.DisableCastlingForKing(AIColor); // if King is attacked => castling disabled
 		for (int i = start; i != start + 6; ++i)
 		{
 			uint64_t j = 1;
@@ -253,7 +282,10 @@ int PlayerWithAIGame::MiniMax(Map map, bool isAIMoveNow, int depth, int alpha, i
 	else
 	{
 		Color playerColor = isPlayerMoveFirst ? Color::White : Color::Black;
-		int bestMove = 9999, start = (playerColor == Color::Black ? 0 : 6); // used fixed enum order
+		float bestMove = infScore;
+		int start = (playerColor == Color::Black ? 0 : 6); // used fixed enum order
+		if (map.IsShahFor(playerColor))
+			map.DisableCastlingForKing(playerColor); // if King is attacked => castling disabled
 		for (int i = start; i != start + 6; ++i)
 		{
 			uint64_t j = 1;
@@ -304,7 +336,6 @@ void PlayerWithAIGame::ChangeActivePlayer()
 	mut1.unlock();
 	map.ClearPossibleMoves();
 	activePlayer = (activePlayer == player2) ? player1 : player2;
-	map.FindAllPossibleMoves(activePlayer->GetColor());
 	status = map.CheckGameFinal(activePlayer->GetColor());
 	if (status != GameStatus::Pat && status != GameStatus::Mat)
 	{
@@ -321,14 +352,40 @@ void PlayerWithAIGame::ChangeActivePlayer()
 		mut3.unlock();
 		map.ClearPossibleMoves();
 		activePlayer = (activePlayer == player2) ? player1 : player2;
-		map.FindAllPossibleMoves(activePlayer->GetColor());
 		status = map.CheckGameFinal(activePlayer->GetColor());
 
 		if (stopTime)
 			activePlayer->StartTimer();
 		isTimeLimited = stopTime;
 	}
-#ifdef RandBot
+#ifdef SmartBotTest
+	if (status != GameStatus::Pat && status != GameStatus::Mat && map.movesHistory.size() < 1000)
+	{
+		activePlayer = (activePlayer == player2) ? player1 : player2;
+		isPlayerMoveFirst = !isPlayerMoveFirst;
+		ChangeActivePlayer();
+	}
+	else
+	{
+		if (map.movesHistory.size() < 1000)
+		{
+			if (activePlayer->GetColor() == Color::White)
+				++winBlack;
+			else
+				++winWhite;
+		}
+		std::cout << "\nFinish!\nCounts of moves: " << map.movesHistory.size() << "\nStats: winWhite = " << winWhite 
+			<< ", winBlack = " << winBlack << "\nStart new!";
+		if ((winWhite + winBlack) % 10 == 0)
+			system("pause");
+		mut1.lock();
+		map.ClearPossibleMoves();
+		map = Map();
+		mut1.unlock();
+		ChangeActivePlayer();
+	}
+#endif
+#ifdef RandBotTest
 	if (status != GameStatus::Pat && status != GameStatus::Mat)
 	{
 		activePlayer = (activePlayer == player2) ? player1 : player2;
@@ -336,7 +393,8 @@ void PlayerWithAIGame::ChangeActivePlayer()
 	}
 	else
 	{
-		std::cout << "\nFinish!\n\nStart new!";
+		std::cout << "\nFinish!\nCounts of moves: " << map.movesHistory.size() << "\nStart new!";
+		system("pause");
 		mut1.lock();
 		map = Map();
 		mut1.unlock();
