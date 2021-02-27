@@ -1,0 +1,89 @@
+language: cpp
+
+git:
+  depth: 10
+
+jobs:
+  include:
+  - stage: Unit tests
+    name: Linux (gcc 6)
+    os: linux
+    dist: xenial
+    env: COMPILER=g++-6
+    services:
+    - xvfb
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - g++-6
+        - libudev-dev
+        - libxrandr-dev
+        - libgl1-mesa-dev
+    cache:
+      directories:
+      - $HOME/SFML-2.5.0_LINUX
+    script:
+      - chmod +x tests/travis_linux_tests.sh
+      - CXX=$COMPILER tests/travis_linux_tests.sh
+    after_success: bash <(curl -s https://codecov.io/bash) -x gcov-6 -a "-s /home/travis/build/texus/TGUI -pr"
+
+  - stage: Cross-platform tests
+    name: Linux (gcc 4.9)
+    os: linux
+    dist: xenial
+    env: COMPILER=g++-4.9
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - g++-4.9
+        - libudev-dev
+        - libxrandr-dev
+        - libxcursor-dev
+        - libgl1-mesa-dev
+    cache:
+      ccache: true
+      directories:
+      - $HOME/SFML_LINUX
+    script:
+      - chmod +x tests/travis_linux.sh
+      - CXX=$COMPILER tests/travis_linux.sh
+
+  - name: Android
+    language: android
+    env:
+    - NDK_DIR=$HOME/android-ndk
+    android:
+      components:
+      - android-27
+      - build-tools-26.0.2
+    addons:
+      apt:
+        packages:
+        - gradle
+    cache:
+      directories:
+      - $HOME/sfml-cache
+    script:
+      - chmod +x tests/travis_android.sh
+      - tests/travis_android.sh
+
+  - name: macOS
+    os: osx
+    cache:
+      directories:
+      - $HOME/SFML_OSX
+    script:
+      - chmod +x tests/travis_osx.sh
+      - tests/travis_osx.sh
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/66857e210e9200bcb6b7
+    on_success: change
+    on_failure: always
+    on_start: never

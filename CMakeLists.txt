@@ -27,7 +27,6 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT $
 set(LIBRARY_NAME ChessEngine)
 add_library(${LIBRARY_NAME} SHARED
 	src/ChessEngine/framework.h
-	src/ChessEngine/dllmain.cpp
 	src/ChessEngine/pch.h
 	src/ChessEngine/pch.cpp
 	src/ChessEngine/ChessEngine.h
@@ -42,6 +41,10 @@ add_library(${LIBRARY_NAME} SHARED
 )
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 
+if(WIN32)
+	target_sources(${LIBRARY_NAME} PRIVATE src/ChessEngine/dllmain.cpp)
+endif()
+
 target_compile_definitions(${LIBRARY_NAME} PRIVATE "CHESSENGINE_EXPORTS")
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBRARY_NAME}) 
@@ -49,10 +52,9 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBRARY_NAME})
 add_subdirectory(external/SFML-2.5.1)
 target_link_libraries(${PROJECT_NAME} PUBLIC sfml-audio sfml-graphics sfml-network sfml-system sfml-window)
 
-
-add_subdirectory(external/TGUI-0.9)
+add_subdirectory(external/TGUI-0.8)
 target_link_libraries(${PROJECT_NAME} PUBLIC tgui)
 
 target_include_directories(${PROJECT_NAME} PUBLIC src/ChessEngine)
 target_include_directories(${PROJECT_NAME} PUBLIC external/SFML-2.5.1/include)
-target_include_directories(${PROJECT_NAME} PUBLIC external/TGUI-0.9/include)
+target_include_directories(${PROJECT_NAME} PUBLIC external/TGUI-0.8/include)

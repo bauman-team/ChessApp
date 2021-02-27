@@ -1,0 +1,14 @@
+comment: false
+codecov:
+  branch: "0.8"
+coverage:
+  range: 60...100
+  status:
+    project: off
+    patch: off
+    changes: off
+ignore:
+- tests/.*
+- examples/.*
+- include/TGUI/Aurora/.*
+- include/TGUI/nanosvg/.*
