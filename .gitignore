@@ -344,5 +344,6 @@ healthchecksdb
 *.vcxproj
 *.vcxproj.filters
 *.sln
+*.exe
 
 LastGame.log
