@@ -33,9 +33,9 @@ cmake --build .
 
 Put to the executable file directory this files of shared libraries:
 ```powershell
-sfml-graphics
-sfml-window
-sfml-audio
-sfml-system
-tgui
+sfml-graphics.dll
+sfml-window.dll
+sfml-audio.dll
+sfml-system.dll
+tgui.dll
 ```
