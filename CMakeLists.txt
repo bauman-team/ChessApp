@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.2)
 
+if(UNIX)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+endif()
+
 set(PROJECT_NAME ChessApp)
 project(${PROJECT_NAME})
 
@@ -43,9 +47,8 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT $
 
 if(WIN32)
 	target_sources(${LIBRARY_NAME} PRIVATE src/ChessEngine/dllmain.cpp)
+	target_compile_definitions(${LIBRARY_NAME} PRIVATE "CHESSENGINE_EXPORTS")
 endif()
-
-target_compile_definitions(${LIBRARY_NAME} PRIVATE "CHESSENGINE_EXPORTS")
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBRARY_NAME}) 
 

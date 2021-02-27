@@ -17,11 +17,11 @@
 - Choose started figures positions of game
 
 ## Installing:
-- Project will be cross-platform, but now tested only Windows.
+- Project will be cross-platform, now tested Windows and Linux (Ubuntu).
 - For building project needs Git, CMake and compiler.
 
 ```powershell
-git clone https://github.com/bauman-team/ChessApp.git
+git clone https://github.com/bauman-team/ChessApp.git ChessApp
 cd ChessApp
 mkdir build
 cd build
@@ -31,11 +31,11 @@ cmake --build .
 
 - On windows need:
 
-Put to the .exe directory this files:
+Put to the executable file directory this files of shared libraries:
 ```powershell
-sfml-graphics.dll
-sfml-window.dll
-sfml-audio.dll
-sfml-system.dll
-tgui.dll
+sfml-graphics
+sfml-window
+sfml-audio
+sfml-system
+tgui
 ```

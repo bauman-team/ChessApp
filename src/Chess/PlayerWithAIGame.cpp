@@ -1,4 +1,5 @@
 #include "PlayerWithAIGame.h"
+#include <math.h> // for supporting linux
 //#define RandBotTest
 //#define SmartBotTest
 //#define TestWeightAndBitboards

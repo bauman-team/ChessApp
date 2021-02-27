@@ -4,6 +4,7 @@
 
 #include <thread>
 #include <mutex>
+#include <atomic> // for supporting linux
 //#include <ctime>
 //#include <cstdlib>
 
