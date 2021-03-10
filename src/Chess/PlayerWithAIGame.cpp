@@ -1,14 +1,14 @@
 #include "PlayerWithAIGame.h"
 #include <math.h> // for supporting linux
 //#define RandBotTest
-//#define SmartBotTest
-//#define TestWeightAndBitboards
+#define SmartBotTest
+#define TestWeightAndBitboards
 CHESSENGINE_API extern std::mutex mut1;
 extern std::mutex mut3;
 std::mutex mut2;
 // TODO: delete test
 const float PlayerWithAIGame::figureWeight[FIGURE_TYPES] = { 900, 90, 30, 30, 50, 10, 900, 90, 30, 30, 50, 10 }; // black
-const float PlayerWithAIGame::figureWeightTest[FIGURE_TYPES] = { 900, 90, 30, 30, 60, 10, 900, 90, 30, 30, 60, 10 }; // white
+const float PlayerWithAIGame::figureWeightTest[FIGURE_TYPES] = { 900, 90, 30, 30, 50, 10, 900, 90, 30, 30, 50, 10 }; // white
 int PlayerWithAIGame::winWhite = 0;
 int PlayerWithAIGame::winBlack = 0;
 
@@ -360,7 +360,7 @@ void PlayerWithAIGame::ChangeActivePlayer()
 		isTimeLimited = stopTime;
 	}
 #ifdef SmartBotTest
-	if (status != GameStatus::Pat && status != GameStatus::Mat && map.movesHistory.size() < 1000)
+	if (status != GameStatus::Pat && status != GameStatus::Mat && map.movesHistory.size() < 300)
 	{
 		activePlayer = (activePlayer == player2) ? player1 : player2;
 		isPlayerMoveFirst = !isPlayerMoveFirst;
@@ -368,7 +368,7 @@ void PlayerWithAIGame::ChangeActivePlayer()
 	}
 	else
 	{
-		if (map.movesHistory.size() < 1000)
+		if (map.movesHistory.size() < 300)
 		{
 			if (activePlayer->GetColor() == Color::White)
 				++winBlack;

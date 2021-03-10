@@ -2,7 +2,6 @@
 
 CHESSENGINE_API extern std::mutex mut1;
 std::mutex mut3;
-std::mutex mut4;
 
 TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
 	: Game(window, resource, properties), isTimeLimited(false) {}
