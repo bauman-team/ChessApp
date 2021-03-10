@@ -1,8 +1,8 @@
 #include "PlayerWithAIGame.h"
 #include <math.h> // for supporting linux
 //#define RandBotTest
-#define SmartBotTest
-#define TestWeightAndBitboards
+//#define SmartBotTest
+//#define TestWeightAndBitboards
 CHESSENGINE_API extern std::mutex mut1;
 extern std::mutex mut3;
 std::mutex mut2;

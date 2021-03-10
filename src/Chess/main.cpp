@@ -185,6 +185,7 @@ int main()
 		}
 		#ifndef _WIN32
 		(game) ? game->Show() : menu.Show();
+		window.display();
 		#endif
 		#ifdef _WIN32
 		if (!game)
