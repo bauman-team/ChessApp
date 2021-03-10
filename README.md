@@ -25,17 +25,24 @@ git clone https://github.com/bauman-team/ChessApp.git ChessApp
 cd ChessApp
 mkdir build
 cd build
+```
+
+- On linux:
+```powershell
 cmake ..
 cmake --build .
 ```
 
-- On windows need:
+- On windows:
 
-Put to the executable file directory this files of shared libraries:
+Release:
 ```powershell
-sfml-graphics.dll
-sfml-window.dll
-sfml-audio.dll
-sfml-system.dll
-tgui.dll
+cmake .. -DCMAKE_BUILD_TYPE:STRING=Release
+cmake --build . --config Release
+```
+
+Debug:
+```powershell
+cmake .. -DCMAKE_BUILD_TYPE:STRING=Debug
+cmake --build . --config Debug
 ```

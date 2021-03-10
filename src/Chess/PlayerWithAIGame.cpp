@@ -355,9 +355,11 @@ void PlayerWithAIGame::ChangeActivePlayer()
 		activePlayer = (activePlayer == player2) ? player1 : player2;
 		status = map.CheckGameFinal(activePlayer->GetColor());
 
-		if (stopTime)
+		if (stopTime && status != GameStatus::Pat && status != GameStatus::Mat)
+		{
 			activePlayer->StartTimer();
-		isTimeLimited = stopTime;
+			isTimeLimited = stopTime;
+		}
 	}
 #ifdef SmartBotTest
 	if (status != GameStatus::Pat && status != GameStatus::Mat && map.movesHistory.size() < 300)

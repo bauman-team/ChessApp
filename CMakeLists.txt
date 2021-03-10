@@ -22,7 +22,6 @@ add_executable(${PROJECT_NAME}
 	src/Chess/TwoPlayersGame.h
 	src/Chess/TwoPlayersGame.cpp
 )
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 
 set(LIBRARY_NAME ChessEngine)
 add_library(${LIBRARY_NAME} SHARED
@@ -39,9 +38,52 @@ add_library(${LIBRARY_NAME} SHARED
 	src/ChessEngine/Pos.h
 	src/ChessEngine/Pos.cpp
 )
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 
 if(WIN32)
+	set(CMAKE_OUTPUT_DIRECTORY "build/$<CONFIGURATION>")
+	if(CMAKE_BUILD_TYPE STREQUAL "Release")
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy
+		"${PROJECT_SOURCE_DIR}/build/external/SFML-2.5.1/lib/$<CONFIGURATION>/sfml-graphics-2.dll"
+		$<TARGET_FILE_DIR:${PROJECT_NAME}>
+	)
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy
+		"${PROJECT_SOURCE_DIR}/build/external/SFML-2.5.1/lib/$<CONFIGURATION>/sfml-system-2.dll"
+		$<TARGET_FILE_DIR:${PROJECT_NAME}>
+	)
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy
+		"${PROJECT_SOURCE_DIR}/build/external/SFML-2.5.1/lib/$<CONFIGURATION>/sfml-window-2.dll"
+		$<TARGET_FILE_DIR:${PROJECT_NAME}>
+	)
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy
+		"${PROJECT_SOURCE_DIR}/build/external/TGUI-0.8/lib/$<CONFIGURATION>/tgui.dll"
+		$<TARGET_FILE_DIR:${PROJECT_NAME}>
+	)
+	elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy
+			"${PROJECT_SOURCE_DIR}/build/external/SFML-2.5.1/lib/$<CONFIGURATION>/sfml-graphics-d-2.dll"
+			$<TARGET_FILE_DIR:${PROJECT_NAME}>
+		)
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy
+			"${PROJECT_SOURCE_DIR}/build/external/SFML-2.5.1/lib/$<CONFIGURATION>/sfml-system-d-2.dll"
+			$<TARGET_FILE_DIR:${PROJECT_NAME}>
+		)
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy
+			"${PROJECT_SOURCE_DIR}/build/external/SFML-2.5.1/lib/$<CONFIGURATION>/sfml-window-d-2.dll"
+			$<TARGET_FILE_DIR:${PROJECT_NAME}>
+		)
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy
+			"${PROJECT_SOURCE_DIR}/build/external/TGUI-0.8/lib/$<CONFIGURATION>/tgui-d.dll"
+			$<TARGET_FILE_DIR:${PROJECT_NAME}>
+		)
+	endif(CMAKE_BUILD_TYPE STREQUAL "Release")
 	target_sources(${LIBRARY_NAME} PRIVATE src/ChessEngine/dllmain.cpp)
 	target_compile_definitions(${LIBRARY_NAME} PRIVATE "CHESSENGINE_EXPORTS")
 elseif(UNIX)
@@ -52,7 +94,7 @@ endif()
 target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBRARY_NAME}) 
 
 add_subdirectory(external/SFML-2.5.1)
-target_link_libraries(${PROJECT_NAME} PUBLIC sfml-audio sfml-graphics sfml-network sfml-system sfml-window)
+target_link_libraries(${PROJECT_NAME} PUBLIC sfml-graphics sfml-system sfml-window) #sfml-audio sfml-network
 
 add_subdirectory(external/TGUI-0.8)
 target_link_libraries(${PROJECT_NAME} PUBLIC tgui)
