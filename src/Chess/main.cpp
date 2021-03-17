@@ -55,7 +55,13 @@ int main()
 			case sf::Event::Closed:
 				if (game)
 					game->Save();
+				#ifdef _WIN32
+				mut4.lock();
+				#endif
 				window.close();
+				#ifdef _WIN32
+				mut4.unlock();
+				#endif
 				break;
 			case sf::Event::MouseButtonPressed:
 				if (game && (game->GetStatus() == GameStatus::Play || game->GetStatus() == GameStatus::Shah) && event.mouseButton.button == sf::Mouse::Left)
@@ -86,9 +92,8 @@ int main()
 						#ifdef _WIN32
 						window.setActive(false);
 						thDraw = std::thread([&game, &window]() {
-							while (sf::sleep(sf::seconds(0.05)), mut4.lock(), game)
+							while (sf::sleep(sf::seconds(0.05)), mut4.lock(), window.setActive(true), window.isOpen() && game)
 							{
-								window.setActive(true);
 								window.clear(sf::Color::White);
 								if (game)
 									game->Show();
@@ -155,9 +160,8 @@ int main()
 			#ifdef _WIN32
 			window.setActive(false);
 			thDraw = std::thread([&game, &window]() {
-				while (sf::sleep(sf::seconds(0.05)), mut4.lock(), game)
+				while (sf::sleep(sf::seconds(0.05)), mut4.lock(), window.setActive(true), window.isOpen() && game)
 				{
-					window.setActive(true);
 					window.clear(sf::Color::White);
 					if (game)
 						game->Show();

@@ -26,6 +26,7 @@ class CHESSENGINE_API Map
 	std::vector<MoveInfo> movesHistory;
 	std::vector<OneFigureMoves> allPossibleMoves;
 	std::array<bool, 4> possibleCastling;
+	uint16_t countOfMoves;
 
 	void Move(const Pos& from, const Pos& to);
 	void SetToEmpty(const Pos& target);
@@ -53,7 +54,7 @@ public:
 
 	BoardPos CheckEmpty(const Pos& from, const Pos& to) const;
 
-	bool IsShahFor(const Color kingColor) const;
+	bool IsShahFor(const Color kingColor) const noexcept;
 	void EraseForbiddenMoves(OneFigureMoves& figureMoves);
 
 	// castling methods
@@ -69,7 +70,7 @@ public:
 
 	const MoveInfo GetLastMoveInfo() const;
 	const std::vector<MoveInfo>& GetMovesHistory() const;
-	int GetMovesCount() const { return movesHistory.size(); }
+	uint16_t GetMovesCount() const { return countOfMoves; }
 
 	~Map(){}
 

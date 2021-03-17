@@ -24,6 +24,7 @@ Map::Map()
 	map[static_cast<int>(FigureType::Pawn_white)] = 65'280;
 	for (int i = 0; i != 4; ++i)
 		possibleCastling[i] = true;
+	countOfMoves = 0;
 }
 
 Map::Map(const Map& baseMap)
@@ -36,6 +37,7 @@ Map::Map(const Map& baseMap)
 	}
 	if (!baseMap.movesHistory.empty())
 		movesHistory = baseMap.movesHistory;
+	countOfMoves = baseMap.countOfMoves;
 }
 
 GameStatus Map::CheckGameFinal(const Color activePlayerColor)
@@ -137,8 +139,9 @@ void Map::ClearPossibleMoves()
 
 void Map::Move(const Pos& from, const Pos& to)
 {
+	++countOfMoves; // inc counter
 	FigureType activeFigureType = GetFigureType(from), eatenFigureType = GetFigureType(to);
-	MoveInfo info(from, to, activeFigureType, eatenFigureType, possibleCastling, false);
+	MoveInfo info(from, to, activeFigureType, eatenFigureType, possibleCastling, false, countOfMoves);
 	movesHistory.push_back(info); // save info about move
 	if (eatenFigureType != FigureType::Empty)
 	{
@@ -178,6 +181,7 @@ void Map::Move(const Pos& from, const Pos& to)
 
 void Map::UndoMove()
 {
+	--countOfMoves; //dec counter
 	MoveInfo info(GetLastMoveInfo());
 	uint8_t get = 16;
 	movesHistory.pop_back();
@@ -246,7 +250,7 @@ void Map::PawnToQueen(const Pos& target)
 {
 	FigureType figureType = GetFigureType(target);
 	FigureType Queen = Figure::GetFigureTypeColor(figureType) == Color::White ? FigureType::Queen_white : FigureType::Queen_black;
-	MoveInfo info(target, target, Queen, figureType, AdditionalInfo::NULL_INFO); // NULL because info about it move not used
+	MoveInfo info(target, target, Queen, figureType, AdditionalInfo::NULL_INFO, countOfMoves); // NULL because info about it move not used
 	movesHistory.push_back(info);
 	map[static_cast<int>(figureType)] -= target.ToBitboard();
 	map[static_cast<int>(Queen)] += target.ToBitboard();
@@ -254,6 +258,7 @@ void Map::PawnToQueen(const Pos& target)
 
 void Map::RookCastling(const Pos& kingFrom, const Pos& kingTo)
 {
+	--countOfMoves; // to correct count for write to MovesHistory
 	Pos rookFrom;
 	Pos rookTo;
 	int y = (GetColor(kingTo) == Color::Black) ? 7 : 0;
@@ -270,7 +275,7 @@ void Map::RookCastling(const Pos& kingFrom, const Pos& kingTo)
 	Move(rookFrom, rookTo);
 }
 
-bool Map::IsShahFor(const Color kingColor) const
+bool Map::IsShahFor(const Color kingColor) const noexcept
 {
 	FigureType king = kingColor == Color::Black ? FigureType::King_black : FigureType::King_white;
 	uint64_t defendStraight, defendDiagonal, attackedStraight, attackedDiagonal, attackedKingKnight,

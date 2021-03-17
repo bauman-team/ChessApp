@@ -329,9 +329,6 @@ void PlayerWithAIGame::ChangeActivePlayer()
 {
 	bool stopTime = isTimeLimited;
 	isTimeLimited = false;
-	mut3.lock();
-	UpdateSideMenu();
-	mut3.unlock();
 	mut1.lock();
 	activePlayer->SetChosenPosition(Pos::NULL_POS);
 	mut1.unlock();
@@ -348,9 +345,6 @@ void PlayerWithAIGame::ChangeActivePlayer()
 		std::cout << "\n\tTime of calculating (in milliseconds): " << time.asMilliseconds()
 			<< "\n\tCount of calculated positions: " << positionsCount << "\n\tEnd!";
 		map.MakeMove(bestMove.from, bestMove.to);
-		mut3.lock();
-		UpdateSideMenu();
-		mut3.unlock();
 		map.ClearPossibleMoves();
 		activePlayer = (activePlayer == player2) ? player1 : player2;
 		status = map.CheckGameFinal(activePlayer->GetColor());

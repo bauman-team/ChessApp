@@ -1,5 +1,4 @@
 #pragma once
-//#include "Map.h"
 #include "Menu.h"
 #include "Drawer.h"
 #include <SFML/Window.hpp>

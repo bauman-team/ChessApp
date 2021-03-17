@@ -47,7 +47,7 @@ void Drawer::SetResources(const Resources& resources)
 	timeText.setFont(font);
 
 	for (int i = 0; i < FIGURE_TYPES; ++i)
-		figuresTextures[i].loadFromFile(resources.GetPathToFigure((FigureType)i));
+		figuresTextures[i].loadFromFile(resources.GetPathToFigure(static_cast<FigureType>(i)));
 
 	for (int i = 0; i < FIGURE_TYPES; ++i)
 		figuresSprites[i].setTexture(figuresTextures[i]);
@@ -147,7 +147,7 @@ void Drawer::ResizeWindowForMenu(const sf::Vector2f& menuSize)
 {
 	window->setPosition(sf::Vector2i((sf::VideoMode::getDesktopMode().width - menuSize.x) / 2, 
 									 (sf::VideoMode::getDesktopMode().height - menuSize.y) / 2));
-	window->setSize((sf::Vector2u)menuSize);
+	window->setSize(static_cast<sf::Vector2u>(menuSize));
 }
 
 void Drawer::ShowGuiElems(tgui::Gui& gui)

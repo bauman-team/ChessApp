@@ -27,14 +27,15 @@ class CHESSENGINE_API MoveInfo
 	Pos from;
 	Pos to;
 	AdditionalInfo additionalInfo;
+	uint16_t numOfMove;
 public:
 	MoveInfo();
 
-	MoveInfo(const Pos& _from, const Pos& _to, FigureType _activeFigure, FigureType _eatenFigure, std::array<bool, 4> _castling, bool _isCaptureEnPassant)
-		: activeFigure(_activeFigure), eatenFigure(_eatenFigure), from(_from), to(_to), additionalInfo(_castling, _isCaptureEnPassant) { }
+	MoveInfo(const Pos& _from, const Pos& _to, FigureType _activeFigure, FigureType _eatenFigure, std::array<bool, 4> _castling, bool _isCaptureEnPassant, uint16_t _numOfMove)
+		: activeFigure(_activeFigure), eatenFigure(_eatenFigure), from(_from), to(_to), additionalInfo(_castling, _isCaptureEnPassant), numOfMove(_numOfMove) { }
 
-	MoveInfo(const Pos& _from, const Pos& _to, FigureType _activeFigure, FigureType _eatenFigure, AdditionalInfo _additionalInfo)
-		: activeFigure(_activeFigure), eatenFigure(_eatenFigure), from(_from), to(_to), additionalInfo(_additionalInfo) { }
+	MoveInfo(const Pos& _from, const Pos& _to, FigureType _activeFigure, FigureType _eatenFigure, AdditionalInfo _additionalInfo, uint16_t _numOfMove)
+		: activeFigure(_activeFigure), eatenFigure(_eatenFigure), from(_from), to(_to), additionalInfo(_additionalInfo), numOfMove(_numOfMove) { }
 	
 	MoveInfo(const MoveInfo& copy);
 
@@ -44,6 +45,7 @@ public:
 	FigureType GetTypeEatenFigure() const { return eatenFigure; }
 	Pos GetPosBeforeMove() const { return from; }
 	Pos GetPosAfterMove() const { return to; }
+	uint16_t GetNumOfMove() const { return numOfMove; }
 
 	void SetEatenFigure(const FigureType _eatenFigure) { eatenFigure = _eatenFigure; }
 	void SetCaptureEnPassant() { additionalInfo.SetCaptureEnPassant(); }

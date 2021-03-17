@@ -2,7 +2,7 @@
 #include "MoveInfo.h"
 
 const AdditionalInfo AdditionalInfo::NULL_INFO({}, false);
-const MoveInfo MoveInfo::NULL_INFO(Pos::NULL_POS, Pos::NULL_POS, FigureType::Empty, FigureType::Empty, AdditionalInfo::NULL_INFO);
+const MoveInfo MoveInfo::NULL_INFO{};
 
 inline bool AdditionalInfo::operator==(const AdditionalInfo comp) const
 {
@@ -25,7 +25,7 @@ inline AdditionalInfo::AdditionalInfo(std::array<bool, 4> _castling, bool _isCap
 	}
 }
 
-MoveInfo::MoveInfo() : from(Pos::NULL_POS), to(Pos::NULL_POS), activeFigure(FigureType::Empty), eatenFigure(FigureType::Empty), additionalInfo(AdditionalInfo::NULL_INFO) {}
+MoveInfo::MoveInfo() : from(Pos::NULL_POS), to(Pos::NULL_POS), activeFigure(FigureType::Empty), eatenFigure(FigureType::Empty), additionalInfo(AdditionalInfo::NULL_INFO), numOfMove(0) {}
 
 MoveInfo::MoveInfo(const MoveInfo& copy)
 {
@@ -34,6 +34,7 @@ MoveInfo::MoveInfo(const MoveInfo& copy)
 	from = copy.from;
 	to = copy.to;
 	additionalInfo = copy.additionalInfo;
+	numOfMove = copy.numOfMove;
 }
 
 bool MoveInfo::isEatenFigureExists() const
@@ -47,7 +48,8 @@ bool MoveInfo::operator==(const MoveInfo& comp) const
 		|| eatenFigure != comp.eatenFigure
 		|| from != comp.from 
 		|| to != comp.to
-		|| additionalInfo != comp.additionalInfo)
+		|| additionalInfo != comp.additionalInfo
+		|| numOfMove != comp.numOfMove)
 		return false;
 	return true;
 }

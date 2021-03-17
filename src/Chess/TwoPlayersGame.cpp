@@ -12,6 +12,10 @@ void TwoPlayersGame::Show()
 	drawer.ShowMap(map);
 	mut1.unlock();
 
+	mut1.lock();
+	UpdateSideMenu();
+	mut1.unlock();
+
 	mut3.lock();
 	drawer.ShowGuiElems(gameGui);
 	mut3.unlock();
@@ -37,10 +41,6 @@ void TwoPlayersGame::ChangeActivePlayer()
 {
 	bool stopTime = isTimeLimited;
 	isTimeLimited = false; // stop game timer
-
-	mut3.lock();
-	UpdateSideMenu(); // TODO: add info about current move to side menu
-	mut3.unlock();
 
 	mut1.lock();
 	map.ClearPossibleMoves();

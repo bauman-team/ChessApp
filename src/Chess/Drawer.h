@@ -5,6 +5,7 @@
 
 class Drawer
 {
+	friend class Game; // TODO: delete
 	sf::RenderWindow* window;
 	sf::Texture mapTexture;
 	sf::Sprite mapSprite;

@@ -1,5 +1,6 @@
 #include "Game.h"
 #include <fstream>
+#include <iostream>
 
 Game::Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
 	: drawer(window, resource, properties), gameGui(*window), status(GameStatus::Play)
@@ -15,8 +16,8 @@ Game::Game(sf::RenderWindow* window, const Resources& resource, const MapPropert
 	exitButton->setWidgetName("ExitButton");
 	
 	tgui::ScrollablePanel::Ptr panel = tgui::ScrollablePanel::create();
-	panel->setPosition((drawer.GetMapProps().GetGameWindowWidth() - drawer.GetMapProps().GetSideMenuWidth() / 2 - exitButton->getSize().x / 2), 0);
-	panel->setSize(200, 600);
+	panel->setPosition((drawer.GetMapProps().GetGameWindowWidth() - drawer.GetMapProps().GetSideMenuWidth() + 10), 0);
+	panel->setSize(280, 600);
 	gameGui.add(panel);
 	panel->tgui::Widget::setWidgetName("ScrollablePanel");
 }
@@ -70,22 +71,57 @@ void Game::ActivateMenuSettings(Menu& menu)
 
 void Game::UpdateSideMenu()
 {
+	auto info = map.GetMovesHistory();
 	tgui::ScrollablePanel::Ptr panel = gameGui.get<tgui::ScrollablePanel>("ScrollablePanel");
-	if (map.GetMovesCount() > 0 && !panel->get(std::to_string(map.GetMovesCount())))
-	{
-		tgui::Label::Ptr label = tgui::Label::create();
-		if (map.GetMovesCount() > 1 && !panel->get(std::to_string(map.GetMovesCount() - 1)))
+	for (auto it = info.begin(); it != info.end(); ++it) // TODO: Rook? maybe only text 'r'
+		if (!panel->get(std::to_string(it->GetNumOfMove()))) // TODO: Pawn to Queen
 		{
-			label->setText(std::to_string(map.GetMovesCount()) + ") " + map.GetMovesHistory().at(map.GetMovesCount() - 2).GetPosBeforeMove().ToString() + " --> " + map.GetMovesHistory().at(map.GetMovesCount() - 2).GetPosAfterMove().ToString());
-			label->setPosition(0, gameGui.get<tgui::ScrollablePanel>("ScrollablePanel")->get(std::to_string(map.GetMovesCount() - 2))->getPosition().y + 20);
+			tgui::Label::Ptr labelFrom = tgui::Label::create(), labelTo = tgui::Label::create(), labelId = tgui::Label::create();
+			std::string moveId = std::to_string(it->GetNumOfMove()) + ')';
+			labelFrom->setText(it->GetPosBeforeMove().ToString());
+			labelFrom->setTextSize(20);
+			labelFrom->setPosition(moveId.length() * 14 + 50, 20);
+			labelTo->setText(it->GetPosAfterMove().ToString());
+			labelTo->setTextSize(20);
+			labelTo->setPosition(moveId.length() * 14 + 120, 20);
+			labelId->setText(moveId);
+			labelId->setTextSize(20);
+			labelId->setPosition(0, 20);
+			tgui::Canvas::Ptr drawFrame = tgui::Canvas::create();
+			drawFrame->setSize(tgui::Layout2d(260, 70));
+			if (it->GetNumOfMove() != 1)
+			{
+				drawFrame->setPosition(0, gameGui.get<tgui::ScrollablePanel>("ScrollablePanel")->get(std::to_string(it->GetNumOfMove() - 1))->getPosition().y + 50);
+				labelFrom->setPosition(moveId.length() * 14 + 50, gameGui.get<tgui::ScrollablePanel>("ScrollablePanel")->get(std::to_string(it->GetNumOfMove() - 1))->getPosition().y + 70);
+				labelTo->setPosition(moveId.length() * 14 + 120, gameGui.get<tgui::ScrollablePanel>("ScrollablePanel")->get(std::to_string(it->GetNumOfMove() - 1))->getPosition().y + 70);
+				labelId->setPosition(0, gameGui.get<tgui::ScrollablePanel>("ScrollablePanel")->get(std::to_string(it->GetNumOfMove() - 1))->getPosition().y + 70);
+			}
+			drawFrame->clear(tgui::Color(255, 255, 255));
+			gameGui.get<tgui::ScrollablePanel>("ScrollablePanel")->add(drawFrame);
+			sf::RectangleShape line(sf::Vector2f(20, 2));
+			line.setFillColor(sf::Color::Black);
+			line.setPosition(moveId.length() * 14 + 85, 32);
+			sf::CircleShape triangle(7, 3);
+			triangle.setFillColor(sf::Color::Black);
+			triangle.rotate(90);
+			triangle.setPosition(moveId.length() * 14 + 115, 26);
+			tgui::Sprite sp[FIGURE_TYPES];
+			for (int i = 0; i < FIGURE_TYPES; ++i)
+			{
+				sp[i].setTexture(drawer.figuresTextures[i]);
+				sp[i].setSize(tgui::Vector2f(50, 50));
+			}
+			sp[static_cast<int>(it->GetTypeActiveFigure())].setPosition(moveId.length() * 14 - 5, 0);
+			if (it->GetTypeEatenFigure() != FigureType::Empty)
+				sp[static_cast<int>(it->GetTypeEatenFigure())].setPosition(moveId.length() * 14 + 150, 0);
+			drawFrame->draw(sp[static_cast<int>(it->GetTypeActiveFigure())]);
+			if (it->GetTypeEatenFigure() != FigureType::Empty)
+				drawFrame->draw(sp[static_cast<int>(it->GetTypeEatenFigure())]);
+			drawFrame->draw(triangle);
+			drawFrame->draw(line);
+			gameGui.get<tgui::ScrollablePanel>("ScrollablePanel")->add(labelFrom);
+			gameGui.get<tgui::ScrollablePanel>("ScrollablePanel")->add(labelTo);
+			gameGui.get<tgui::ScrollablePanel>("ScrollablePanel")->add(labelId);
+			drawFrame->setWidgetName(std::to_string(it->GetNumOfMove())); // TODO: add names to other widgets
 		}
-		else
-		{
-			label->setText(std::to_string(map.GetMovesCount()) + ") " + map.GetLastMoveInfo().GetPosBeforeMove().ToString() + " --> " + map.GetLastMoveInfo().GetPosAfterMove().ToString());
-			if (map.GetMovesCount() != 1)
-				label->setPosition(0, gameGui.get<tgui::ScrollablePanel>("ScrollablePanel")->get(std::to_string(map.GetMovesCount() - 1))->getPosition().y + 20);
-		}
-		gameGui.get<tgui::ScrollablePanel>("ScrollablePanel")->add(label);
-		label->setWidgetName(std::to_string(map.GetMovesCount()));
-	}
 }
