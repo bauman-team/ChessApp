@@ -41,10 +41,10 @@ public:
 
 	bool isEatenFigureExists() const;
 
-	FigureType GetTypeActiveFigure() const { return activeFigure; }
+	FigureType GetTypeActiveFigure() const noexcept { return activeFigure; }
 	FigureType GetTypeEatenFigure() const { return eatenFigure; }
-	Pos GetPosBeforeMove() const { return from; }
-	Pos GetPosAfterMove() const { return to; }
+	Pos GetPosBeforeMove() const noexcept { return from; }
+	Pos GetPosAfterMove() const noexcept { return to; }
 	uint16_t GetNumOfMove() const { return numOfMove; }
 
 	void SetEatenFigure(const FigureType _eatenFigure) { eatenFigure = _eatenFigure; }

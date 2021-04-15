@@ -49,26 +49,26 @@ public:
 	void UndoMove();
 
 	// functions for bot to easy do and undo different moves
-	void DoImitationMove(const Pos& from, const Pos& to);
-	void UndoImitationMove(const Pos& from, const Pos& to, FigureType eatenType);
+	void DoImitationMove(const Pos& from, const Pos& to) noexcept;
+	void UndoImitationMove(const Pos& from, const Pos& to, FigureType eatenType) noexcept;
 
-	BoardPos CheckEmpty(const Pos& from, const Pos& to) const;
+	BoardPos CheckEmpty(const Pos& from, const Pos& to) const noexcept;
 
 	bool IsShahFor(const Color kingColor) const noexcept;
-	void EraseForbiddenMoves(OneFigureMoves& figureMoves);
+	void EraseForbiddenMoves(OneFigureMoves& figureMoves) noexcept;
 
 	// castling methods
-	bool IsCastlingAllowedForKing(const Pos& kingPos) const;
-	bool IsCastlingAllowedWithRook(const Pos& rookPos, const Color& rookColor) const;
+	bool IsCastlingAllowedForKing(const Pos& kingPos) const noexcept;
+	bool IsCastlingAllowedWithRook(const Pos& rookPos, const Color& rookColor) const noexcept;
 	void DisableCastlingForKing(const Color& kingColor);
 	void DisableCastlingWithRook(const Pos& rookPos, const Color& rookColor);
 
-	Color GetColor(const Pos& pos) const;
-	Color GetColor(const FigureType type) const;
-	FigureType GetFigureType(const Pos& pos) const;
+	Color GetColor(const Pos& pos) const noexcept;
+	Color GetColor(const FigureType type) const noexcept;
+	FigureType GetFigureType(const Pos& pos) const noexcept;
 	FigureType GetFigureType(const int index) const;
 
-	const MoveInfo GetLastMoveInfo() const;
+	const MoveInfo GetLastMoveInfo() const noexcept;
 	const std::vector<MoveInfo>& GetMovesHistory() const;
 	uint16_t GetMovesCount() const { return countOfMoves; }
 

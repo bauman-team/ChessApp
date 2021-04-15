@@ -13,24 +13,22 @@ protected:
 	Drawer drawer;
 	Map map;
 	GameStatus status;
-	tgui::Gui gameGui;
 
-	void UpdateSideMenu();
-	void SetExitStatus(); // private?
+	void SetExitStatus();
 public:
-	Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties);
-
+	Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
+		: drawer(window, resource, properties, &Game::SetExitStatus, this), status(GameStatus::Play) { }
 	void virtual StartGame() = 0;
 	void virtual Show() = 0;
 	void virtual ChangeActivePlayer() = 0;
 	void virtual SetPosition(int mouseX, int mouseY) = 0; 
 	void virtual SetPlayers(std::string name1, std::string name2, sf::Time timeLimit = sf::seconds(0)) = 0;
 
-	volatile GameStatus GetStatus() const;
+	volatile GameStatus GetStatus() const { return status; }
+	void HandleEvent(sf::Event& event);
 
 	void Save() const;
-	void HandleEvent(sf::Event& event);
 	void ActivateMenuSettings(Menu& menu);
-
+	
 	virtual ~Game(){}
 };

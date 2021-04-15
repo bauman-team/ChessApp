@@ -13,7 +13,7 @@ public:
 	Resources(std::string mapPath, Pos _playAreaTopLeft, int _squareSize) : pathToMapImage(mapPath) {}
 
 	std::string GetPathToMapImage() const { return pathToMapImage; }
-	std::string GetPathToFigure(FigureType figureType) const { return pathToFigureImage[static_cast<int>(figureType)]; }
+	std::string GetPathToFigure(FigureType figureType) const { return pathToFigureImage[toUType(figureType)]; }
 	std::string GetPathToFont() const { return pathToFont; }
 
 	void SetMapImage(std::string mapPath) { pathToMapImage = mapPath; }
@@ -21,6 +21,6 @@ public:
 	void SetFigureImage(FigureType figureType, std::string figurePath)
 	{
 		assert(figureType != FigureType::Empty);
-		pathToFigureImage[static_cast<int>(figureType)] = figurePath;
+		pathToFigureImage[toUType(figureType)] = figurePath;
 	}
 };

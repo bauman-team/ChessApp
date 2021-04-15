@@ -1,24 +1,17 @@
 #include "TwoPlayersGame.h"
 
 CHESSENGINE_API extern std::mutex mut1;
-std::mutex mut3;
 
 TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
 	: Game(window, resource, properties), isTimeLimited(false) {}
 
 void TwoPlayersGame::Show()
 {
+	drawer.WindowIsResized();
 	mut1.lock();
 	drawer.ShowMap(map);
+	drawer.ShowSideMenu(map);
 	mut1.unlock();
-
-	mut1.lock();
-	UpdateSideMenu();
-	mut1.unlock();
-
-	mut3.lock();
-	drawer.ShowGuiElems(gameGui);
-	mut3.unlock();
 
 	if (isTimeLimited && !activePlayer->GetIsBot())
 		drawer.ShowTimer(activePlayer->GetRemainingTime());

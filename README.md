@@ -30,7 +30,16 @@ cd build
 - On linux:
 ```powershell
 cmake ..
-cmake --build .
+```
+
+Release:
+```powershell
+cmake --build . --config Release
+```
+
+Debug:
+```powershell
+cmake --build . --config Debug
 ```
 
 - On windows:

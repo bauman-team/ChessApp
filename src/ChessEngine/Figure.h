@@ -30,21 +30,28 @@ enum class CHESSENGINE_API Color { White, Black, None }; // None color for Empty
 
 enum class CHESSENGINE_API BoardPos { Lock, Empty, Opposite };
 
+template<typename E>
+constexpr auto
+toUType(E enumerator) noexcept
+{
+	return static_cast<std::underlying_type_t<E>>(enumerator);
+}
+
 class Map;
 
 
 class CHESSENGINE_API Figure
 {
-	static std::vector<Pos> FindPossibleMovesKing(const Pos& coord, Map& map);
-	static std::vector<Pos> FindPossibleMovesQueen(const Pos& coord, const Map& map);
-	static std::vector<Pos> FindPossibleMovesBishop(const Pos& coord, const Map& map);
-	static std::vector<Pos> FindPossibleMovesKnight(const Pos& coord, const Map& map);
-	static std::vector<Pos> FindPossibleMovesRook(const Pos& coord, const Map& map);
-	static std::vector<Pos> FindPossibleMovesPawn(const Pos& coord, const Map& map);
+	static std::vector<Pos> FindPossibleMovesKing(const Pos& coord, Map& map) noexcept;
+	static std::vector<Pos> FindPossibleMovesQueen(const Pos& coord, const Map& map) noexcept;
+	static std::vector<Pos> FindPossibleMovesBishop(const Pos& coord, const Map& map) noexcept;
+	static std::vector<Pos> FindPossibleMovesKnight(const Pos& coord, const Map& map) noexcept;
+	static std::vector<Pos> FindPossibleMovesRook(const Pos& coord, const Map& map) noexcept;
+	static std::vector<Pos> FindPossibleMovesPawn(const Pos& coord, const Map& map) noexcept;
 
-	static std::vector<Pos> FindStraightMoves(const Pos& coord, const Map& map);
-	static std::vector<Pos> FindDiagonalMoves(const Pos& coord, const Map& map);
+	static std::vector<Pos> FindStraightMoves(const Pos& coord, const Map& map) noexcept;
+	static std::vector<Pos> FindDiagonalMoves(const Pos& coord, const Map& map) noexcept;
 public:
-	static std::vector<Pos> FindPossibleMoves(const Pos& figurePosition, FigureType figureType, Map& map);
-	static Color GetFigureTypeColor(FigureType figureType);
+	static std::vector<Pos> FindPossibleMoves(const Pos& figurePosition, FigureType figureType, Map& map) noexcept;
+	static Color GetFigureTypeColor(FigureType figureType) noexcept;
 };

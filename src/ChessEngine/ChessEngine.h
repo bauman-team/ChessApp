@@ -5,6 +5,6 @@
 	#else
 		#define CHESSENGINE_API __declspec(dllimport)
 	#endif
-#elif __linux__
+#else
 	#define CHESSENGINE_API
 #endif

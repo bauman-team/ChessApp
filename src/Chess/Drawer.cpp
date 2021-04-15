@@ -1,9 +1,8 @@
 #include "Drawer.h"
 
-Drawer::Drawer(sf::RenderWindow* _window, const Resources& resources, const MapProperties& properties)
-	: window(_window), mapProps(properties)
+Drawer::Drawer(sf::RenderWindow* _window, const Resources& resources, const MapProperties& properties, GameSet SetExitStatus, Game* game)
+	: sideMenu(_window, properties, SetExitStatus, game), window(_window), mapProps(properties), windowScale(1.0, 1.0)
 {
-	ResizeWindowForGame();
 	window->setFramerateLimit(60);
 
 	SetResources(resources);
@@ -86,9 +85,9 @@ void Drawer::ShowMap(const Map& map)
 			if (figureType != FigureType::Empty)
 			{
 				Pos coord = (isWhiteActive) ? Pos(i, 7 - j) : Pos(7 - i, j);
-				figuresSprites[static_cast<int>(figureType)].setPosition(mapProps.GetPlayAreaTopLeftX() + coord.GetX() * squareSize,
+				figuresSprites[toUType(figureType)].setPosition(mapProps.GetPlayAreaTopLeftX() + coord.GetX() * squareSize,
 																			 mapProps.GetPlayAreaTopLeftY() + coord.GetY() * squareSize);
-				window->draw(figuresSprites[static_cast<int>(figureType)]);
+				window->draw(figuresSprites[toUType(figureType)]);
 			}
 		}
 	}
@@ -137,10 +136,10 @@ void Drawer::RotateBoard()
 	isWhiteActive = !isWhiteActive;
 }
 
-void Drawer::ResizeWindowForGame()
+void Drawer::WindowIsResized()
 {
-	// using create() because setSize() works incorrectly
-	window->create(sf::VideoMode(mapProps.GetGameWindowWidth(), mapProps.GetGameWindowHeight()), "Chess");
+	windowScale.x = static_cast<float>(window->getSize().x) / mapProps.GetGameWindowWidth();
+	windowScale.y = static_cast<float>(window->getSize().y) / mapProps.GetGameWindowHeight();
 }
 
 void Drawer::ResizeWindowForMenu(const sf::Vector2f& menuSize)
@@ -150,18 +149,18 @@ void Drawer::ResizeWindowForMenu(const sf::Vector2f& menuSize)
 	window->setSize(static_cast<sf::Vector2u>(menuSize));
 }
 
-void Drawer::ShowGuiElems(tgui::Gui& gui)
+void Drawer::ShowSideMenu(const Map& map)
 {
-	gui.draw();
+	sideMenu.UpdateSideMenu(map.GetMovesHistory(), figuresSprites);
 }
 
 Pos Drawer::TransformMousePosition(int mouseX, int mouseY) const
 {
-	if (mouseX >= mapProps.GetPlayAreaTopLeftX() && mouseX <= mapProps.GetPlayAreaTopLeftX() + mapProps.GetSquareSize() * 8 &&
-		mouseY >= mapProps.GetPlayAreaTopLeftY() && mouseY <= mapProps.GetPlayAreaTopLeftY() + mapProps.GetSquareSize() * 8)
+	if (mouseX >= mapProps.GetPlayAreaTopLeftX() * windowScale.x && mouseX <= (mapProps.GetPlayAreaTopLeftX() + mapProps.GetSquareSize() * 8) * windowScale.x &&
+		mouseY >= mapProps.GetPlayAreaTopLeftY() * windowScale.y && mouseY <= (mapProps.GetPlayAreaTopLeftY() + mapProps.GetSquareSize() * 8) * windowScale.y)
 	{
-		int coordX = (mouseX - mapProps.GetPlayAreaTopLeftX()) / mapProps.GetSquareSize();
-		int coordY = 7 - (mouseY - mapProps.GetPlayAreaTopLeftY()) / mapProps.GetSquareSize();
+		int coordX = (mouseX - mapProps.GetPlayAreaTopLeftX() * windowScale.x) / mapProps.GetSquareSize() / windowScale.x;
+		int coordY = 8 - (mouseY - mapProps.GetPlayAreaTopLeftY() * windowScale.y) / mapProps.GetSquareSize() / windowScale.y;
 		return Pos(coordX, coordY);
 	}
 	return {};
@@ -181,6 +180,11 @@ void Drawer::ShowPossibleMoves(const Pos& chosenPos, const Map& map)
 						   mapProps.GetPlayAreaTopLeftY() + (coord.GetY() + offset) * mapProps.GetSquareSize());
 		window->draw(circle);
 	}
+}
+
+void Drawer::HandleEvent(sf::Event& event)
+{
+	sideMenu.HandleEvent(event);
 }
 
 void Drawer::DisplayWindow()

@@ -4,7 +4,6 @@
 //#define SmartBotTest
 //#define TestWeightAndBitboards
 CHESSENGINE_API extern std::mutex mut1;
-extern std::mutex mut3;
 std::mutex mut2;
 // TODO: delete test
 const float PlayerWithAIGame::figureWeight[FIGURE_TYPES] = { 900, 90, 30, 30, 50, 10, 900, 90, 30, 30, 50, 10 }; // black
@@ -167,7 +166,7 @@ PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
 				{
 					Map copyMap(MAP);
 					copyMap.Move(movesPositions[j].from, movesPositions[j].to);
-					std::pair<int, float> score = std::pair<int, float>(j, PlayerWithAIGame::MiniMax(copyMap, false, DEPTH, -10'000, 10'000));
+					std::pair<int, float> score = std::pair<int, float>(j, PlayerWithAIGame::MiniMax(copyMap, false, DEPTH, -10'000, 10'000)); // isPlayerMoveFirst ? DEPTH + 1 : 
 					mut2.lock();
 					movesScore.push_back(score);
 					mut2.unlock();
@@ -221,7 +220,7 @@ float PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Col
 			selected = selectedMap.GetFigureType(i);
 			if (selected != FigureType::Empty)
 				score += (selectedMap.GetColor(selected) == playerColor ? 1.0 : -1.0)
-				* (figureWeight[static_cast<int>(selected)] + bitboards[static_cast<int>(selected)][i / 8][i % 8]);
+				* (figureWeight[toUType(selected)] + bitboards[toUType(selected)][i / 8][i % 8]);
 		}
 #ifdef TestWeightAndBitboards
 	}
@@ -233,7 +232,7 @@ float PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Col
 			selected = selectedMap.GetFigureType(i);
 			if (selected != FigureType::Empty)
 				score += (selectedMap.GetColor(selected) == playerColor ? 1.0 : -1.0)
-				* (figureWeightTest[static_cast<int>(selected)] + bitboards[static_cast<int>(selected)][i / 8][i % 8]);
+				* (figureWeightTest[toUType(selected)] + bitboards[toUType(selected)][i / 8][i % 8]);
 		}
 	}
 #endif

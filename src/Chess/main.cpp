@@ -46,7 +46,7 @@ int main()
 		#ifdef _WIN32
 		if (!game)
 		#endif
-			window.clear(sf::Color::White);
+			window.clear(sf::Color::White); // TODO: select back color in menu/game
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
@@ -92,9 +92,9 @@ int main()
 						#ifdef _WIN32
 						window.setActive(false);
 						thDraw = std::thread([&game, &window]() {
-							while (sf::sleep(sf::seconds(0.05)), mut4.lock(), window.setActive(true), window.isOpen() && game)
+							while (sf::sleep(sf::seconds(0.05)), mut4.lock(), game && (window.setActive(true), window.isOpen()))
 							{
-								window.clear(sf::Color::White);
+								window.clear(sf::Color(208, 167, 130, 255));
 								if (game)
 									game->Show();
 								window.display();
@@ -124,7 +124,13 @@ int main()
 				{
 					if (game)
 						game->Save();
+					#ifdef _WIN32
+					mut4.lock();
+					#endif
 					window.close();
+					#ifdef _WIN32
+					mut4.unlock();
+					#endif
 				}
 				break;
 			}
@@ -160,9 +166,9 @@ int main()
 			#ifdef _WIN32
 			window.setActive(false);
 			thDraw = std::thread([&game, &window]() {
-				while (sf::sleep(sf::seconds(0.05)), mut4.lock(), window.setActive(true), window.isOpen() && game)
+				while (sf::sleep(sf::seconds(0.05)), mut4.lock(), game && (window.setActive(true), window.isOpen()))
 				{
-					window.clear(sf::Color::White);
+					window.clear(sf::Color(208, 167, 130, 255));
 					if (game)
 						game->Show();
 					window.display();
