@@ -8,7 +8,7 @@ int main()
 	srand(time(NULL));
 	setlocale(0, "ru");
 	sf::RenderWindow window;
-	window.create(sf::VideoMode(700, 550), "Chess");
+	window.create(sf::VideoMode{ 700, 550 }, "Chess");
 	Resources res;
 	res.SetMapImage("../res/images/map.png");
 	res.SetFigureImage(FigureType::King_black, "../res/images/King_black.png");
@@ -31,14 +31,14 @@ int main()
 	prop.SetGameWindowHeight(920);
 	prop.SetSideMenuWidth(300);
 
-	Game* game = nullptr;
-	Menu menu(window, "../res/form.txt");
+	Game* game = nullptr; // TODO: goto stack ???
+	Menu menu{ window, "../res/form.txt" };
 
-	std::thread* thSetCell = nullptr;
+	std::thread thSetCell{ };
 	#ifdef _WIN32
 	std::thread thDraw;
 	#endif
-	bool thSetCellIsFinished = true; //TODO : why???
+	auto thSetCellIsFinished{ true }; // TODO: because main thread is not joinable???
 
 	//((PlayerWithAIGame*)game)->output();
 	while(sf::sleep(sf::seconds(0.05)), window.isOpen())
@@ -66,14 +66,14 @@ int main()
 			case sf::Event::MouseButtonPressed:
 				if (game && (game->GetStatus() == GameStatus::Play || game->GetStatus() == GameStatus::Shah) && event.mouseButton.button == sf::Mouse::Left)
 				{
-					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+					auto mousePos{ sf::Mouse::getPosition(window) };
 					if (thSetCellIsFinished)
 					{
 						thSetCellIsFinished = false;
-						thSetCell = new std::thread([&game, &thSetCellIsFinished, mousePos]() {
+						thSetCell = std::thread{ [&game, &thSetCellIsFinished, mousePos]() {
 							game->SetPosition(mousePos.x, mousePos.y);
-							thSetCellIsFinished = true; });
-						thSetCell->detach();
+							thSetCellIsFinished = true; } };
+						thSetCell.detach();
 					}
 				}
 				break;
@@ -82,19 +82,19 @@ int main()
 				{
 					if (menu.CanStartGame())
 					{
-						InitialData inputValues = menu.GetInitialData();
+						auto inputValues{ menu.GetInitialData() };
 						if (inputValues.mode == GameMode::TwoPlayers)
-							game = new TwoPlayersGame(&window, res, prop);
+							game = new TwoPlayersGame{ &window, res, prop };
 						else
-							game = new PlayerWithAIGame(&window, res, prop);
+							game = new PlayerWithAIGame{ &window, res, prop };
 						game->SetPlayers(inputValues.firstName, inputValues.secondName, inputValues.time);
 						game->StartGame();
 						#ifdef _WIN32
 						window.setActive(false);
-						thDraw = std::thread([&game, &window]() {
+						thDraw = std::thread{ [&game, &window]() {
 							while (sf::sleep(sf::seconds(0.05)), mut4.lock(), game && (window.setActive(true), window.isOpen()))
 							{
-								window.clear(sf::Color(208, 167, 130, 255));
+								window.clear(sf::Color{ 208, 167, 130, 255 });
 								if (game)
 									game->Show();
 								window.display();
@@ -103,7 +103,7 @@ int main()
 							}
 							window.setActive(false);
 							mut4.unlock();
-							});
+							} };
 						thDraw.detach();
 						#endif
 						if (typeid(*game) == typeid(PlayerWithAIGame))
@@ -112,10 +112,10 @@ int main()
 							{
 								while (!thSetCellIsFinished) sf::sleep(sf::seconds(0.1));
 								thSetCellIsFinished = false;
-								thSetCell = new std::thread([&game, &thSetCellIsFinished]() {
+								thSetCell = std::thread{ [&game, &thSetCellIsFinished]() {
 									game->ChangeActivePlayer();
-									thSetCellIsFinished = true; });
-								thSetCell->detach();
+									thSetCellIsFinished = true; } };
+								thSetCell.detach();
 							}
 						}
 					}
@@ -156,19 +156,19 @@ int main()
 		}
 		if (!game && menu.NeedStartGame()) // after click "start" button, handler start game
 		{
-			InitialData inputValues = menu.GetInitialData();
+			auto inputValues{ menu.GetInitialData() };
 			if (inputValues.mode == GameMode::TwoPlayers)
-				game = new TwoPlayersGame(&window, res, prop);
+				game = new TwoPlayersGame{ &window, res, prop };
 			else
-				game = new PlayerWithAIGame(&window, res, prop);
+				game = new PlayerWithAIGame{ &window, res, prop };
 			game->SetPlayers(inputValues.firstName, inputValues.secondName, inputValues.time);
 			game->StartGame();
 			#ifdef _WIN32
 			window.setActive(false);
-			thDraw = std::thread([&game, &window]() {
+			thDraw = std::thread{ [&game, &window]() {
 				while (sf::sleep(sf::seconds(0.05)), mut4.lock(), game && (window.setActive(true), window.isOpen()))
 				{
-					window.clear(sf::Color(208, 167, 130, 255));
+					window.clear(sf::Color{ 208, 167, 130, 255 });
 					if (game)
 						game->Show();
 					window.display();
@@ -177,7 +177,7 @@ int main()
 				}
 				window.setActive(false);
 				mut4.unlock();
-				});
+				} };
 			thDraw.detach();
 			#endif
 			if (typeid(*game) == typeid(PlayerWithAIGame))
@@ -186,10 +186,10 @@ int main()
 				{
 					while (!thSetCellIsFinished) sf::sleep(sf::seconds(0.1));
 					thSetCellIsFinished = false;
-					thSetCell = new std::thread([&game, &thSetCellIsFinished]() {
+					thSetCell = std::thread{ [&game, &thSetCellIsFinished]() {
 						game->ChangeActivePlayer();
-						thSetCellIsFinished = true; });
-					thSetCell->detach();
+						thSetCellIsFinished = true; } };
+					thSetCell.detach();
 				}
 			}
 		}

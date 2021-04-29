@@ -20,13 +20,8 @@ protected:
 	const static int countOfThreads;
 	struct Move
 	{
-		Pos from;
-		Pos to;
-		Move(Pos _from, Pos _to)
-		{
-			from = _from;
-			to = _to;
-		}
+		Pos from, to;
+		Move(Pos _from, Pos _to) : from{ _from }, to{ _to } { }
 	};
 
 	Move StartAI(double timeForWaiting = 0);
@@ -35,7 +30,7 @@ protected:
 
 public:
 	PlayerWithAIGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties) 
-		: TwoPlayersGame(window, resource, _mapProperties) {}
+		: TwoPlayersGame{ window, resource, _mapProperties } { }
 
 	void virtual SetPlayers(std::string name1, std::string name2, sf::Time timeLimit = sf::seconds(0));
 
@@ -46,13 +41,13 @@ public:
 
 	/*void output()
 	{
-		for (int i = 0; i != 6; ++i)
+		for (auto i = 0; i != 6; ++i)
 		{
 			std::cout << "{";
-			for (int j = 0; j != 8; ++j)
+			for (auto j = 0; j != 8; ++j)
 			{
 				std::cout << "{";
-				for (int k = 0; k != 8; ++k)
+				for (auto k = 0; k != 8; ++k)
 				{
 					std::cout << bitboards[i][7 - j][7 - k];
 					if (bitboards[i][7 - j][7 - k] == (static_cast<int>bitboards[i][7 - j][7 - k]))

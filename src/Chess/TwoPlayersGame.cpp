@@ -3,7 +3,7 @@
 CHESSENGINE_API extern std::mutex mut1;
 
 TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
-	: Game(window, resource, properties), isTimeLimited(false) {}
+	: Game{ window, resource, properties }, isTimeLimited{ false } { }
 
 void TwoPlayersGame::Show()
 {
@@ -18,7 +18,7 @@ void TwoPlayersGame::Show()
 	if (activePlayer->HasTime())
 	{
 		mut1.lock();
-		Pos chosenPos = activePlayer->GetChosenPosition();
+		auto chosenPos = activePlayer->GetChosenPosition();
 		if (chosenPos != Pos::NULL_POS)
 		{
 			drawer.ShowActiveFigure(chosenPos, map);
@@ -32,17 +32,17 @@ void TwoPlayersGame::Show()
 
 void TwoPlayersGame::ChangeActivePlayer()
 {
-	bool stopTime = isTimeLimited;
+	auto stopTime{ isTimeLimited };
 	isTimeLimited = false; // stop game timer
 
 	mut1.lock();
 	map.ClearPossibleMoves();
-	activePlayer->SetChosenPosition(Pos::NULL_POS);
+	activePlayer->SetChosenPosition({ });
 	mut1.unlock();
 
 	sf::sleep(sf::seconds(2));
 
-	activePlayer = (activePlayer == player2) ? player1 : player2;
+	activePlayer = activePlayer == player2 ? player1 : player2;
 
 	/*sf::Clock clock; // test of speed algorithm calculation possible moves
 	std::atomic<int> crucialCount = 0;
@@ -70,12 +70,12 @@ void TwoPlayersGame::SetPosition(int mouseX, int mouseY)
 {
 	if (activePlayer->HasTime())
 	{
-		Pos position = drawer.TransformMousePosition(mouseX, mouseY); // transform coords on window to position on map
+		auto position{ drawer.TransformMousePosition(mouseX, mouseY) }; // transform coords on window to position on map
 		if (position != Pos::NULL_POS)
 		{
 			if (activePlayer->GetColor() == Color::Black)
 			{
-				position = Pos(7 - position.GetX(), 7 - position.GetY());
+				position = Pos{ static_cast<uint8_t>(7 - position.GetX()), static_cast<uint8_t>(7 - position.GetY()) };
 			}
 			if (position.IsValid()) // if position is correct
 			{
@@ -101,14 +101,14 @@ void TwoPlayersGame::SetPlayers(std::string name1, std::string name2, sf::Time t
 {
 	if (timeLimit != sf::seconds(0))
 		isTimeLimited = true;
-	player1 = new Player(Color::White, name1, timeLimit);
-	player2 = new Player(Color::Black, name2, timeLimit);
+	player1 = new Player{ Color::White, name1, timeLimit };
+	player2 = new Player{ Color::Black, name2, timeLimit };
 	activePlayer = player1;
 }
 
 inline void TwoPlayersGame::SpeedTestingOnProcessorThread(Map& map, Color activeColor, int count, std::atomic<int>& crucialCount)
 {
-	for (int i = 0; i < count; ++i)
+	for (auto i = 0; i < count; ++i)
 	{
 		map.FindAllPossibleMoves(activeColor);
 		map.ClearPossibleMoves();

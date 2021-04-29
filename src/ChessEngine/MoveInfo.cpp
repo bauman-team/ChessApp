@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "MoveInfo.h"
 
-const AdditionalInfo AdditionalInfo::NULL_INFO({}, false);
-const MoveInfo MoveInfo::NULL_INFO{};
+const AdditionalInfo AdditionalInfo::NULL_INFO{ };
+const MoveInfo MoveInfo::NULL_INFO{ };
 
 inline bool AdditionalInfo::operator==(const AdditionalInfo comp) const
 {
@@ -12,12 +12,12 @@ inline bool AdditionalInfo::operator==(const AdditionalInfo comp) const
 	return true;
 }
 
-inline AdditionalInfo::AdditionalInfo(std::array<bool, 4> _castling, bool _isCaptureEnPassant) : castling(0), isCaptureEnPassant(0)
+inline AdditionalInfo::AdditionalInfo(std::array<bool, 4> _castling, bool _isCaptureEnPassant) : castling{ 0 }, isCaptureEnPassant{ 0 }
 {
-	uint8_t add = 1;
+	auto add{ 1 };
 	if (_isCaptureEnPassant)
 		isCaptureEnPassant = add;
-	for (int i = 0; i != 4; ++i)
+	for (auto i = 0; i != 4; ++i)
 	{
 		if (_castling[i])
 			castling |= add;
@@ -25,7 +25,7 @@ inline AdditionalInfo::AdditionalInfo(std::array<bool, 4> _castling, bool _isCap
 	}
 }
 
-MoveInfo::MoveInfo() : from(Pos::NULL_POS), to(Pos::NULL_POS), activeFigure(FigureType::Empty), eatenFigure(FigureType::Empty), additionalInfo(AdditionalInfo::NULL_INFO), numOfMove(0) {}
+MoveInfo::MoveInfo() : from{ }, to{ }, activeFigure{ FigureType::Empty }, eatenFigure{ FigureType::Empty }, additionalInfo{ AdditionalInfo::NULL_INFO }, numOfMove{ 0 } { }
 
 MoveInfo::MoveInfo(const MoveInfo& copy)
 {

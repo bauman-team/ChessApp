@@ -36,7 +36,7 @@ public:
 	Map(); 
 	Map(const Map& map);
 
-	GameStatus CheckGameFinal(const Color activePlayerColor);
+	GameStatus CheckGameFinal(const Color &activePlayerColor);
 
 	std::vector<Pos> GetPossibleMovesFrom(const Pos& figurePosition) const;
 	const std::vector<OneFigureMoves>& GetAllPossibleMoves() const { return allPossibleMoves; }

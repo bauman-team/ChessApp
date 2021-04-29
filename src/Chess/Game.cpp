@@ -9,13 +9,13 @@ void Game::HandleEvent(sf::Event& event)
 
 void Game::Save() const
 {
-	std::vector<MoveInfo> movesHistory = map.GetMovesHistory();
-	std::ofstream out("LastGame.log");
-	Pos posBefore;
-	Pos posAfter;
+	auto movesHistory{ map.GetMovesHistory() };
+	std::ofstream out{ "LastGame.log" };
+	auto posBefore{ Pos::NULL_POS };
+	auto posAfter{ Pos::NULL_POS };
 	out << "   \n";
-	int numberOfMoves = movesHistory.size();
-	for (int i = 0; i < numberOfMoves; ++i)
+	auto numberOfMoves{ movesHistory.size() };
+	for (auto i = 0; i < numberOfMoves; ++i)
 	{
 		posBefore = movesHistory[i].GetPosBeforeMove();
 		posAfter = movesHistory[i].GetPosAfterMove();

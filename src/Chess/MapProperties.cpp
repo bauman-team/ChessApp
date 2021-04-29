@@ -15,12 +15,12 @@ void MapProperties::SetPlayAreaTopLeft(uint8_t _playAreaTopLeftX, uint8_t _playA
 	playAreaTopLeftY = _playAreaTopLeftY; 
 }
 
-void MapProperties::SetGameWindowHeight(int windowHeight)
+void MapProperties::SetGameWindowHeight(uint32_t windowHeight)
 {
 	gameWindowHeight = windowHeight;
 }
 
-void MapProperties::SetSideMenuWidth(int menuWidth)
+void MapProperties::SetSideMenuWidth(uint32_t menuWidth)
 {
 	sideMenuWidth = menuWidth;
 }

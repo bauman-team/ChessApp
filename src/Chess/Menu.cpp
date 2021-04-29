@@ -2,7 +2,7 @@
 
 const std::string Menu::botName{ "bot" };
 
-Menu::Menu(sf::RenderWindow& window, std::string widgetsFile) : menuGui(window)
+Menu::Menu(sf::RenderWindow& window, std::string widgetsFile) : menuGui{ window }
 {
 	menuGui.loadWidgetsFromFile(widgetsFile);
 	LoadIcons();
@@ -44,11 +44,11 @@ tgui::Vector2f Menu::GetMenuSize() const
 
 bool Menu::CanStartGame()
 {
-	std::string errorMessage = "";
+	std::string errorMessage{ };
 	if (menuGui.get<tgui::RadioButton>("TwoPlayersRB")->isChecked())
 	{
-		std::string firstName = menuGui.get<tgui::EditBox>("FirstPlayerName")->getText();
-		std::string secondName = menuGui.get<tgui::EditBox>("SecondPlayerName")->getText();
+		auto firstName{ static_cast<std::string>(menuGui.get<tgui::EditBox>("FirstPlayerName")->getText()) };
+		auto secondName{ static_cast<std::string>(menuGui.get<tgui::EditBox>("SecondPlayerName")->getText()) };
 		if (firstName.find_first_not_of(" \t\n\v\f\r") == std::string::npos)
 			errorMessage = "Enter the name of the first player!";
 		else if (secondName.find_first_not_of(" \t\n\v\f\r") == std::string::npos)
@@ -70,7 +70,7 @@ bool Menu::CanStartGame()
 	}
 	else if (menuGui.get<tgui::RadioButton>("OnePlayerRB")->isChecked())
 	{
-		std::string name = menuGui.get<tgui::EditBox>("FirstPlayerName")->getText();
+		auto name{ static_cast<std::string>(menuGui.get<tgui::EditBox>("FirstPlayerName")->getText()) };
 		if (name.find_first_not_of(" \t\n\v\f\r") == std::string::npos)
 			errorMessage = "Enter the name!";
 		else
@@ -97,7 +97,7 @@ bool Menu::CanStartGame()
 		errorMessage = "Select mode of the game!";
 
 	menuGui.get<tgui::Label>("MessageLabel")->setText(errorMessage);
-	needStartGame = (errorMessage == "") ? true : false;
+	needStartGame = errorMessage == "";
 	return needStartGame;
 }
 
@@ -113,34 +113,34 @@ void Menu::ActivateStartMenu()
 
 void Menu::SetConnections()
 {
-	tgui::Widget::Ptr timerCheckBox = menuGui.get("TimerCheckBox");
+	auto timerCheckBox{ menuGui.get("TimerCheckBox") };
 	timerCheckBox->connect(tgui::Signals::CheckBox::Checked, &Menu::ShowTimerSettings, this);
 	timerCheckBox->connect(tgui::Signals::CheckBox::Unchecked, &Menu::HideTimerSettings, this);
 
-	tgui::Widget::Ptr timeSlider = menuGui.get("TimeSlider");
+	auto timeSlider{ menuGui.get("TimeSlider") };
 	timeSlider->connect(tgui::Signals::Slider::ValueChanged, &Menu::ChangeChoosenTime, this);
 
-	tgui::RadioButton::Ptr twoPlayersRB = menuGui.get<tgui::RadioButton>("TwoPlayersRB");
+	auto twoPlayersRB{ menuGui.get<tgui::RadioButton>("TwoPlayersRB") };
 	twoPlayersRB->connect(tgui::Signals::RadioButton::Checked, &Menu::ShowTwoPlayersSettings, this);
 
-	tgui::RadioButton::Ptr onePlayerRB = menuGui.get<tgui::RadioButton>("OnePlayerRB");
+	auto onePlayerRB{ menuGui.get<tgui::RadioButton>("OnePlayerRB") };
 	onePlayerRB->connect(tgui::Signals::RadioButton::Checked, &Menu::ShowOnePlayerSettings, this);
 
-	tgui::Tabs::Ptr colorsTab = menuGui.get<tgui::Tabs>("ColorsTab");
+	auto colorsTab{ menuGui.get<tgui::Tabs>("ColorsTab") };
 	colorsTab->connect(tgui::Signals::Tabs::TabSelected, &Menu::ShowChoosenColor, this);
 
-	tgui::Button::Ptr startButton = menuGui.get<tgui::Button>("StartButton");
+	auto startButton{ menuGui.get<tgui::Button>("StartButton") };
 	startButton->connect(tgui::Signals::Button::Pressed, &Menu::CanStartGame, this);
 }
 
 void Menu::LoadIcons()
 {
-	tgui::Picture::Ptr firstPlayerIcon = menuGui.get<tgui::Picture>("FirstPlayerIcon");
-	tgui::Texture firstIconTexture("../res/images/Pawn_white.png");
+	auto firstPlayerIcon{ menuGui.get<tgui::Picture>("FirstPlayerIcon") };
+	tgui::Texture firstIconTexture{ "../res/images/Pawn_white.png" };
 	firstPlayerIcon->getRenderer()->setTexture(firstIconTexture);
 
-	tgui::Picture::Ptr secondPlayerIcon = menuGui.get<tgui::Picture>("SecondPlayerIcon");
-	tgui::Texture secondIconTexture("../res/images/Pawn_black.png");
+	auto secondPlayerIcon{ menuGui.get<tgui::Picture>("SecondPlayerIcon") };
+	tgui::Texture secondIconTexture{ "../res/images/Pawn_black.png" };
 	secondPlayerIcon->getRenderer()->setTexture(secondIconTexture);
 }
 
@@ -168,7 +168,7 @@ void Menu::ShowOnePlayerSettings()
 
 void Menu::ShowTwoPlayersSettings()
 {
-	tgui::Texture firstIconTexture("../res/images/Pawn_white.png");
+	auto firstIconTexture{ tgui::Texture{ "../res/images/Pawn_white.png" } };
 	menuGui.get<tgui::Picture>("FirstPlayerIcon")->getRenderer()->setTexture(firstIconTexture);
 
 	menuGui.get("FirstPlayerIcon")->setVisible(true);
@@ -185,8 +185,8 @@ void Menu::ChangeChoosenTime()
 
 void Menu::ShowChoosenColor()
 {
-	std::string texturePath = (menuGui.get<tgui::Tabs>("ColorsTab")->getSelected() == "White") ? "../res/images/Pawn_white.png" : "../res/images/Pawn_black.png";
-	tgui::Texture firstIconTexture(texturePath);
-	tgui::Picture::Ptr firstPlayerIcon = menuGui.get<tgui::Picture>("FirstPlayerIcon");
+	std::string texturePath{ (menuGui.get<tgui::Tabs>("ColorsTab")->getSelected() == "White") ? "../res/images/Pawn_white.png" : "../res/images/Pawn_black.png" };
+	tgui::Texture firstIconTexture{ texturePath };
+	auto firstPlayerIcon{ menuGui.get<tgui::Picture>("FirstPlayerIcon") };
 	firstPlayerIcon->getRenderer()->setTexture(firstIconTexture);
 }

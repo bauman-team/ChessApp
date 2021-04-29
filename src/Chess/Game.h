@@ -17,7 +17,7 @@ protected:
 	void SetExitStatus();
 public:
 	Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
-		: drawer(window, resource, properties, &Game::SetExitStatus, this), status(GameStatus::Play) { }
+		: drawer{ window, resource, properties, &Game::SetExitStatus, this }, status{ GameStatus::Play } { }
 	void virtual StartGame() = 0;
 	void virtual Show() = 0;
 	void virtual ChangeActivePlayer() = 0;
@@ -30,5 +30,5 @@ public:
 	void Save() const;
 	void ActivateMenuSettings(Menu& menu);
 	
-	virtual ~Game(){}
+	virtual ~Game() { }
 };

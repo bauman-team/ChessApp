@@ -7,10 +7,10 @@ constexpr auto STRAIGHT_DIRECTIONS{ 4 };
 std::vector<Pos> Figure::FindDiagonalMoves(const Pos& coord, const Map& map) noexcept
 {
 	std::vector<Pos> possibleMoves;
-	Pos nextPosition;
-	BoardPos emptyStatus;
+	auto nextPosition{ coord };
+	auto emptyStatus{ BoardPos::Empty };
 
-	for (int i = 0; i < DIAG_DIRECTIONS; ++i)
+	for (auto i = 0; i < DIAG_DIRECTIONS; ++i)
 	{
 		nextPosition = coord;
 		do
@@ -64,11 +64,10 @@ std::vector<Pos> Figure::FindPossibleMoves(const Pos& figurePosition, FigureType
 
 std::vector<Pos> Figure::FindPossibleMovesKing(const Pos& coord, Map& map) noexcept
 {
-	Pos nextPosition;
 	std::vector<Pos> possibleMoves;
-
+	auto nextPosition{ coord };
 	// checking all nearby squares
-	for (int i = -1; i != 3; i += 2)
+	for (auto i = -1; i != 3; i += 2)
 	{
 		nextPosition = coord.Add(0, i);
 		if (toUType(map.CheckEmpty(coord, nextPosition)))
@@ -90,36 +89,36 @@ std::vector<Pos> Figure::FindPossibleMovesKing(const Pos& coord, Map& map) noexc
 	// castling
 	if (map.IsCastlingAllowedForKing(coord))
 	{
-		Color activeColor = map.GetColor(coord);
-		int y = (activeColor == Color::White) ? 0 : 7;
+		auto activeColor{ map.GetColor(coord) };
+		auto y{ static_cast<uint8_t>((activeColor == Color::White) ? 0 : 7) };
 
 		// checking long castling
-		if (map.IsCastlingAllowedWithRook(Pos(0, y), activeColor) &&
-			map.CheckEmpty(coord, Pos(1, y)) == BoardPos::Empty &&
-			map.CheckEmpty(coord, Pos(2, y)) == BoardPos::Empty &&
-			map.CheckEmpty(coord, Pos(3, y)) == BoardPos::Empty)
+		if (map.IsCastlingAllowedWithRook(Pos{ 0, y }, activeColor) &&
+			map.CheckEmpty(coord, Pos{ 1, y }) == BoardPos::Empty &&
+			map.CheckEmpty(coord, Pos{ 2, y }) == BoardPos::Empty &&
+			map.CheckEmpty(coord, Pos{ 3, y }) == BoardPos::Empty)
 		{
 			OneFigureMoves checkMoves;
 			checkMoves.from = coord;
-			checkMoves.to.push_back(Pos(3, y));
+			checkMoves.to.push_back(Pos{ 3, y });
 
 			map.EraseForbiddenMoves(checkMoves);
 			if (!checkMoves.to.empty())
-				possibleMoves.push_back(Pos(2, y));
+				possibleMoves.push_back(Pos{ 2, y });
 		}
 
 		// checking short castling
-		if (map.IsCastlingAllowedWithRook(Pos(7, y), activeColor) &&
-			map.CheckEmpty(coord, Pos(6, y)) == BoardPos::Empty &&
-			map.CheckEmpty(coord, Pos(5, y)) == BoardPos::Empty)
+		if (map.IsCastlingAllowedWithRook(Pos{ 7, y }, activeColor) &&
+			map.CheckEmpty(coord, Pos{ 6, y }) == BoardPos::Empty &&
+			map.CheckEmpty(coord, Pos{ 5, y }) == BoardPos::Empty)
 		{
 			OneFigureMoves checkMoves;
 			checkMoves.from = coord;
-			checkMoves.to.push_back(Pos(5, y));
+			checkMoves.to.push_back(Pos{ 5, y });
 
 			map.EraseForbiddenMoves(checkMoves);
 			if (!checkMoves.to.empty())
-				possibleMoves.push_back(Pos(6, y));
+				possibleMoves.push_back(Pos{ 6, y });
 		}
 	}
 	return possibleMoves;
@@ -127,8 +126,7 @@ std::vector<Pos> Figure::FindPossibleMovesKing(const Pos& coord, Map& map) noexc
 
 std::vector<Pos> Figure::FindPossibleMovesQueen(const Pos& coord, const Map& map) noexcept
 {
-	std::vector<Pos> possibleMoves = FindStraightMoves(coord, map);
-	std::vector<Pos> moreMoves = FindDiagonalMoves(coord, map);
+	auto possibleMoves{ FindStraightMoves(coord, map) }, moreMoves{ FindDiagonalMoves(coord, map) };
 	possibleMoves.insert(possibleMoves.end(), moreMoves.begin(), moreMoves.end());
 	return possibleMoves;
 }
@@ -140,9 +138,9 @@ std::vector<Pos> Figure::FindPossibleMovesBishop(const Pos& coord, const Map& ma
 
 std::vector<Pos> Figure::FindPossibleMovesKnight(const Pos& coord, const Map& map) noexcept
 {
-	Pos nextPosition;
 	std::vector<Pos> possibleMoves;
-	for (int i = -1, j = 2 * i; i != 3; i += 2, j = 2 * i)
+	auto nextPosition{ coord };
+	for (auto i = -1, j = 2 * i; i != 3; i += 2, j = 2 * i)
 	{
 		nextPosition = coord.Add(i, j);
 		if (toUType(map.CheckEmpty(coord, nextPosition)))
@@ -170,10 +168,10 @@ std::vector<Pos> Figure::FindPossibleMovesRook(const Pos& coord, const Map& map)
 
 std::vector<Pos> Figure::FindPossibleMovesPawn(const Pos& coord, const Map& map) noexcept
 {
-	Pos nextPosition = coord;
 	std::vector<Pos> possibleMoves;
-	Color pawnColor = map.GetColor(coord);
-	int8_t offset = pawnColor == Color::Black ? -1 : 1; // black go down | white go up
+	auto nextPosition{ coord };
+	auto pawnColor{ map.GetColor(coord) };
+	auto offset{ static_cast<int8_t>(pawnColor == Color::Black ? -1 : 1) }; // black go down | white go up
 	nextPosition = nextPosition.Add(0, offset); 
 
 	// checking straight moves
@@ -199,16 +197,16 @@ std::vector<Pos> Figure::FindPossibleMovesPawn(const Pos& coord, const Map& map)
 		possibleMoves.push_back(nextPosition);
 
 	// checking capture en passant
-	const MoveInfo lastMove = map.GetLastMoveInfo();
+	const auto lastMove{ map.GetLastMoveInfo() };
 	if (lastMove != MoveInfo::NULL_INFO)
 	{
-		FigureType activeType = lastMove.GetTypeActiveFigure();
+		auto activeType{ lastMove.GetTypeActiveFigure() };
 		if (activeType == FigureType::Pawn_black || activeType == FigureType::Pawn_white)
 		{
-			Pos posBefore = lastMove.GetPosBeforeMove();
-			Pos posAfter = lastMove.GetPosAfterMove();
+			auto posBefore{ lastMove.GetPosBeforeMove() };
+			auto posAfter{ lastMove.GetPosAfterMove() };
 			if (abs(posAfter.GetY() - posBefore.GetY()) == 2 && (posAfter.GetY() == coord.GetY()) && abs(posAfter.GetX() - coord.GetX()) == 1)
-				possibleMoves.push_back(Pos(posAfter.GetX(), coord.GetY() + (posAfter.GetY() > posBefore.GetY() ? -1 : 1)));
+				possibleMoves.push_back(Pos{ posAfter.GetX(), static_cast<uint8_t>(coord.GetY() + (posAfter.GetY() > posBefore.GetY() ? -1 : 1)) });
 		}
 	}
 	return possibleMoves;
@@ -217,10 +215,10 @@ std::vector<Pos> Figure::FindPossibleMovesPawn(const Pos& coord, const Map& map)
 std::vector<Pos> Figure::FindStraightMoves(const Pos& coord, const Map& map) noexcept
 {
 	std::vector<Pos> possibleMoves;
-	Pos nextPosition;
-	BoardPos emptyStatus;
+	auto nextPosition{ coord };
+	auto emptyStatus{ BoardPos::Empty };
 
-	for (int i = 0; i != STRAIGHT_DIRECTIONS; ++i)
+	for (auto i = 0; i != STRAIGHT_DIRECTIONS; ++i)
 	{
 		nextPosition = coord;
 		do

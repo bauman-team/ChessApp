@@ -9,7 +9,7 @@ struct CHESSENGINE_API AdditionalInfo // fieldbite
 	uint8_t castling : 4;
 	uint8_t isCaptureEnPassant : 1;
 
-	AdditionalInfo() : castling(0), isCaptureEnPassant(0) {}
+	AdditionalInfo() : castling{ 0 }, isCaptureEnPassant{ 0 } { }
 	AdditionalInfo(std::array<bool, 4> _castling, bool _isCaptureEnPassant);
 	bool operator==(const AdditionalInfo comp) const;
 	bool operator!=(const AdditionalInfo comp) const { return !(*this == comp); }
@@ -32,10 +32,10 @@ public:
 	MoveInfo();
 
 	MoveInfo(const Pos& _from, const Pos& _to, FigureType _activeFigure, FigureType _eatenFigure, std::array<bool, 4> _castling, bool _isCaptureEnPassant, uint16_t _numOfMove)
-		: activeFigure(_activeFigure), eatenFigure(_eatenFigure), from(_from), to(_to), additionalInfo(_castling, _isCaptureEnPassant), numOfMove(_numOfMove) { }
+		: activeFigure{ _activeFigure }, eatenFigure{ _eatenFigure }, from{ _from }, to{ _to }, additionalInfo{ _castling, _isCaptureEnPassant }, numOfMove{ _numOfMove } { }
 
 	MoveInfo(const Pos& _from, const Pos& _to, FigureType _activeFigure, FigureType _eatenFigure, AdditionalInfo _additionalInfo, uint16_t _numOfMove)
-		: activeFigure(_activeFigure), eatenFigure(_eatenFigure), from(_from), to(_to), additionalInfo(_additionalInfo), numOfMove(_numOfMove) { }
+		: activeFigure{ _activeFigure }, eatenFigure{ _eatenFigure }, from{ _from }, to{ _to }, additionalInfo{ _additionalInfo }, numOfMove{ _numOfMove } { }
 	
 	MoveInfo(const MoveInfo& copy);
 

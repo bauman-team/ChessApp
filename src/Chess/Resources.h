@@ -9,8 +9,8 @@ class Resources
 	std::string pathToFigureImage[FIGURE_TYPES];
 	std::string pathToFont;
 public:
-	Resources() {}
-	Resources(std::string mapPath, Pos _playAreaTopLeft, int _squareSize) : pathToMapImage(mapPath) {}
+	Resources() { }
+	Resources(std::string mapPath, Pos _playAreaTopLeft, int _squareSize) : pathToMapImage{ mapPath } { }
 
 	std::string GetPathToMapImage() const { return pathToMapImage; }
 	std::string GetPathToFigure(FigureType figureType) const { return pathToFigureImage[toUType(figureType)]; }
