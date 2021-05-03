@@ -1,7 +1,9 @@
 #include "PlayerWithAIGame.h"
 #include <math.h> // for supporting linux
-#include <xmmintrin.h>
+
+//#include <xmmintrin.h>
 //#include <intrin.h> 
+
 //#define RandBotTest
 //#define SmartBotTest
 //#define TestWeightAndBitboards

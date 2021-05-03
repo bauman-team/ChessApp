@@ -9,6 +9,8 @@ add_executable(${PROJECT_NAME}
 
 	src/Chess/Game.h
 	src/Chess/Game.cpp
+	src/Chess/SideMenu.h
+	src/Chess/SideMenu.cpp
 	src/Chess/Drawer.h
 	src/Chess/Drawer.cpp
 	src/Chess/MapProperties.h
