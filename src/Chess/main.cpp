@@ -31,6 +31,8 @@ int main()
 	prop.SetGameWindowHeight(920);
 	prop.SetSideMenuWidth(300);
 
+	sf::Color backgroundGameColor{ 208, 167, 130, 255 };
+
 	Game* game = nullptr; // TODO: goto stack ???
 	Menu menu{ window, "../res/form.txt" };
 
@@ -43,10 +45,12 @@ int main()
 	//((PlayerWithAIGame*)game)->output();
 	while(sf::sleep(sf::seconds(0.05)), window.isOpen())
 	{
-		#ifdef _WIN32
 		if (!game)
-		#endif
 			window.clear(sf::Color::White); // TODO: select back color in menu/game
+		#ifndef _WIN32
+		else
+			window.clear(backgroundGameColor);
+		#endif
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
@@ -94,7 +98,7 @@ int main()
 						thDraw = std::thread{ [&game, &window]() {
 							while (sf::sleep(sf::seconds(0.05)), mut4.lock(), game && (window.setActive(true), window.isOpen()))
 							{
-								window.clear(sf::Color{ 208, 167, 130, 255 });
+								window.clear(backgroundGameColor);
 								if (game)
 									game->Show();
 								window.display();
@@ -168,7 +172,7 @@ int main()
 			thDraw = std::thread{ [&game, &window]() {
 				while (sf::sleep(sf::seconds(0.05)), mut4.lock(), game && (window.setActive(true), window.isOpen()))
 				{
-					window.clear(sf::Color{ 208, 167, 130, 255 });
+					window.clear(backgroundGameColor);
 					if (game)
 						game->Show();
 					window.display();
