@@ -4,7 +4,7 @@
 const AdditionalInfo AdditionalInfo::NULL_INFO{ };
 const MoveInfo MoveInfo::NULL_INFO{ };
 
-inline bool AdditionalInfo::operator==(const AdditionalInfo comp) const
+bool AdditionalInfo::operator==(const AdditionalInfo comp) const
 {
 	if (castling != comp.castling
 		|| isCaptureEnPassant != comp.isCaptureEnPassant)
@@ -12,7 +12,7 @@ inline bool AdditionalInfo::operator==(const AdditionalInfo comp) const
 	return true;
 }
 
-inline AdditionalInfo::AdditionalInfo(std::array<bool, 4> _castling, bool _isCaptureEnPassant) : castling{ 0 }, isCaptureEnPassant{ 0 }
+AdditionalInfo::AdditionalInfo(std::array<bool, 4> _castling, bool _isCaptureEnPassant) : castling{ 0 }, isCaptureEnPassant{ 0 }
 {
 	auto add{ 1 };
 	if (_isCaptureEnPassant)
