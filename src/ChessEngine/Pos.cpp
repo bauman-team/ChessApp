@@ -1,13 +1,39 @@
 #include "pch.h"
 #include "Pos.h"
 
+#define UseAsm
+
 const Pos Pos::NULL_POS{ };
 
 Pos::Pos(uint8_t x, uint8_t y) noexcept
 {
+#ifdef UseAsm
+	_asm {
+			push ebx
+			push ax
+			mov ebx, this
+			mov al, 255
+			cmp x, 8
+			jae FINISH
+			cmp x, 0
+			jb FINISH
+			cmp y, 8
+			jae FINISH
+			cmp y, 0
+			jb FINISH
+			mov al, y
+			shl x, 4
+			or al, x
+		FINISH: mov [ebx].xy, al
+			pop ax
+			pop ebx
+	}
+#endif
+#ifndef UseAsm
 	xy = 255;
 	if (x < 8 && x >= 0 && y < 8 && y >= 0)
 		xy = (x << 4) | y;
+#endif
 }
 
 auto Pos::GetX() const noexcept -> uint8_t
@@ -27,11 +53,44 @@ auto Pos::ToIndex() const noexcept -> uint8_t
 
 auto Pos::ToBitboard() const noexcept -> uint64_t
 {
+#ifdef UseAsm
+	uint32_t bitboardL;
+	uint64_t bitboard;
+	auto y{ GetY() }, x{ GetX() };
+	auto offset = y > 3;
+	if (offset)
+		y -= 4;
+	_asm {
+			push ecx
+			push ebx
+			mov ecx, 0
+			mov ebx, 1
+		SETY: cmp cl, y
+			je FINY
+			shl ebx, 8
+			inc cl
+			jmp SETY
+		FINY: mov ecx, 0
+		SETX: cmp cl, x
+			je FINX
+			shl ebx, 1
+			inc cl
+			jmp SETX
+		FINX: mov bitboardL, ebx
+			pop ebx 
+			pop ecx
+	}
+	bitboard = bitboardL;
+	if (offset)
+		bitboard <<= 32;
+#endif
+#ifndef UseAsm
 	uint64_t bitboard = 1;
 	for (auto i = 0; i != GetY(); ++i)
 		bitboard <<= 8;
 	for (auto i = 0; i != GetX(); ++i)
 		bitboard <<= 1;
+#endif
 	return bitboard;
 }
 
@@ -69,6 +128,32 @@ auto Pos::Add(int8_t x, int8_t y) const noexcept -> Pos
 auto Pos::BitboardToPosition(uint64_t bitboard) noexcept -> Pos
 {
 	uint8_t x = 0, y = 0;
+#ifdef UseAsm
+	uint32_t bitboardL;
+	if (bitboard > 4'294'967'295)
+	{
+		y += 4;
+		bitboard >>= 32;
+	}
+	bitboardL = bitboard;
+	_asm {
+		push ebx
+		mov ebx, bitboardL
+		GETY: cmp ebx, 128
+		jbe GETX
+		shr ebx, 8
+		inc y
+		jmp GETY
+		GETX: cmp ebx, 1
+		jbe FIN
+		shr ebx, 1
+		inc x
+		jmp GETX
+		FIN:
+		pop ebx
+	}
+#endif
+#ifndef UseAsm
 	while (bitboard > 128)
 	{
 		++y;
@@ -79,6 +164,7 @@ auto Pos::BitboardToPosition(uint64_t bitboard) noexcept -> Pos
 		++x;
 		bitboard >>= 1;
 	}
+#endif
 	return Pos{ x, y };
 }
 

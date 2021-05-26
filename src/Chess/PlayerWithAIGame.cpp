@@ -1,8 +1,12 @@
 #include "PlayerWithAIGame.h"
 #include <math.h> // for supporting linux
 
-//#include <xmmintrin.h>
-//#include <intrin.h> 
+//#define UseAvx
+
+#ifdef UseAvx
+#include <xmmintrin.h>
+#include <intrin.h> 
+#endif
 
 //#define RandBotTest
 //#define SmartBotTest
@@ -217,7 +221,8 @@ float PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Col
 	if (isPlayerMoveFirst) // for testing
 	{
 #endif
-		/*float x[64]{ 0.0 }, y[64]{ 0.0 }, z[64]{ 0.0 };
+#ifdef UseAvx
+		float x[64]{ 0.0 }, y[64]{ 0.0 }, z[64]{ 0.0 };
 		for (auto i = 0; i != 64; ++i)
 		{
 			selected = selectedMap.GetFigureType(i);
@@ -237,8 +242,9 @@ float PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Col
 			xArr = _mm256_mul_ps(xArr, yArr);
 			_mm256_store_ps(z, xArr);
 			score += z[0] + z[1] + z[2] + z[3] + z[4] + z[5] + z[6] + z[7];
-		}*/
-
+		}
+#endif
+#ifndef UseAvx
 		// black
 		for (auto i = 0; i != 64; ++i)
 		{
@@ -247,6 +253,7 @@ float PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Col
 				score += (selectedMap.GetColor(selected) == playerColor ? 1.0 : -1.0)
 				* (figureWeight[toUType(selected)] + bitboards[toUType(selected)][i / 8][i % 8]);
 		}
+#endif
 #ifdef TestWeightAndBitboards
 	}
 	else

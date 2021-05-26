@@ -30,22 +30,22 @@ int main()
 	prop.SetSquareSize(100);
 	prop.SetGameWindowHeight(920);
 	prop.SetSideMenuWidth(300);
-
-	Game* game = nullptr; // TODO: goto stack ???
+	
+	std::shared_ptr<Game> game{ nullptr };
 	Menu menu{ window, "../res/form.txt" };
 
 	std::thread thSetCell{ };
-	#ifdef _WIN32
+#ifdef _WIN32
 	std::thread thDraw;
-	#endif
+#endif
 	auto thSetCellIsFinished{ true }; // TODO: because main thread is not joinable???
 
 	//((PlayerWithAIGame*)game)->output();
 	while(sf::sleep(sf::seconds(0.05)), window.isOpen())
 	{
-		#ifdef _WIN32
+	#ifdef _WIN32
 		if (!game)
-		#endif
+	#endif
 			window.clear(sf::Color::White); // TODO: select back color in menu/game
 		sf::Event event;
 		while (window.pollEvent(event))
@@ -55,13 +55,13 @@ int main()
 			case sf::Event::Closed:
 				if (game)
 					game->Save();
-				#ifdef _WIN32
+			#ifdef _WIN32
 				mut4.lock();
-				#endif
+			#endif
 				window.close();
-				#ifdef _WIN32
+			#ifdef _WIN32
 				mut4.unlock();
-				#endif
+			#endif
 				break;
 			case sf::Event::MouseButtonPressed:
 				if (game && (game->GetStatus() == GameStatus::Play || game->GetStatus() == GameStatus::Shah) && event.mouseButton.button == sf::Mouse::Left)
@@ -71,7 +71,8 @@ int main()
 					{
 						thSetCellIsFinished = false;
 						thSetCell = std::thread{ [&game, &thSetCellIsFinished, mousePos]() {
-							game->SetPosition(mousePos.x, mousePos.y);
+							std::shared_ptr<Game> thGame{ game };
+							thGame->SetPosition(mousePos.x, mousePos.y);
 							thSetCellIsFinished = true; } };
 						thSetCell.detach();
 					}
@@ -84,12 +85,12 @@ int main()
 					{
 						auto inputValues{ menu.GetInitialData() };
 						if (inputValues.mode == GameMode::TwoPlayers)
-							game = new TwoPlayersGame{ &window, res, prop };
+							game = std::make_shared<TwoPlayersGame>(&window, res, prop);
 						else
-							game = new PlayerWithAIGame{ &window, res, prop };
+							game = std::make_shared<PlayerWithAIGame>(&window, res, prop);
 						game->SetPlayers(inputValues.firstName, inputValues.secondName, inputValues.time);
 						game->StartGame();
-						#ifdef _WIN32
+					#ifdef _WIN32
 						window.setActive(false);
 						thDraw = std::thread{ [&game, &window]() {
 							while (sf::sleep(sf::seconds(0.05)), mut4.lock(), game && (window.setActive(true), window.isOpen()))
@@ -105,10 +106,10 @@ int main()
 							mut4.unlock();
 							} };
 						thDraw.detach();
-						#endif
+					#endif
 						if (typeid(*game) == typeid(PlayerWithAIGame))
 						{
-							if (!((PlayerWithAIGame*)game)->GetIsPlayerMoveFirst()) // if the first move of the bot
+							if (!std::dynamic_pointer_cast<PlayerWithAIGame>(game)->GetIsPlayerMoveFirst()) // if the first move of the bot
 							{
 								while (!thSetCellIsFinished) sf::sleep(sf::seconds(0.1));
 								thSetCellIsFinished = false;
@@ -124,13 +125,13 @@ int main()
 				{
 					if (game)
 						game->Save();
-					#ifdef _WIN32
+				#ifdef _WIN32
 					mut4.lock();
-					#endif
+				#endif
 					window.close();
-					#ifdef _WIN32
+				#ifdef _WIN32
 					mut4.unlock();
-					#endif
+				#endif
 				}
 				break;
 			}
@@ -139,16 +140,14 @@ int main()
 				game->HandleEvent(event); // for side menu
 				if (game->GetStatus() == GameStatus::Exit) // button exit is clicked (was opened start menu)
 				{
-					#ifdef _WIN32
+				#ifdef _WIN32
 					mut4.lock();
-					#endif
+				#endif
 					game->ActivateMenuSettings(menu);
-					if (thSetCellIsFinished)
-						delete game; // TODO: ??? MEMORY LEAK game delete (why memory clear, when theard don't finished?) 
 					game = nullptr;
-					#ifdef _WIN32
+				#ifdef _WIN32
 					mut4.unlock();
-					#endif
+				#endif
 				}
 			}
 			if (!game)
@@ -158,12 +157,12 @@ int main()
 		{
 			auto inputValues{ menu.GetInitialData() };
 			if (inputValues.mode == GameMode::TwoPlayers)
-				game = new TwoPlayersGame{ &window, res, prop };
+				game = std::make_shared<TwoPlayersGame>(&window, res, prop);
 			else
-				game = new PlayerWithAIGame{ &window, res, prop };
+				game = std::make_shared<PlayerWithAIGame>(&window, res, prop);
 			game->SetPlayers(inputValues.firstName, inputValues.secondName, inputValues.time);
 			game->StartGame();
-			#ifdef _WIN32
+		#ifdef _WIN32
 			window.setActive(false);
 			thDraw = std::thread{ [&game, &window]() {
 				while (sf::sleep(sf::seconds(0.05)), mut4.lock(), game && (window.setActive(true), window.isOpen()))
@@ -179,10 +178,10 @@ int main()
 				mut4.unlock();
 				} };
 			thDraw.detach();
-			#endif
+		#endif
 			if (typeid(*game) == typeid(PlayerWithAIGame))
 			{
-				if (!((PlayerWithAIGame*)game)->GetIsPlayerMoveFirst()) // if the first move of the bot
+				if (!std::dynamic_pointer_cast<PlayerWithAIGame>(game)->GetIsPlayerMoveFirst()) // if the first move of the bot
 				{
 					while (!thSetCellIsFinished) sf::sleep(sf::seconds(0.1));
 					thSetCellIsFinished = false;
@@ -193,11 +192,11 @@ int main()
 				}
 			}
 		}
-		#ifndef _WIN32
+	#ifndef _WIN32
 		(game) ? game->Show() : menu.Show();
 		window.display();
-		#endif
-		#ifdef _WIN32
+	#endif
+	#ifdef _WIN32
 		if (!game)
 		{
 			mut4.lock();
@@ -205,8 +204,7 @@ int main()
 			window.display();
 			mut4.unlock();
 		}
-		#endif
+	#endif
 	}
-	delete game;
 	return EXIT_SUCCESS;
 }
