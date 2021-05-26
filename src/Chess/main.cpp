@@ -30,6 +30,8 @@ int main()
 	prop.SetSquareSize(100);
 	prop.SetGameWindowHeight(920);
 	prop.SetSideMenuWidth(300);
+
+	sf::Color backgroundGameColor{ 208, 167, 130, 255 };
 	
 	std::shared_ptr<Game> game{ nullptr };
 	Menu menu{ window, "../res/form.txt" };
@@ -43,10 +45,12 @@ int main()
 	//((PlayerWithAIGame*)game)->output();
 	while(sf::sleep(sf::seconds(0.05)), window.isOpen())
 	{
-	#ifdef _WIN32
 		if (!game)
-	#endif
 			window.clear(sf::Color::White); // TODO: select back color in menu/game
+		#ifndef _WIN32
+		else
+			window.clear(backgroundGameColor);
+		#endif
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
@@ -70,9 +74,8 @@ int main()
 					if (thSetCellIsFinished)
 					{
 						thSetCellIsFinished = false;
-						thSetCell = std::thread{ [&game, &thSetCellIsFinished, mousePos]() {
-							std::shared_ptr<Game> thGame{ game };
-							thGame->SetPosition(mousePos.x, mousePos.y);
+						thSetCell = std::thread{ [game, &thSetCellIsFinished, mousePos]() {
+							game->SetPosition(mousePos.x, mousePos.y);
 							thSetCellIsFinished = true; } };
 						thSetCell.detach();
 					}
@@ -92,10 +95,10 @@ int main()
 						game->StartGame();
 					#ifdef _WIN32
 						window.setActive(false);
-						thDraw = std::thread{ [&game, &window]() {
+						thDraw = std::thread{ [&backgroundGameColor, &game, &window]() {
 							while (sf::sleep(sf::seconds(0.05)), mut4.lock(), game && (window.setActive(true), window.isOpen()))
 							{
-								window.clear(sf::Color{ 208, 167, 130, 255 });
+								window.clear(backgroundGameColor);
 								if (game)
 									game->Show();
 								window.display();
@@ -113,7 +116,7 @@ int main()
 							{
 								while (!thSetCellIsFinished) sf::sleep(sf::seconds(0.1));
 								thSetCellIsFinished = false;
-								thSetCell = std::thread{ [&game, &thSetCellIsFinished]() {
+								thSetCell = std::thread{ [game, &thSetCellIsFinished]() {
 									game->ChangeActivePlayer();
 									thSetCellIsFinished = true; } };
 								thSetCell.detach();
@@ -164,10 +167,10 @@ int main()
 			game->StartGame();
 		#ifdef _WIN32
 			window.setActive(false);
-			thDraw = std::thread{ [&game, &window]() {
+			thDraw = std::thread{ [&backgroundGameColor, &game, &window]() {
 				while (sf::sleep(sf::seconds(0.05)), mut4.lock(), game && (window.setActive(true), window.isOpen()))
 				{
-					window.clear(sf::Color{ 208, 167, 130, 255 });
+					window.clear(backgroundGameColor);
 					if (game)
 						game->Show();
 					window.display();
@@ -185,7 +188,7 @@ int main()
 				{
 					while (!thSetCellIsFinished) sf::sleep(sf::seconds(0.1));
 					thSetCellIsFinished = false;
-					thSetCell = std::thread{ [&game, &thSetCellIsFinished]() {
+					thSetCell = std::thread{ [game, &thSetCellIsFinished]() {
 						game->ChangeActivePlayer();
 						thSetCellIsFinished = true; } };
 					thSetCell.detach();
