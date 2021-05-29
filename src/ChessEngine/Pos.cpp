@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Pos.h"
+#include <iostream>
 
 #define UseAsm
 
@@ -8,6 +9,7 @@ const Pos Pos::NULL_POS{ };
 Pos::Pos(uint8_t x, uint8_t y) noexcept
 {
 #ifdef UseAsm
+#ifdef _WIN32
 	_asm {
 			push ebx
 			push ax
@@ -28,6 +30,29 @@ Pos::Pos(uint8_t x, uint8_t y) noexcept
 			pop ax
 			pop ebx
 	}
+#endif
+#ifdef __linux__
+	asm(
+		"mov $255, %%al\n\t"
+		"mov %[x], %%bl\n\t"
+		"cmp $8, %%bl\n\t"
+		"jae FINISH\n\t"
+		"cmp $0, %%bl\n\t"
+		"jb FINISH\n\t"
+		"mov %[y], %%bl\n\t"
+		"cmp $8, %%bl\n\t"
+		"jae FINISH\n\t"
+		"cmp $0, %%bl\n\t"
+		"jb FINISH\n\t"
+		"mov %[x], %%al\n\t"
+		"shl $4, %%al\n\t"
+		"or %%bl, %%al\n\t"
+		"FINISH:\n\t"
+		"mov %%al, %[xy]\n\t"
+		: [xy]"=m"(this->xy)
+		: [x]"m"(x), [y]"m"(y)
+		: "eax", "ebx", "ecx");
+#endif
 #endif
 #ifndef UseAsm
 	xy = 255;
@@ -60,6 +85,7 @@ auto Pos::ToBitboard() const noexcept -> uint64_t
 	auto offset = y > 3;
 	if (offset)
 		y -= 4;
+#ifdef _WIN32
 	_asm {
 			push ecx
 			push ebx
@@ -80,6 +106,28 @@ auto Pos::ToBitboard() const noexcept -> uint64_t
 			pop ebx 
 			pop ecx
 	}
+#endif
+#ifdef __linux__
+	asm(
+		"mov $0, %%ecx\n\t"
+		"mov $1, %%ebx\n\t"
+		"SETY: cmp %[y], %%cl\n\t"
+		"je FINY\n\t"
+		"shl $8, %%ebx\n\t"
+		"inc %%cl\n\t"
+		"jmp SETY\n\t"
+		"FINY: mov $0, %%ecx\n\t"
+		"SETX: cmp %[x], %%cl\n\t"
+		"je FINX\n\t"
+		"shl $1, %%ebx\n\t"
+		"inc %%cl\n\t"
+		"jmp SETX\n\t"
+		"FINX: mov %%ebx, %[bitboardL]\n\t"
+		: [bitboardL]"=m"(bitboardL)
+		: [x]"m"(x), [y]"m"(y)
+		: "ebx", "ecx"
+		);
+#endif
 	bitboard = bitboardL;
 	if (offset)
 		bitboard <<= 32;
@@ -136,6 +184,7 @@ auto Pos::BitboardToPosition(uint64_t bitboard) noexcept -> Pos
 		bitboard >>= 32;
 	}
 	bitboardL = bitboard;
+#ifdef _WIN32
 	_asm {
 		push ebx
 		mov ebx, bitboardL
@@ -152,6 +201,29 @@ auto Pos::BitboardToPosition(uint64_t bitboard) noexcept -> Pos
 		FIN:
 		pop ebx
 	}
+#endif
+#ifdef __linux__
+	asm(
+		"mov %[bitboardL], %%ebx\n\t"
+		"mov %[y], %%cl\n\t"
+		"GETY: cmp $128, %%ebx\n\t"
+		"jbe FINGETY\n\t"
+		"shr $8, %%ebx\n\t"
+		"inc %%cl\n\t"
+		"jmp GETY\n\t"
+		"FINGETY: mov %%cl, %[y]\n\t"
+		"mov $0, %%cl\n\t"
+		"GETX: cmp $1, %%ebx\n\t"
+		"jbe FINGETX\n\t"
+		"shr $1, %%ebx\n\t"
+		"inc %%cl\n\t"
+		"jmp GETX\n\t"
+		"FINGETX: mov %%cl, %[x]\n\t"
+		: [x]"=m"(x), [y]"=m"(y)
+		: [bitboardL]"m"(bitboardL)
+		: "ebx", "ecx"
+		);
+#endif
 #endif
 #ifndef UseAsm
 	while (bitboard > 128)

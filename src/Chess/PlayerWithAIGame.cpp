@@ -142,7 +142,7 @@ const float PlayerWithAIGame::bitboards[FIGURE_TYPES][8][8]{
 };
 const float PlayerWithAIGame::infScore{ 9999 };
 const int PlayerWithAIGame::errorRate{ 20 };
-const int PlayerWithAIGame::DEPTH{ 4 }; // searching depth of move
+const int PlayerWithAIGame::DEPTH{ 2 }; // searching depth of move
 const int PlayerWithAIGame::countOfThreads{ 8 };
 
 std::atomic<int> positionsCount{ 0 }; // TODO: delete debug counter
