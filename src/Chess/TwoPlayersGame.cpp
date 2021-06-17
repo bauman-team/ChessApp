@@ -44,19 +44,6 @@ void TwoPlayersGame::ChangeActivePlayer()
 
 	activePlayer = activePlayer == player2 ? player1 : player2;
 
-	/*sf::Clock clock; // test of speed algorithm calculation possible moves
-	std::atomic<int> crucialCount = 0;
-	int countOfThreads = 50, i = 0;
-	while (crucialCount != countOfThreads)
-	{
-		for (; i != countOfThreads; ++i)
-		{
-			Map *copy = new Map(map);
-			std::thread th(SpeedTestingOnProcessorThread, std::ref(*copy), activePlayer->GetColor(), 20000, std::ref(crucialCount));
-			th.detach();
-		}
-	}
-	sf::Time time = clock.getElapsedTime();*/	
 	status = map.CheckGameFinal(activePlayer->GetColor());
 	drawer.RotateBoard();
 	if (stopTime && status != GameStatus::Pat && status != GameStatus::Mat)

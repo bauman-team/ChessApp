@@ -9,7 +9,7 @@ void Game::HandleEvent(sf::Event& event)
 
 void Game::Save() const
 {
-	auto movesHistory{ map.GetMovesHistory() };
+	auto movesHistory{ map.GetMovesLog() };
 	std::ofstream out{ "LastGame.log" };
 	auto posBefore{ Pos::NULL_POS };
 	auto posAfter{ Pos::NULL_POS };

@@ -7,7 +7,7 @@ enum class FigureType;
 struct CHESSENGINE_API AdditionalInfo // fieldbite
 {
 	uint8_t castling : 4;
-	uint8_t isCaptureEnPassant : 1;
+	uint8_t isCaptureEnPassant : 1; // TODO: only for logs, maybe delete?
 
 	AdditionalInfo() : castling{ 0 }, isCaptureEnPassant{ 0 } { }
 	AdditionalInfo(std::array<bool, 4> _castling, bool _isCaptureEnPassant);

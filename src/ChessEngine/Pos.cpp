@@ -144,7 +144,7 @@ auto Pos::ToBitboard() const noexcept -> uint64_t
 
 auto Pos::IsValid() const noexcept -> bool
 {
-	return (xy != 255);
+	return xy != 255;
 }
 
 auto Pos::operator=(const Pos& coords) noexcept -> Pos&

@@ -18,13 +18,8 @@ protected:
 	static bool isPlayerMoveFirst;
 	const static int DEPTH;
 	const static int countOfThreads;
-	struct Move
-	{
-		Pos from, to;
-		Move(Pos _from, Pos _to) : from{ _from }, to{ _to } { }
-	};
 
-	Move StartAI(double timeForWaiting = 0);
+	std::vector<MoveInfo> StartAI(double timeForWaiting = 0);
 	static float CalculatePositionScore(const Map& selectedMap, const Color AIColor);
 	static float MiniMax(Map map, bool isAIMoveNow, int depth, float alpha, float beta);
 

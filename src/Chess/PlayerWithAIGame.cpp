@@ -8,8 +8,7 @@
 #include <intrin.h> 
 #endif
 
-//#define RandBotTest
-//#define SmartBotTest
+#define SmartBotTest
 //#define TestWeightAndBitboards
 CHESSENGINE_API extern std::mutex mut1;
 std::mutex mut2;
@@ -147,70 +146,52 @@ const int PlayerWithAIGame::countOfThreads{ 8 };
 
 std::atomic<int> positionsCount{ 0 }; // TODO: delete debug counter
 
-PlayerWithAIGame::Move PlayerWithAIGame::StartAI(double timeForWaiting)
+std::vector<MoveInfo> PlayerWithAIGame::StartAI(double timeForWaiting)
 {
-#ifdef RandBotTest
-	if (activePlayer->GetColor() == Color::Black && isPlayerMoveFirst
-		|| activePlayer->GetColor() == Color::White && !isPlayerMoveFirst)
+	std::vector<std::pair<int, float>> movesScore{ };
+	std::atomic<uint16_t> countWorkingThreads{ 0 };
+	auto moves{ map.GetAllPossibleMoves() };
+	auto countOfMovesInThread{ 0 }, from{ 0 }, countOfMoves{ static_cast<int>(moves.size()) };
+	for (auto i = countOfThreads; i >= 0 && countOfMoves > 0; --i)
 	{
-#endif
-		std::vector<std::pair<int, float>> movesScore{ };
-		std::vector<Move> movesPositions{ }; // fill vector all possible moves
-		for (auto it1 = map.GetAllPossibleMoves().begin(); it1 != map.GetAllPossibleMoves().end(); ++it1)
-			for (auto it2 = (*it1).to.begin(); it2 != (*it1).to.end(); ++it2)
-				movesPositions.push_back(Move{ (*it1).from, *it2 });
-		std::atomic<uint16_t> countWorkingThreads{ 0 };
-		auto countOfMovesInThread{ 0 }, from{ 0 }, countOfMoves{ static_cast<int>(movesPositions.size()) };
-		for (auto i = countOfThreads; i >= 0 && countOfMoves > 0; --i)
-		{
-			++countWorkingThreads; // add to active process count
-			from = movesPositions.size() - countOfMoves; 
-			countOfMovesInThread = ceil(countOfMoves / i); // count checking of moves in this thread
-			countOfMoves -= countOfMovesInThread; // count checking of moves is left
-			auto MAP{ map };
-			std::thread th{ [from, countOfMovesInThread, movesPositions, &movesScore, MAP, &countWorkingThreads]() {
-				for (auto j = from; j != from + countOfMovesInThread; ++j)
-				{
-					auto copyMap{ MAP };
-					copyMap.Move(movesPositions[j].from, movesPositions[j].to);
-					auto score{ std::pair<int, float>(j, PlayerWithAIGame::MiniMax(copyMap, false, DEPTH, -10'000, 10'000)) }; // isPlayerMoveFirst ? DEPTH + 1 : 
-					mut2.lock();
-					movesScore.push_back(score);
-					mut2.unlock();
-				}
-				--countWorkingThreads;
-				} };
-			th.detach();
-		}
-
-		sf::sleep(sf::seconds(timeForWaiting));
-
-		if (timeForWaiting == 0) 
-			while (countWorkingThreads != 0)
-				sf::sleep(sf::seconds(0.03));
-
-		std::sort(movesScore.begin(), movesScore.end(), [](const std::pair<int, float>& left, const std::pair<int, float>& right)
+		++countWorkingThreads; // add to active process count
+		from = moves.size() - countOfMoves;
+		countOfMovesInThread = ceil(countOfMoves / i); // count checking of moves in this thread
+		countOfMoves -= countOfMovesInThread; // count checking of moves is left
+		auto MAP{ map };
+		std::thread th{ [from, countOfMovesInThread, moves, &movesScore, MAP, &countWorkingThreads]() {
+			for (auto j = from; j != from + countOfMovesInThread; ++j)
 			{
-				return left.second > right.second;
-			});
-		// Additional error rate
-		if (rand() % 100 < errorRate && (*movesScore.begin()).second != infScore && movesScore.size() > 1)
+				auto copyMap{ MAP };
+				copyMap.Move(moves[j]);
+				auto score{ std::pair<int, float>(j, PlayerWithAIGame::MiniMax(copyMap, false, DEPTH, -10'000, 10'000)) }; // isPlayerMoveFirst ? DEPTH + 1 : 
+				mut2.lock();
+				movesScore.push_back(score);
+				mut2.unlock();
+			}
+			--countWorkingThreads;
+			} };
+		th.detach();
+	}
+
+	sf::sleep(sf::seconds(timeForWaiting));
+
+	if (timeForWaiting == 0) 
+		while (countWorkingThreads != 0)
+			sf::sleep(sf::seconds(0.03));
+
+	std::sort(movesScore.begin(), movesScore.end(), [](const std::pair<int, float>& left, const std::pair<int, float>& right)
 		{
-			for (auto i = 0; i != std::min(3, static_cast<int>(movesScore.size())); ++i)
-				std::cout << "\n\t" + movesPositions[(*(movesScore.begin() + i)).first].from.ToString() + "  -->  " + movesPositions[(*(movesScore.begin() + i)).first].to.ToString();
-			return movesPositions[(*(movesScore.begin() + (rand() % std::min(3, static_cast<int>(movesPositions.size() - 1))) + 1)).first];
-		}
-		return movesPositions[(*movesScore.begin()).first];
-#ifdef RandBotTest
-	}
-	else
+			return left.second > right.second;
+		});
+	// Additional error rate
+	if (rand() % 100 < errorRate && (*movesScore.begin()).second != infScore && movesScore.size() > 1)
 	{
-		//srand(std::time(NULL));
-		auto rand1 = rand() % map.GetAllPossibleMoves().size();
-		//sf::sleep(sf::seconds(0.5));
-		return Move(map.GetAllPossibleMoves().at(rand1).from, map.GetAllPossibleMoves().at(rand1).to.at(rand() % map.GetAllPossibleMoves().at(rand1).to.size()));
+		for (auto i = 0; i != std::min(3, static_cast<int>(movesScore.size())); ++i)
+			std::cout << "\n\t" + moves[(*(movesScore.begin() + i)).first][0].GetPosBeforeMove().ToString() + "  -->  " + moves[(*(movesScore.begin() + i)).first][0].GetPosAfterMove().ToString();
+		return moves[(*(movesScore.begin() + (rand() % std::min(3, static_cast<int>(moves.size() - 1))) + 1)).first];
 	}
-#endif
+	return moves[(*movesScore.begin()).first];
 }
 
 float PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Color playerColor)
@@ -283,22 +264,18 @@ float PlayerWithAIGame::MiniMax(Map map, bool isAIMoveNow, int depth, float alph
 		auto AIColor{ isPlayerMoveFirst ? Color::Black : Color::White };
 		auto bestMove{ -infScore };
 		auto start{ AIColor == Color::Black ? 0 : 6 }; // used fixed enum order
-		if (map.IsShahFor(AIColor))
-			map.DisableCastlingForKing(AIColor); // if King is attacked => castling disabled
 		for (auto i = start; i != start + 6; ++i)
 		{
 			uint64_t j{ 1 };
 			while (j) // check all positions
 			{
-				if (j & map.map[i]) // is selected figure position
+				if (j & map.GetMap()[i]) // is selected figure position
 				{
-					OneFigureMoves moves;
-					moves.from = Pos::BitboardToPosition(j);
-					moves.to = Figure::FindPossibleMoves(moves.from, static_cast<FigureType>(i), map); // find figure possible moves without checking shah 
-					for (auto posItr = moves.to.begin(); posItr != moves.to.end(); ++posItr)
+					auto oneFigureMoves = Figure::FindPossibleMoves(Pos::BitboardToPosition(j), static_cast<FigureType>(i), map); // find figure possible moves without checking shah
+					for (auto moveItr = oneFigureMoves.begin(); moveItr != oneFigureMoves.end(); ++moveItr)
 					{
-						map.Move(moves.from, *posItr);
-						if (!map.IsShahFor(AIColor))
+						map.Move(*moveItr);
+						if (!Figure::IsShahFor(AIColor, map.GetMap()))
 							bestMove = std::max(bestMove, MiniMax(map, !isAIMoveNow, depth, alpha, beta));
 						map.UndoMove();
 						alpha = std::max(bestMove, alpha);
@@ -316,22 +293,18 @@ float PlayerWithAIGame::MiniMax(Map map, bool isAIMoveNow, int depth, float alph
 		auto playerColor{ isPlayerMoveFirst ? Color::White : Color::Black };
 		auto bestMove{ infScore };
 		auto start{ playerColor == Color::Black ? 0 : 6 }; // used fixed enum order
-		if (map.IsShahFor(playerColor))
-			map.DisableCastlingForKing(playerColor); // if King is attacked => castling disabled
 		for (auto i = start; i != start + 6; ++i)
 		{
 			uint64_t j{ 1 };
 			while (j) // check all positions
 			{
-				if (j & map.map[i]) // is selected figure position
+				if (j & map.GetMap()[i]) // is selected figure position
 				{
-					OneFigureMoves moves;
-					moves.from = Pos::BitboardToPosition(j);
-					moves.to = Figure::FindPossibleMoves(moves.from, static_cast<FigureType>(i), map); // find figure possible moves without checking shah 
-					for (auto posItr = moves.to.begin(); posItr != moves.to.end(); ++posItr)
+					auto oneFigureMoves = Figure::FindPossibleMoves(Pos::BitboardToPosition(j), static_cast<FigureType>(i), map); // find figure possible moves without checking shah
+					for (auto moveItr = oneFigureMoves.begin(); moveItr != oneFigureMoves.end(); ++moveItr)
 					{
-						map.Move(moves.from, *posItr);
-						if (!map.IsShahFor(playerColor))
+						map.Move(*moveItr);
+						if (!Figure::IsShahFor(playerColor, map.GetMap()))
 							bestMove = std::min(bestMove, MiniMax(map, !isAIMoveNow, depth - 1, alpha, beta));
 						map.UndoMove();
 						beta = std::min(bestMove, beta);
@@ -375,7 +348,7 @@ void PlayerWithAIGame::ChangeActivePlayer()
 		auto time{ clock.getElapsedTime() };
 		std::cout << "\n\tTime of calculating (in milliseconds): " << time.asMilliseconds()
 			<< "\n\tCount of calculated positions: " << positionsCount << "\n\tEnd!";
-		map.MakeMove(bestMove.from, bestMove.to);
+		map.MakeMove(bestMove[0].GetPosBeforeMove(), bestMove[0].GetPosAfterMove());
 		map.ClearPossibleMoves();
 		activePlayer = (activePlayer == player2) ? player1 : player2;
 		status = map.CheckGameFinal(activePlayer->GetColor());
@@ -387,7 +360,7 @@ void PlayerWithAIGame::ChangeActivePlayer()
 		}
 	}
 #ifdef SmartBotTest
-	if (status != GameStatus::Pat && status != GameStatus::Mat && map.movesHistory.size() < 300)
+	if (status != GameStatus::Pat && status != GameStatus::Mat && map.GetMovesCount() < 300)
 	{
 		activePlayer = (activePlayer == player2) ? player1 : player2;
 		isPlayerMoveFirst = !isPlayerMoveFirst;
@@ -395,35 +368,19 @@ void PlayerWithAIGame::ChangeActivePlayer()
 	}
 	else
 	{
-		if (map.movesHistory.size() < 300)
+		if (map.GetMovesCount() < 300)
 		{
 			if (activePlayer->GetColor() == Color::White)
 				++winBlack;
 			else
 				++winWhite;
 		}
-		std::cout << "\nFinish!\nCounts of moves: " << map.movesHistory.size() << "\nStats: winWhite = " << winWhite 
+		std::cout << "\nFinish!\nCounts of moves: " << map.GetMovesCount() << "\nStats: winWhite = " << winWhite
 			<< ", winBlack = " << winBlack << "\nStart new!";
 		if ((winWhite + winBlack) % 10 == 0)
 			system("pause");
 		mut1.lock();
 		map.ClearPossibleMoves();
-		map = Map();
-		mut1.unlock();
-		ChangeActivePlayer();
-	}
-#endif
-#ifdef RandBotTest
-	if (status != GameStatus::Pat && status != GameStatus::Mat)
-	{
-		activePlayer = (activePlayer == player2) ? player1 : player2;
-		ChangeActivePlayer();
-	}
-	else
-	{
-		std::cout << "\nFinish!\nCounts of moves: " << map.movesHistory.size() << "\nStart new!";
-		system("pause");
-		mut1.lock();
 		map = Map();
 		mut1.unlock();
 		ChangeActivePlayer();

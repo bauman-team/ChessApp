@@ -164,7 +164,7 @@ int main()
 			else
 				game = std::make_shared<PlayerWithAIGame>(&window, res, prop);
 			game->SetPlayers(inputValues.firstName, inputValues.secondName, inputValues.time);
-			game->StartGame();
+			game->StartGame(); // TODO: LSP
 		#ifdef _WIN32
 			window.setActive(false);
 			thDraw = std::thread{ [&backgroundGameColor, &game, &window]() {
@@ -182,7 +182,7 @@ int main()
 				} };
 			thDraw.detach();
 		#endif
-			if (typeid(*game) == typeid(PlayerWithAIGame))
+			if (typeid(*game) == typeid(PlayerWithAIGame)) // TODO: LSP
 			{
 				if (!std::dynamic_pointer_cast<PlayerWithAIGame>(game)->GetIsPlayerMoveFirst()) // if the first move of the bot
 				{

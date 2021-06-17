@@ -152,7 +152,7 @@ void Drawer::ResizeWindowForMenu(const sf::Vector2f& menuSize)
 
 void Drawer::ShowSideMenu(const Map& map)
 {
-	sideMenu.UpdateSideMenu(map.GetMovesHistory());
+	sideMenu.UpdateSideMenu(map.GetMovesLog());
 }
 
 Pos Drawer::TransformMousePosition(int mouseX, int mouseY) const

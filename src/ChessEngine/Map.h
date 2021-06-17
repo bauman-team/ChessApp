@@ -8,30 +8,17 @@ enum class BoardPos;
 
 class MoveInfo;
 class Figure;
-class PlayerWithAIGame;
-
-
-struct CHESSENGINE_API OneFigureMoves
-{
-	Pos from;
-	std::vector<Pos> to;
-};
+class PlayerWithAIGame; // TODO: delete
 
 
 class CHESSENGINE_API Map
 {
-	friend class PlayerWithAIGame;
-
-	uint64_t map[FIGURE_TYPES];
-	std::vector<MoveInfo> movesHistory;
-	std::vector<OneFigureMoves> allPossibleMoves;
-	std::array<bool, 4> possibleCastling;
+	std::array<uint64_t, FIGURE_TYPES>  map;
+	std::vector<MoveInfo> movesLog;
+	std::vector<std::vector<MoveInfo>> allPossibleMoves;
+	std::array<bool, 4> possibleCastling; // first 2 elements for white king, last for black
 	uint16_t countOfMoves;
 
-	void Move(const Pos& from, const Pos& to);
-	void SetToEmpty(const Pos& target);
-	void PawnToQueen(const Pos& target);
-	void RookCastling(const Pos& kingFrom, const Pos& kingTo);
 public:
 	Map(); 
 	Map(const Map& map);
@@ -39,29 +26,24 @@ public:
 	GameStatus CheckGameFinal(const Color &activePlayerColor);
 
 	std::vector<Pos> GetPossibleMovesFrom(const Pos& figurePosition) const;
-	const std::vector<OneFigureMoves>& GetAllPossibleMoves() const { return allPossibleMoves; }
+	const auto GetAllPossibleMoves() const { return allPossibleMoves; }
 
-	void FindAllPossibleMoves(const Color& activeColor);
+	void FindAllPossibleMoves(const Color& activeColor); // Return game status
 
 	bool MakeMove(const Pos& previousPosition, const Pos& nextPosition);
 	void ClearPossibleMoves();
 	
+	void Move(std::vector<MoveInfo> move);
 	void UndoMove();
 
 	// functions for bot to easy do and undo different moves
 	void DoImitationMove(const Pos& from, const Pos& to) noexcept;
 	void UndoImitationMove(const Pos& from, const Pos& to, FigureType eatenType) noexcept;
 
-	BoardPos CheckEmpty(const Pos& from, const Pos& to) const noexcept;
-
-	bool IsShahFor(const Color kingColor) const noexcept;
-	void EraseForbiddenMoves(OneFigureMoves& figureMoves) noexcept;
-
-	// castling methods
-	bool IsCastlingAllowedForKing(const Pos& kingPos) const noexcept;
-	bool IsCastlingAllowedWithRook(const Pos& rookPos, const Color& rookColor) const noexcept;
+	auto GetPossibleCastling() const noexcept { return possibleCastling; }
 	void DisableCastlingForKing(const Color& kingColor);
-	void DisableCastlingWithRook(const Pos& rookPos, const Color& rookColor);
+
+	auto GetMap() const noexcept { return map; }
 
 	Color GetColor(const Pos& pos) const noexcept;
 	Color GetColor(const FigureType type) const noexcept;
@@ -69,8 +51,8 @@ public:
 	FigureType GetFigureType(const int index) const;
 
 	const MoveInfo GetLastMoveInfo() const noexcept;
-	const std::vector<MoveInfo>& GetMovesHistory() const;
-	uint16_t GetMovesCount() const { return countOfMoves; }
+	const std::vector<MoveInfo>& GetMovesLog() const;
+	auto GetMovesCount() const { return countOfMoves; }
 
 	~Map(){}
 
