@@ -7,7 +7,7 @@
 #include "Pos.h"
 #include "Map.h"
 
-enum class CHESSENGINE_API FigureType // used current fixed order
+enum class CHESSENGINE_API FigureType // used fixed enum order
 {
 	King_black,
 	Queen_black,

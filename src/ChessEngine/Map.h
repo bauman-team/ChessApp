@@ -2,13 +2,13 @@
 #include "MoveInfo.h"
 
 enum class CHESSENGINE_API GameStatus { Play, Shah, Mat, Pat, TimeIsOver, Exit };
+enum class CHESSENGINE_API MoveStatus { Made, NeedFigureType, NotFound };
 enum class FigureType;
 enum class Color;
 enum class BoardPos;
 
 class MoveInfo;
 class Figure;
-class PlayerWithAIGame; // TODO: delete
 
 
 class CHESSENGINE_API Map
@@ -28,9 +28,9 @@ public:
 	std::vector<Pos> GetPossibleMovesFrom(const Pos& figurePosition) const;
 	const auto GetAllPossibleMoves() const { return allPossibleMoves; }
 
-	void FindAllPossibleMoves(const Color& activeColor); // Return game status
+	void FindAllPossibleMoves(const Color& activeColor); 
 
-	bool MakeMove(const Pos& previousPosition, const Pos& nextPosition);
+	MoveStatus MakeMove(const Pos& previousPosition, const Pos& nextPosition, const FigureType selectedFigure); // TODO: = FigureType::Empty  don't work?????
 	void ClearPossibleMoves();
 	
 	void Move(std::vector<MoveInfo> move);

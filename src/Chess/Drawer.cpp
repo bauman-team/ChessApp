@@ -1,7 +1,8 @@
 #include "Drawer.h"
 
 Drawer::Drawer(sf::RenderWindow* _window, const Resources& resources, const MapProperties& properties, GameSet SetExitStatus, Game* game)
-	: sideMenu{ _window, properties, SetExitStatus, game }, window{ _window }, mapProps{ properties }, windowScale{ 1.0, 1.0 }
+	: sideMenu{ _window, properties, SetExitStatus, game }, window{ _window }, mapProps{ properties }, windowScale{ 1.0, 1.0 },
+	selectedPosFrom{ Pos::NULL_POS }, selectedPosTo{ Pos::NULL_POS }, selectedFigure{ FigureType::Empty }
 {
 	window->setFramerateLimit(60);
 
@@ -82,16 +83,33 @@ void Drawer::ShowMap(const Map& map)
 	{
 		for (uint8_t i = 0; i != 8; ++i)
 		{
-			auto figureType{ map.GetFigureType(Pos{ i, j }) };
-			if (figureType != FigureType::Empty)
+			auto position{ Pos{ i, j } };
+			auto figureType{ map.GetFigureType(position) };
+			if (figureType != FigureType::Empty &&
+				(!selectedPosTo.IsValid() || selectedPosTo.IsValid() && selectedPosFrom != position && selectedPosTo != position))
 			{
 				auto coord{ (isWhiteActive) ? Pos{ i, static_cast<uint8_t>(7 - j) } : Pos{ static_cast<uint8_t>(7 - i), j } };
+				if (!selectedPosTo.IsValid())
+					figuresSprites[toUType(figureType)].setColor(sf::Color{ 255, 255, 255, 255 });
+				else
+					figuresSprites[toUType(figureType)].setColor(sf::Color{ 255, 255, 255, 100 }); // transparent figure
 				figuresSprites[toUType(figureType)].setPosition(mapProps.GetPlayAreaTopLeftX() + coord.GetX() * squareSize,
-																			 mapProps.GetPlayAreaTopLeftY() + coord.GetY() * squareSize);
+						mapProps.GetPlayAreaTopLeftY() + coord.GetY() * squareSize);
+				window->draw(figuresSprites[toUType(figureType)]);
+			}
+			else if (selectedPosTo == position)
+			{
+				auto coord{ (isWhiteActive) ? Pos{ i, static_cast<uint8_t>(7 - j) } : Pos{ static_cast<uint8_t>(7 - i), j } };
+				figureType = selectedFigure.front();
+				figuresSprites[toUType(figureType)].setColor(sf::Color{ 255, 255, 255, 255 });
+				figuresSprites[toUType(figureType)].setPosition(mapProps.GetPlayAreaTopLeftX() + coord.GetX() * squareSize,
+					mapProps.GetPlayAreaTopLeftY() + coord.GetY() * squareSize);
 				window->draw(figuresSprites[toUType(figureType)]);
 			}
 		}
 	}
+	if (selectedPosTo.IsValid())
+		ShowTransformFigure();
 }
 
 void Drawer::ShowTimer(sf::Time time)
@@ -167,6 +185,42 @@ Pos Drawer::TransformMousePosition(int mouseX, int mouseY) const
 	return {};
 }
 
+void Drawer::SetSelectedPositionTo(const Pos position, const Map& map)
+{
+	auto moves{ map.GetAllPossibleMoves() };
+	auto it{ moves.cbegin() }, end{ moves.cend() };
+	for (; it != end; ++it)
+		if (((*it)[0].GetPosBeforeMove() == selectedPosFrom && (*it)[0].GetPosAfterMove() == position)) // search move in the vector of possible moves
+			selectedFigure.push_back((*it)[1].GetTypeActiveFigure());
+	selectedPosTo = position;
+}
+
+void Drawer::SetSelectedFigure(int mouseX, int mouseY)
+{
+	const auto squareSize{ mapProps.GetSquareSize() };
+	auto coord{ (isWhiteActive) ? Pos{ selectedPosTo.GetX(), static_cast<uint8_t>(7 - selectedPosTo.GetY()) } : Pos{ static_cast<uint8_t>(7 - selectedPosTo.GetX()), selectedPosTo.GetY() } };
+	if (mouseX < mapProps.GetPlayAreaTopLeftX() + coord.GetX() * squareSize - 2 && mouseX > mapProps.GetPlayAreaTopLeftX() + coord.GetX() * squareSize - 44 &&
+		mouseY < mapProps.GetPlayAreaTopLeftY() + coord.GetY() * squareSize + 68 && mouseY > mapProps.GetPlayAreaTopLeftY() + coord.GetY() * squareSize + 24)
+	{
+		
+		selectedFigure.push_front(selectedFigure.back());
+		selectedFigure.pop_back();
+	}
+	else if (mouseX < mapProps.GetPlayAreaTopLeftX() + coord.GetX() * squareSize + 146 && mouseX > mapProps.GetPlayAreaTopLeftX() + coord.GetX() * squareSize + 102 &&
+		mouseY < mapProps.GetPlayAreaTopLeftY() + coord.GetY() * squareSize + 68 && mouseY > mapProps.GetPlayAreaTopLeftY() + coord.GetY() * squareSize + 24)
+	{
+		selectedFigure.push_back(selectedFigure.front());
+		selectedFigure.pop_front();
+	}
+}
+
+void Drawer::ClearSelect()
+{ 
+	selectedPosFrom = Pos::NULL_POS;
+	selectedPosTo = Pos::NULL_POS;
+	selectedFigure.clear();
+}
+
 void Drawer::ShowPossibleMoves(const Pos& chosenPos, const Map& map)
 {
 	auto possiblePositions{ map.GetPossibleMovesFrom(chosenPos) };
@@ -181,6 +235,29 @@ void Drawer::ShowPossibleMoves(const Pos& chosenPos, const Map& map)
 						   mapProps.GetPlayAreaTopLeftY() + (coord.GetY() + offset) * mapProps.GetSquareSize());
 		window->draw(circle);
 	}
+}
+
+void Drawer::ShowTransformFigure()
+{
+	const auto squareSize{ mapProps.GetSquareSize() };
+	auto coord{ (isWhiteActive) ? Pos{ selectedPosTo.GetX(), static_cast<uint8_t>(7 - selectedPosTo.GetY()) } : Pos{ static_cast<uint8_t>(7 - selectedPosTo.GetX()), selectedPosTo.GetY() } };
+	sf::CircleShape triangle1{ 25, 3 }, triangle2{ 25, 3 }, triangle3{ 29, 3 }, triangle4{ 29, 3 };
+	triangle3.setFillColor(sf::Color::Black);
+	triangle3.rotate(270);
+	triangle3.setPosition(mapProps.GetPlayAreaTopLeftX() + coord.GetX() * squareSize - 43, mapProps.GetPlayAreaTopLeftY() + coord.GetY() * squareSize + 74);
+	triangle1.setFillColor(sf::Color::White);
+	triangle1.rotate(270);
+	triangle1.setPosition(mapProps.GetPlayAreaTopLeftX() + coord.GetX() * squareSize - 39, mapProps.GetPlayAreaTopLeftY() + coord.GetY() * squareSize + 70);
+	triangle4.setFillColor(sf::Color::Black);
+	triangle4.rotate(90);
+	triangle4.setPosition(mapProps.GetPlayAreaTopLeftX() + coord.GetX() * squareSize + 143, mapProps.GetPlayAreaTopLeftY() + coord.GetY() * squareSize + 16);
+	triangle2.setFillColor(sf::Color::White);
+	triangle2.rotate(90);
+	triangle2.setPosition(mapProps.GetPlayAreaTopLeftX() + coord.GetX() * squareSize + 139, mapProps.GetPlayAreaTopLeftY() + coord.GetY() * squareSize + 20);
+	window->draw(triangle3);
+	window->draw(triangle1);
+	window->draw(triangle4);
+	window->draw(triangle2);
 }
 
 void Drawer::HandleEvent(sf::Event& event)

@@ -18,11 +18,11 @@ void TwoPlayersGame::Show()
 	if (activePlayer->HasTime())
 	{
 		mut1.lock();
-		auto chosenPos = activePlayer->GetChosenPosition();
-		if (chosenPos != Pos::NULL_POS)
+		auto selectedPos = drawer.GetSelectedPositionFrom();
+		if (selectedPos.IsValid() && !drawer.GetSelectedPositionTo().IsValid())
 		{
-			drawer.ShowActiveFigure(chosenPos, map);
-			drawer.ShowPossibleMoves(chosenPos, map);
+			drawer.ShowActiveFigure(selectedPos, map);
+			drawer.ShowPossibleMoves(selectedPos, map);
 		}
 		mut1.unlock();
 	}
@@ -37,7 +37,7 @@ void TwoPlayersGame::ChangeActivePlayer()
 
 	mut1.lock();
 	map.ClearPossibleMoves();
-	activePlayer->SetChosenPosition({ });
+	drawer.ClearSelect();
 	mut1.unlock();
 
 	sf::sleep(sf::seconds(2));
@@ -58,21 +58,36 @@ void TwoPlayersGame::SetPosition(int mouseX, int mouseY)
 	if (activePlayer->HasTime())
 	{
 		auto position{ drawer.TransformMousePosition(mouseX, mouseY) }; // transform coords on window to position on map
-		if (position != Pos::NULL_POS)
+		if (position.IsValid() && // if position is correct
+			(activePlayer->GetColor() == Color::Black ? // rotate for black
+				position = Pos{ static_cast<uint8_t>(7 - position.GetX()), static_cast<uint8_t>(7 - position.GetY()) } : position,
+				!drawer.GetSelectedPositionTo().IsValid() || drawer.GetSelectedPositionTo() == position))
 		{
-			if (activePlayer->GetColor() == Color::Black)
+			if (drawer.GetSelectedPositionFrom().IsValid()) // if chosen position exists
 			{
-				position = Pos{ static_cast<uint8_t>(7 - position.GetX()), static_cast<uint8_t>(7 - position.GetY()) };
+				MoveStatus status = map.MakeMove(drawer.GetSelectedPositionFrom(), position, drawer.GetSelectedFigure()); // try to move
+				if (status == MoveStatus::Made)
+					ChangeActivePlayer();
+				else if (status == MoveStatus::NotFound)
+				{
+					drawer.ClearSelect();
+					drawer.SetSelectedPositionFrom(position);
+				}
+				else
+				{
+					mut1.lock();
+					drawer.SetSelectedPositionTo(position, map);
+					mut1.unlock();
+				}
 			}
-			if (position.IsValid()) // if position is correct
-			{
-				if (activePlayer->GetChosenPosition() != Pos::NULL_POS && // if chosen position exists and
-					activePlayer->GetColor() != map.GetColor(position) &&  // position and activePlayer colors aren't same
-					map.MakeMove(activePlayer->GetChosenPosition(), position)) // try to move
-						ChangeActivePlayer();
-				else // select position
-					activePlayer->SetChosenPosition(position);
-			}
+			else // select position
+				drawer.SetSelectedPositionFrom(position);
+		}
+		else if (drawer.GetSelectedPositionTo().IsValid())
+		{
+			mut1.lock();
+			drawer.SetSelectedFigure(mouseX, mouseY);
+			mut1.unlock();
 		}
 	}
 }

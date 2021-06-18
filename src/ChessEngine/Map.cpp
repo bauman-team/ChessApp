@@ -10,20 +10,20 @@ Map::mapUpBorder{ 18'374'686'479'671'623'680 }, Map::mapDownBorder{ 255 };
 
 Map::Map()
 { // 0 - left down
-	map[toUType(FigureType::Rook_black)] = 9'295'429'630'892'703'744;
-	map[toUType(FigureType::Knight_black)] = 4'755'801'206'503'243'776;
-	map[toUType(FigureType::Bishop_black)] = 2'594'073'385'365'405'696;
-	map[toUType(FigureType::Queen_black)] = 576'460'752'303'423'488;
+	map[toUType(FigureType::Rook_black)] = 0;// 9'295'429'630'892'703'744;
+	map[toUType(FigureType::Knight_black)] = 0;// 4'755'801'206'503'243'776;
+	map[toUType(FigureType::Bishop_black)] = 0;// 2'594'073'385'365'405'696;
+	map[toUType(FigureType::Queen_black)] = 0;// 576'460'752'303'423'488;
 	map[toUType(FigureType::King_black)] = 1'152'921'504'606'846'976;
-	map[toUType(FigureType::Pawn_black)] = 71'776'119'061'217'280;
-	map[toUType(FigureType::Rook_white)] = 129;
-	map[toUType(FigureType::Knight_white)] = 66;
-	map[toUType(FigureType::Bishop_white)] = 36;
-	map[toUType(FigureType::Queen_white)] = 8;
+	map[toUType(FigureType::Pawn_black)] = 0;// 71'776'119'061'217'280;
+	map[toUType(FigureType::Rook_white)] = 0;// 129;
+	map[toUType(FigureType::Knight_white)] = 0;// 66;
+	map[toUType(FigureType::Bishop_white)] = 0;// 36;
+	map[toUType(FigureType::Queen_white)] = 0;// 8;
 	map[toUType(FigureType::King_white)] = 16;
 	map[toUType(FigureType::Pawn_white)] = 65'280;
 	for (auto i = 0; i != 4; ++i)
-		possibleCastling[i] = true;
+		possibleCastling[i] = false;
 	countOfMoves = 0;
 }
 
@@ -97,19 +97,24 @@ void Map::FindAllPossibleMoves(const Color& activeColor)
 	mut1.unlock();
 }
 
-bool Map::MakeMove(const Pos& previousPosition, const Pos& nextPosition)
+MoveStatus Map::MakeMove(const Pos& previousPosition, const Pos& nextPosition, const FigureType selectedFigure)
 {
 	auto it{ allPossibleMoves.cbegin() }, end{ allPossibleMoves.cend() };
-
+	std::vector<std::vector<MoveInfo>> moves;
 	for (; it != end; ++it) 
-		if ((*it)[0].GetPosBeforeMove() == previousPosition && (*it)[0].GetPosAfterMove() == nextPosition) // search move in the vector of possible moves
-		{
-			mut1.lock();
-			Move(*it);
-			mut1.unlock();
-			return true;
-		}
-	return false;
+		if (((*it)[0].GetPosBeforeMove() == previousPosition && (*it)[0].GetPosAfterMove() == nextPosition) &&
+			(selectedFigure == FigureType::Empty || selectedFigure == (*it)[1].GetTypeActiveFigure())) // search move in the vector of possible moves
+			moves.push_back(*it);
+	if (moves.size() == 1)
+	{
+		mut1.lock();
+		Move(moves[0]);
+		mut1.unlock();
+		return MoveStatus::Made;
+	}
+	else if (moves.size() > 1)
+		return MoveStatus::NeedFigureType;
+	return MoveStatus::NotFound;
 }
 
 void Map::ClearPossibleMoves()
@@ -125,7 +130,7 @@ void Map::Move(std::vector<MoveInfo> move)
 	{
 		if ((*it).GetTypeEatenFigure() != FigureType::Empty)
 			map[toUType((*it).GetTypeEatenFigure())] -= (*it).GetPosAfterMove().ToBitboard();
-		if ((*it).GetPosBeforeMove() != Pos::NULL_POS) // used for pawn transform move
+		if ((*it).GetPosBeforeMove().IsValid()) // used for pawn transform move
 			map[toUType((*it).GetTypeActiveFigure())] -= (*it).GetPosBeforeMove().ToBitboard();
 		map[toUType((*it).GetTypeActiveFigure())] += (*it).GetPosAfterMove().ToBitboard();
 	}
@@ -151,7 +156,7 @@ void Map::UndoMove()
 		if (info.GetTypeEatenFigure() != FigureType::Empty)
 			map[toUType(info.GetTypeEatenFigure())] += info.GetPosAfterMove().ToBitboard();
 		map[toUType(info.GetTypeActiveFigure())] -= info.GetPosAfterMove().ToBitboard();
-		if (info.GetPosBeforeMove() != Pos::NULL_POS) // used for pawn transform move
+		if (info.GetPosBeforeMove().IsValid()) // used for pawn transform move
 			map[toUType(info.GetTypeActiveFigure())] += info.GetPosBeforeMove().ToBitboard();
 		info = GetLastMoveInfo();
 	}

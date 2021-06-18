@@ -8,7 +8,7 @@
 #include <intrin.h> 
 #endif
 
-#define SmartBotTest
+//#define SmartBotTest
 //#define TestWeightAndBitboards
 CHESSENGINE_API extern std::mutex mut1;
 std::mutex mut2;
@@ -334,7 +334,7 @@ void PlayerWithAIGame::ChangeActivePlayer()
 	auto stopTime{ isTimeLimited };
 	isTimeLimited = false;
 	mut1.lock();
-	activePlayer->SetChosenPosition(Pos::NULL_POS);
+	drawer.ClearSelect();
 	mut1.unlock();
 	map.ClearPossibleMoves();
 	activePlayer = (activePlayer == player2) ? player1 : player2;
@@ -348,7 +348,7 @@ void PlayerWithAIGame::ChangeActivePlayer()
 		auto time{ clock.getElapsedTime() };
 		std::cout << "\n\tTime of calculating (in milliseconds): " << time.asMilliseconds()
 			<< "\n\tCount of calculated positions: " << positionsCount << "\n\tEnd!";
-		map.MakeMove(bestMove[0].GetPosBeforeMove(), bestMove[0].GetPosAfterMove());
+		map.MakeMove(bestMove[0].GetPosBeforeMove(), bestMove[0].GetPosAfterMove(), bestMove.size() > 1 ? bestMove[1].GetTypeActiveFigure() : FigureType::Empty);
 		map.ClearPossibleMoves();
 		activePlayer = (activePlayer == player2) ? player1 : player2;
 		status = map.CheckGameFinal(activePlayer->GetColor());
@@ -391,9 +391,7 @@ void PlayerWithAIGame::ChangeActivePlayer()
 void PlayerWithAIGame::StartGame()
 {
 	if (!isPlayerMoveFirst)
-	{
 		drawer.RotateBoard();
-	}
 	else
 	{
 		map.FindAllPossibleMoves(activePlayer->GetColor());
