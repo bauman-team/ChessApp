@@ -391,7 +391,10 @@ void PlayerWithAIGame::ChangeActivePlayer()
 void PlayerWithAIGame::StartGame()
 {
 	if (!isPlayerMoveFirst)
+	{
 		drawer.RotateBoard();
+		ChangeActivePlayer(); // if the first move of the bot
+	}
 	else
 	{
 		map.FindAllPossibleMoves(activePlayer->GetColor());

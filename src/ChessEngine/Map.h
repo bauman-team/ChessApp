@@ -21,6 +21,7 @@ class CHESSENGINE_API Map
 
 public:
 	Map(); 
+	Map(const std::array<uint64_t, FIGURE_TYPES> _map);
 	Map(const Map& map);
 
 	GameStatus CheckGameFinal(const Color &activePlayerColor);
@@ -30,7 +31,7 @@ public:
 
 	void FindAllPossibleMoves(const Color& activeColor); 
 
-	MoveStatus MakeMove(const Pos& previousPosition, const Pos& nextPosition, const FigureType selectedFigure); // TODO: = FigureType::Empty  don't work?????
+	MoveStatus MakeMove(const Pos& previousPosition, const Pos& nextPosition, const FigureType selectedFigure);
 	void ClearPossibleMoves();
 	
 	void Move(std::vector<MoveInfo> move);

@@ -10,21 +10,27 @@ Map::mapUpBorder{ 18'374'686'479'671'623'680 }, Map::mapDownBorder{ 255 };
 
 Map::Map()
 { // 0 - left down
-	map[toUType(FigureType::Rook_black)] = 0;// 9'295'429'630'892'703'744;
-	map[toUType(FigureType::Knight_black)] = 0;// 4'755'801'206'503'243'776;
-	map[toUType(FigureType::Bishop_black)] = 0;// 2'594'073'385'365'405'696;
-	map[toUType(FigureType::Queen_black)] = 0;// 576'460'752'303'423'488;
+	map[toUType(FigureType::Rook_black)] = 9'295'429'630'892'703'744;
+	map[toUType(FigureType::Knight_black)] = 4'755'801'206'503'243'776;
+	map[toUType(FigureType::Bishop_black)] = 2'594'073'385'365'405'696;
+	map[toUType(FigureType::Queen_black)] = 576'460'752'303'423'488;
 	map[toUType(FigureType::King_black)] = 1'152'921'504'606'846'976;
-	map[toUType(FigureType::Pawn_black)] = 0;// 71'776'119'061'217'280;
-	map[toUType(FigureType::Rook_white)] = 0;// 129;
-	map[toUType(FigureType::Knight_white)] = 0;// 66;
-	map[toUType(FigureType::Bishop_white)] = 0;// 36;
-	map[toUType(FigureType::Queen_white)] = 0;// 8;
+	map[toUType(FigureType::Pawn_black)] = 71'776'119'061'217'280;
+	map[toUType(FigureType::Rook_white)] = 129;
+	map[toUType(FigureType::Knight_white)] = 66;
+	map[toUType(FigureType::Bishop_white)] = 36;
+	map[toUType(FigureType::Queen_white)] = 8;
 	map[toUType(FigureType::King_white)] = 16;
 	map[toUType(FigureType::Pawn_white)] = 65'280;
 	for (auto i = 0; i != 4; ++i)
-		possibleCastling[i] = false;
+		possibleCastling[i] = true;
 	countOfMoves = 0;
+}
+
+Map::Map(const std::array<uint64_t, FIGURE_TYPES> _map) : Map()
+{
+	for (auto i = 0; i != FIGURE_TYPES; ++i)
+		map[i] = _map[i];
 }
 
 Map::Map(const Map& baseMap)
@@ -137,6 +143,7 @@ void Map::Move(std::vector<MoveInfo> move)
 	it = move.begin();
 	for (auto i = 0; i != 4; ++i)
 		possibleCastling[i] = (*it).GetPossibleCastling()[i];
+	// TODO: delete CRUTCH!!!
 	if (Figure::IsShahFor(GetColor((*it).GetTypeActiveFigure()) == Color::White ? Color::Black : Color::White, map)) // if King is attacked => castling disabled
 	{
 		DisableCastlingForKing(GetColor((*it).GetTypeActiveFigure()) == Color::White ? Color::Black : Color::White);

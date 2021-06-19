@@ -46,7 +46,7 @@ int main()
 	while(sf::sleep(sf::seconds(0.05)), window.isOpen())
 	{
 		if (!game)
-			window.clear(sf::Color::White); // TODO: select back color in menu/game
+			window.clear(sf::Color::White);
 		#ifndef _WIN32
 		else
 			window.clear(backgroundGameColor);
@@ -92,7 +92,12 @@ int main()
 						else
 							game = std::make_shared<PlayerWithAIGame>(&window, res, prop);
 						game->SetPlayers(inputValues.firstName, inputValues.secondName, inputValues.time);
-						game->StartGame();
+						while (!thSetCellIsFinished) sf::sleep(sf::seconds(0.1));
+						thSetCellIsFinished = false;
+						thSetCell = std::thread{ [game, &thSetCellIsFinished]() {
+									game->StartGame();
+									thSetCellIsFinished = true; } };
+						thSetCell.detach();
 					#ifdef _WIN32
 						window.setActive(false);
 						thDraw = std::thread{ [&backgroundGameColor, &game, &window]() {
@@ -110,18 +115,6 @@ int main()
 							} };
 						thDraw.detach();
 					#endif
-						if (typeid(*game) == typeid(PlayerWithAIGame))
-						{
-							if (!std::dynamic_pointer_cast<PlayerWithAIGame>(game)->GetIsPlayerMoveFirst()) // if the first move of the bot
-							{
-								while (!thSetCellIsFinished) sf::sleep(sf::seconds(0.1));
-								thSetCellIsFinished = false;
-								thSetCell = std::thread{ [game, &thSetCellIsFinished]() {
-									game->ChangeActivePlayer();
-									thSetCellIsFinished = true; } };
-								thSetCell.detach();
-							}
-						}
 					}
 				}
 				else if (!game && (event.key.code == sf::Keyboard::Escape))
@@ -164,7 +157,12 @@ int main()
 			else
 				game = std::make_shared<PlayerWithAIGame>(&window, res, prop);
 			game->SetPlayers(inputValues.firstName, inputValues.secondName, inputValues.time);
-			game->StartGame(); // TODO: LSP
+			while (!thSetCellIsFinished) sf::sleep(sf::seconds(0.1));
+			thSetCellIsFinished = false;
+			thSetCell = std::thread{ [game, &thSetCellIsFinished]() {
+						game->StartGame();
+						thSetCellIsFinished = true; } };
+			thSetCell.detach();
 		#ifdef _WIN32
 			window.setActive(false);
 			thDraw = std::thread{ [&backgroundGameColor, &game, &window]() {
@@ -182,18 +180,6 @@ int main()
 				} };
 			thDraw.detach();
 		#endif
-			if (typeid(*game) == typeid(PlayerWithAIGame)) // TODO: LSP
-			{
-				if (!std::dynamic_pointer_cast<PlayerWithAIGame>(game)->GetIsPlayerMoveFirst()) // if the first move of the bot
-				{
-					while (!thSetCellIsFinished) sf::sleep(sf::seconds(0.1));
-					thSetCellIsFinished = false;
-					thSetCell = std::thread{ [game, &thSetCellIsFinished]() {
-						game->ChangeActivePlayer();
-						thSetCellIsFinished = true; } };
-					thSetCell.detach();
-				}
-			}
 		}
 	#ifndef _WIN32
 		(game) ? game->Show() : menu.Show();

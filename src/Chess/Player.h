@@ -22,7 +22,7 @@ public:
 	Player(Color _color, std::string _name, sf::Time timeLimit, bool _isBot = false)
 		: color{ _color }, name{ _name }, remainingTime{ timeLimit }, timeIsUp{ false }, isBot{ _isBot }, numOfFigures{ 16 } { }
 
-	int DecreaseNumOfFigures() { return --numOfFigures; } // TODO: don't use?
+	int DecreaseNumOfFigures() { return --numOfFigures; } // TODO: don't use, maybe delete?
 
 	Color GetColor() const { return color; }
 	std::string GetName() const { return name; }
