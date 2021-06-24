@@ -202,11 +202,7 @@ std::vector<std::vector<MoveInfo>> Figure::FindDiagonalMoves(const Pos& figurePo
 				nextPosFigureType = map.GetFigureType(nextPosition);
 				emptyStatus = CheckEmpty(figureColor, GetFigureTypeColor(nextPosFigureType));
 				if (toUType(emptyStatus))
-				{
-					std::vector<MoveInfo> possibleMove;
-					possibleMove.push_back(std::move(MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount }));
-					possibleMoves.push_back(std::move(possibleMove));
-				}
+					possibleMoves.push_back(std::vector<MoveInfo>{ MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount } });
 			}
 			else
 				emptyStatus = BoardPos::Lock;
@@ -270,44 +266,28 @@ std::vector<std::vector<MoveInfo>> Figure::FindPossibleMovesKing(const Pos& figu
 		{
 			nextPosFigureType = map.GetFigureType(nextPosition);
 			if (toUType(CheckEmpty(figureColor, GetFigureTypeColor(nextPosFigureType))))
-			{
-				std::vector<MoveInfo> possibleMove;
-				possibleMove.push_back(std::move(MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, nextPossibleCastling, false, movesCount }));
-				possibleMoves.push_back(std::move(possibleMove));
-			}
+				possibleMoves.push_back(std::vector<MoveInfo>{ MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, nextPossibleCastling, false, movesCount } });
 		}
 		nextPosition = figurePosition.Add(i, i);
 		if (nextPosition.IsValid())
 		{
 			nextPosFigureType = map.GetFigureType(nextPosition);
 			if (toUType(CheckEmpty(figureColor, GetFigureTypeColor(nextPosFigureType))))
-			{
-				std::vector<MoveInfo> possibleMove;
-				possibleMove.push_back(std::move(MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, nextPossibleCastling, false, movesCount }));
-				possibleMoves.push_back(std::move(possibleMove));
-			}
+				possibleMoves.push_back(std::vector<MoveInfo>{ MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, nextPossibleCastling, false, movesCount } });
 		}
 		nextPosition = figurePosition.Add(i, -i);
 		if (nextPosition.IsValid())
 		{
 			nextPosFigureType = map.GetFigureType(nextPosition);
 			if (toUType(CheckEmpty(figureColor, GetFigureTypeColor(nextPosFigureType))))
-			{
-				std::vector<MoveInfo> possibleMove;
-				possibleMove.push_back(std::move(MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, nextPossibleCastling, false, movesCount }));
-				possibleMoves.push_back(std::move(possibleMove));
-			}
+				possibleMoves.push_back(std::vector<MoveInfo>{ MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, nextPossibleCastling, false, movesCount } });
 		}
 		nextPosition = figurePosition.Add(i, 0);
 		if (nextPosition.IsValid())
 		{
 			nextPosFigureType = map.GetFigureType(nextPosition);
 			if (toUType(CheckEmpty(figureColor, GetFigureTypeColor(nextPosFigureType))))
-			{
-				std::vector<MoveInfo> possibleMove;
-				possibleMove.push_back(std::move(MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, nextPossibleCastling, false, movesCount }));
-				possibleMoves.push_back(std::move(possibleMove));
-			}
+				possibleMoves.push_back(std::vector<MoveInfo>{ MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, nextPossibleCastling, false, movesCount } });
 		}
 	}
 	
@@ -326,8 +306,8 @@ std::vector<std::vector<MoveInfo>> Figure::FindPossibleMovesKing(const Pos& figu
 			if (!IsShahFor(figureColor, map.GetMap()))
 			{
 				std::vector<MoveInfo> possibleMove;
-				possibleMove.push_back(std::move(MoveInfo{ figurePosition, Pos{ 2, y }, figureType, FigureType::Empty, nextPossibleCastling, false, movesCount }));
-				possibleMove.push_back(std::move(MoveInfo{ Pos{ 0, y }, Pos{ 3, y }, figureColor == Color::White ? FigureType::Rook_white : FigureType::Rook_black, FigureType::Empty, nextPossibleCastling, false, movesCount }));
+				possibleMove.push_back(MoveInfo{ figurePosition, Pos{ 2, y }, figureType, FigureType::Empty, nextPossibleCastling, false, movesCount });
+				possibleMove.push_back(MoveInfo{ Pos{ 0, y }, Pos{ 3, y }, figureColor == Color::White ? FigureType::Rook_white : FigureType::Rook_black, FigureType::Empty, nextPossibleCastling, false, movesCount });
 				possibleMoves.push_back(std::move(possibleMove));
 			}
 			map.UndoImitationMove(figurePosition, Pos{ 3, y }, FigureType::Empty);
@@ -342,8 +322,8 @@ std::vector<std::vector<MoveInfo>> Figure::FindPossibleMovesKing(const Pos& figu
 			if (!IsShahFor(figureColor, map.GetMap()))
 			{
 				std::vector<MoveInfo> possibleMove;
-				possibleMove.push_back(std::move(MoveInfo{ figurePosition, Pos{ 6, y }, figureType, FigureType::Empty, nextPossibleCastling, false, movesCount }));
-				possibleMove.push_back(std::move(MoveInfo{ Pos{ 7, y }, Pos{ 5, y }, figureColor == Color::White ? FigureType::Rook_white : FigureType::Rook_black, FigureType::Empty, nextPossibleCastling, false, movesCount }));
+				possibleMove.push_back(MoveInfo{ figurePosition, Pos{ 6, y }, figureType, FigureType::Empty, nextPossibleCastling, false, movesCount });
+				possibleMove.push_back(MoveInfo{ Pos{ 7, y }, Pos{ 5, y }, figureColor == Color::White ? FigureType::Rook_white : FigureType::Rook_black, FigureType::Empty, nextPossibleCastling, false, movesCount });
 				possibleMoves.push_back(std::move(possibleMove));
 			}
 			map.UndoImitationMove(figurePosition, Pos{ 5, y }, FigureType::Empty);
@@ -379,44 +359,28 @@ std::vector<std::vector<MoveInfo>> Figure::FindPossibleMovesKnight(const Pos& fi
 		{
 			nextPosFigureType = map.GetFigureType(nextPosition);
 			if (toUType(CheckEmpty(figureColor, GetFigureTypeColor(nextPosFigureType))))
-			{
-				std::vector<MoveInfo> possibleMove;
-				possibleMove.push_back(std::move(MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount }));
-				possibleMoves.push_back(std::move(possibleMove));
-			}
+				possibleMoves.push_back(std::vector<MoveInfo>{ MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount } });
 		}
 		nextPosition = figurePosition.Add(i, -j);
 		if (nextPosition.IsValid())
 		{
 			nextPosFigureType = map.GetFigureType(nextPosition);
 			if (toUType(CheckEmpty(figureColor, GetFigureTypeColor(nextPosFigureType))))
-			{
-				std::vector<MoveInfo> possibleMove;
-				possibleMove.push_back(std::move(MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount }));
-				possibleMoves.push_back(std::move(possibleMove));
-			}
+				possibleMoves.push_back(std::vector<MoveInfo>{ MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount } });
 		}
 		nextPosition = figurePosition.Add(j, i);
 		if (nextPosition.IsValid())
 		{
 			nextPosFigureType = map.GetFigureType(nextPosition);
 			if (toUType(CheckEmpty(figureColor, GetFigureTypeColor(nextPosFigureType))))
-			{
-				std::vector<MoveInfo> possibleMove;
-				possibleMove.push_back(std::move(MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount }));
-				possibleMoves.push_back(std::move(possibleMove));
-			}
+				possibleMoves.push_back(std::vector<MoveInfo>{ MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount } });
 		}
 		nextPosition = figurePosition.Add(-j, i);
 		if (nextPosition.IsValid())
 		{
 			nextPosFigureType = map.GetFigureType(nextPosition);
 			if (toUType(CheckEmpty(figureColor, GetFigureTypeColor(nextPosFigureType))))
-			{
-				std::vector<MoveInfo> possibleMove;
-				possibleMove.push_back(std::move(MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount }));
-				possibleMoves.push_back(std::move(possibleMove));
-			}
+				possibleMoves.push_back(std::vector<MoveInfo>{ MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount } });
 		}
 	}
 	return possibleMoves;
@@ -424,7 +388,7 @@ std::vector<std::vector<MoveInfo>> Figure::FindPossibleMovesKnight(const Pos& fi
 
 std::vector<std::vector<MoveInfo>> Figure::FindPossibleMovesRook(const Pos& figurePosition, const FigureType figureType, Map& map) noexcept
 {
-	return FindStraightMoves(figurePosition, figureType, map); // TODO: move-semantic?
+	return FindStraightMoves(figurePosition, figureType, map);
 }
 
 std::vector<std::vector<MoveInfo>> Figure::FindPossibleMovesPawn(const Pos& figurePosition, const FigureType figureType, Map& map) noexcept
@@ -441,19 +405,19 @@ std::vector<std::vector<MoveInfo>> Figure::FindPossibleMovesPawn(const Pos& figu
 	if (nextPosFigureType == FigureType::Empty)
 	{
 		std::vector<MoveInfo> possibleMove;
-		possibleMove.push_back(std::move(MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount }));
+		possibleMove.push_back(MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount });
 		if (figurePosition.GetY() == 6 && pawnColor == Color::White || figurePosition.GetY() == 1 && pawnColor == Color::Black)
 		{
-			possibleMove.push_back(std::move(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Queen_white : FigureType::Queen_black, figureType, possibleCastling, false, movesCount }));
+			possibleMove.push_back(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Queen_white : FigureType::Queen_black, figureType, possibleCastling, false, movesCount });
 			possibleMoves.push_back(possibleMove);
 			possibleMove.pop_back();
-			possibleMove.push_back(std::move(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Bishop_white : FigureType::Bishop_black, figureType, possibleCastling, false, movesCount }));
+			possibleMove.push_back(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Bishop_white : FigureType::Bishop_black, figureType, possibleCastling, false, movesCount });
 			possibleMoves.push_back(possibleMove);
 			possibleMove.pop_back();
-			possibleMove.push_back(std::move(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Knight_white : FigureType::Knight_black, figureType, possibleCastling, false, movesCount }));
+			possibleMove.push_back(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Knight_white : FigureType::Knight_black, figureType, possibleCastling, false, movesCount });
 			possibleMoves.push_back(possibleMove);
 			possibleMove.pop_back();
-			possibleMove.push_back(std::move(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Rook_white : FigureType::Rook_black, figureType, possibleCastling, false, movesCount }));
+			possibleMove.push_back(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Rook_white : FigureType::Rook_black, figureType, possibleCastling, false, movesCount });
 			possibleMoves.push_back(std::move(possibleMove));
 		}
 		else
@@ -466,11 +430,7 @@ std::vector<std::vector<MoveInfo>> Figure::FindPossibleMovesPawn(const Pos& figu
 				nextPosition = nextPosition.Add(0, offset);
 				nextPosFigureType = map.GetFigureType(nextPosition);
 				if (nextPosFigureType == FigureType::Empty)
-				{
-					std::vector<MoveInfo> possibleMove;
-					possibleMove.push_back(std::move(MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount }));
-					possibleMoves.push_back(std::move(possibleMove));
-				}
+					possibleMoves.push_back(std::vector<MoveInfo>{ MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount } });
 			}
 		}
 	}
@@ -483,19 +443,19 @@ std::vector<std::vector<MoveInfo>> Figure::FindPossibleMovesPawn(const Pos& figu
 		if (CheckEmpty(pawnColor, GetFigureTypeColor(nextPosFigureType)) == BoardPos::Opposite)
 		{
 			std::vector<MoveInfo> possibleMove;
-			possibleMove.push_back(std::move(MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount }));
+			possibleMove.push_back(MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount });
 			if (figurePosition.GetY() == 6 && pawnColor == Color::White || figurePosition.GetY() == 1 && pawnColor == Color::Black)
 			{
-				possibleMove.push_back(std::move(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Queen_white : FigureType::Queen_black, figureType, possibleCastling, false, movesCount }));
+				possibleMove.push_back(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Queen_white : FigureType::Queen_black, figureType, possibleCastling, false, movesCount });
 				possibleMoves.push_back(possibleMove);
 				possibleMove.pop_back();
-				possibleMove.push_back(std::move(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Bishop_white : FigureType::Bishop_black, figureType, possibleCastling, false, movesCount }));
+				possibleMove.push_back(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Bishop_white : FigureType::Bishop_black, figureType, possibleCastling, false, movesCount });
 				possibleMoves.push_back(possibleMove);
 				possibleMove.pop_back();
-				possibleMove.push_back(std::move(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Knight_white : FigureType::Knight_black, figureType, possibleCastling, false, movesCount }));
+				possibleMove.push_back(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Knight_white : FigureType::Knight_black, figureType, possibleCastling, false, movesCount });
 				possibleMoves.push_back(possibleMove);
 				possibleMove.pop_back();
-				possibleMove.push_back(std::move(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Rook_white : FigureType::Rook_black, figureType, possibleCastling, false, movesCount }));
+				possibleMove.push_back(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Rook_white : FigureType::Rook_black, figureType, possibleCastling, false, movesCount });
 				possibleMoves.push_back(std::move(possibleMove));
 			}
 			else
@@ -509,19 +469,19 @@ std::vector<std::vector<MoveInfo>> Figure::FindPossibleMovesPawn(const Pos& figu
 		if (CheckEmpty(pawnColor, GetFigureTypeColor(nextPosFigureType)) == BoardPos::Opposite)
 		{
 			std::vector<MoveInfo> possibleMove;
-			possibleMove.push_back(std::move(MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount }));
+			possibleMove.push_back(MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, possibleCastling, false, movesCount });
 			if (figurePosition.GetY() == 6 && pawnColor == Color::White || figurePosition.GetY() == 1 && pawnColor == Color::Black)
 			{
-				possibleMove.push_back(std::move(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Queen_white : FigureType::Queen_black, figureType, possibleCastling, false, movesCount }));
+				possibleMove.push_back(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Queen_white : FigureType::Queen_black, figureType, possibleCastling, false, movesCount });
 				possibleMoves.push_back(possibleMove);
 				possibleMove.pop_back();
-				possibleMove.push_back(std::move(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Bishop_white : FigureType::Bishop_black, figureType, possibleCastling, false, movesCount }));
+				possibleMove.push_back(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Bishop_white : FigureType::Bishop_black, figureType, possibleCastling, false, movesCount });
 				possibleMoves.push_back(possibleMove);
 				possibleMove.pop_back();
-				possibleMove.push_back(std::move(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Knight_white : FigureType::Knight_black, figureType, possibleCastling, false, movesCount }));
+				possibleMove.push_back(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Knight_white : FigureType::Knight_black, figureType, possibleCastling, false, movesCount });
 				possibleMoves.push_back(possibleMove);
 				possibleMove.pop_back();
-				possibleMove.push_back(std::move(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Rook_white : FigureType::Rook_black, figureType, possibleCastling, false, movesCount }));
+				possibleMove.push_back(MoveInfo{ Pos::NULL_POS, nextPosition, pawnColor == Color::White ? FigureType::Rook_white : FigureType::Rook_black, figureType, possibleCastling, false, movesCount });
 				possibleMoves.push_back(std::move(possibleMove));
 			}
 			else
@@ -541,8 +501,8 @@ std::vector<std::vector<MoveInfo>> Figure::FindPossibleMovesPawn(const Pos& figu
 			if (abs(posAfter.GetY() - posBefore.GetY()) == 2 && (posAfter.GetY() == figurePosition.GetY()) && abs(posAfter.GetX() - figurePosition.GetX()) == 1)
 			{
 				std::vector<MoveInfo> possibleMove;
-				possibleMove.push_back(std::move(MoveInfo{ figurePosition, Pos{ posAfter.GetX(), static_cast<uint8_t>(figurePosition.GetY() + (posAfter.GetY() > posBefore.GetY() ? -1 : 1)) }, figureType, FigureType::Empty, possibleCastling, true, movesCount }));
-				possibleMove.push_back(std::move(MoveInfo{ posAfter, posAfter, figureType, activeType, possibleCastling, true, movesCount }));
+				possibleMove.push_back(MoveInfo{ figurePosition, Pos{ posAfter.GetX(), static_cast<uint8_t>(figurePosition.GetY() + (posAfter.GetY() > posBefore.GetY() ? -1 : 1)) }, figureType, FigureType::Empty, possibleCastling, true, movesCount });
+				possibleMove.push_back(MoveInfo{ posAfter, posAfter, figureType, activeType, possibleCastling, true, movesCount });
 				possibleMoves.push_back(std::move(possibleMove));
 			}
 		}
@@ -583,9 +543,7 @@ std::vector<std::vector<MoveInfo>> Figure::FindStraightMoves(const Pos& figurePo
 				emptyStatus = CheckEmpty(figureColor, GetFigureTypeColor(nextPosFigureType));
 				if (toUType(emptyStatus))
 				{
-					std::vector<MoveInfo> possibleMove;
-					possibleMove.push_back(std::move(MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, nextPossibleCastling, false, movesCount }));
-					possibleMoves.push_back(std::move(possibleMove));
+					possibleMoves.push_back(std::vector<MoveInfo>{ MoveInfo{ figurePosition, nextPosition, figureType, nextPosFigureType, nextPossibleCastling, false, movesCount } });
 				}
 			}
 			else

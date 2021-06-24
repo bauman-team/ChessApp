@@ -23,6 +23,7 @@ public:
 	Map(); 
 	Map(const std::array<uint64_t, FIGURE_TYPES> _map);
 	Map(const Map& map);
+	Map(Map && map) noexcept;
 
 	GameStatus CheckGameFinal(const Color &activePlayerColor);
 
@@ -54,8 +55,6 @@ public:
 	const MoveInfo GetLastMoveInfo() const noexcept;
 	const std::vector<MoveInfo>& GetMovesLog() const;
 	auto GetMovesCount() const { return countOfMoves; }
-
-	~Map(){}
 
 	static const uint8_t offsetHorizontal;
 	static const uint8_t offsetVertical;

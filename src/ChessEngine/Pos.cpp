@@ -147,12 +147,6 @@ auto Pos::IsValid() const noexcept -> bool
 	return xy != 255;
 }
 
-auto Pos::operator=(const Pos& coords) noexcept -> Pos&
-{
-	xy = coords.xy;
-	return *this;
-}
-
 auto Pos::operator==(const Pos& coords) const noexcept -> bool
 {
 	return xy == coords.xy;

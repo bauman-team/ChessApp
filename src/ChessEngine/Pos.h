@@ -19,7 +19,6 @@ public:
 	auto ToBitboard() const noexcept -> uint64_t;
 	auto IsValid() const noexcept -> bool;
 
-	auto operator=(const Pos& coords) noexcept -> Pos&;
 	auto operator==(const Pos& coords) const noexcept -> bool;
 	auto operator!=(const Pos& coords) const noexcept -> bool;
 	auto ToString() const -> std::string;

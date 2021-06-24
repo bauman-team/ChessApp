@@ -46,6 +46,8 @@ Map::Map(const Map& baseMap)
 	countOfMoves = baseMap.countOfMoves;
 }
 
+Map::Map(Map&& map) noexcept = default;
+
 GameStatus Map::CheckGameFinal(const Color &activePlayerColor)
 {
 	FindAllPossibleMoves(activePlayerColor);
@@ -107,7 +109,7 @@ MoveStatus Map::MakeMove(const Pos& previousPosition, const Pos& nextPosition, c
 {
 	auto it{ allPossibleMoves.cbegin() }, end{ allPossibleMoves.cend() };
 	std::vector<std::vector<MoveInfo>> moves;
-	for (; it != end; ++it) 
+	for (; it != end; ++it) // TODO: find_if
 		if (((*it)[0].GetPosBeforeMove() == previousPosition && (*it)[0].GetPosAfterMove() == nextPosition) &&
 			(selectedFigure == FigureType::Empty || selectedFigure == (*it)[1].GetTypeActiveFigure())) // search move in the vector of possible moves
 			moves.push_back(*it);

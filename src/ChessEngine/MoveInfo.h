@@ -36,8 +36,6 @@ public:
 
 	MoveInfo(const Pos& _from, const Pos& _to, FigureType _activeFigure, FigureType _eatenFigure, AdditionalInfo _additionalInfo, uint16_t _numOfMove)
 		: activeFigure{ _activeFigure }, eatenFigure{ _eatenFigure }, from{ _from }, to{ _to }, additionalInfo{ _additionalInfo }, numOfMove{ _numOfMove } { }
-	
-	MoveInfo(const MoveInfo& copy);
 
 	bool isEatenFigureExists() const;
 

@@ -348,7 +348,7 @@ void PlayerWithAIGame::ChangeActivePlayer()
 		auto time{ clock.getElapsedTime() };
 		std::cout << "\n\tTime of calculating (in milliseconds): " << time.asMilliseconds()
 			<< "\n\tCount of calculated positions: " << positionsCount << "\n\tEnd!";
-		map.MakeMove(bestMove[0].GetPosBeforeMove(), bestMove[0].GetPosAfterMove(), bestMove.size() > 1 ? bestMove[1].GetTypeActiveFigure() : FigureType::Empty);
+		map.Move(bestMove);
 		map.ClearPossibleMoves();
 		activePlayer = (activePlayer == player2) ? player1 : player2;
 		status = map.CheckGameFinal(activePlayer->GetColor());

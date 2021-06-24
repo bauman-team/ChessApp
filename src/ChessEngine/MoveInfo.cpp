@@ -27,16 +27,6 @@ AdditionalInfo::AdditionalInfo(std::array<bool, 4> _castling, bool _isCaptureEnP
 
 MoveInfo::MoveInfo() : from{ }, to{ }, activeFigure{ FigureType::Empty }, eatenFigure{ FigureType::Empty }, additionalInfo{ AdditionalInfo::NULL_INFO }, numOfMove{ 0 } { }
 
-MoveInfo::MoveInfo(const MoveInfo& copy)
-{
-	activeFigure = copy.activeFigure;
-	eatenFigure = copy.eatenFigure;
-	from = copy.from;
-	to = copy.to;
-	additionalInfo = copy.additionalInfo;
-	numOfMove = copy.numOfMove;
-}
-
 bool MoveInfo::isEatenFigureExists() const
 {
 	return eatenFigure != FigureType::Empty;
