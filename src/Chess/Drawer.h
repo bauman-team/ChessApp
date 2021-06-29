@@ -2,6 +2,7 @@
 #include "SideMenu.h"
 
 class SideMenu;
+enum class GameMode;
 
 class Drawer
 {
@@ -29,7 +30,7 @@ class Drawer
 	int GetSizeMenuTopLeftX() const;
 	sf::Vector2u GetSideMenuSize() const;
 public:
-	Drawer(sf::RenderWindow* window, const Resources& resources, const MapProperties& properties, GameSet SetExitStatus, Game* game);
+	Drawer(sf::RenderWindow* window, const Resources& resources, const MapProperties& properties, GameMode mode, GameSet SetExitStatus, GameSet MakeUndoMove, Game* game);
 	void ShowMap(const Map& map);
 	void ShowTimer(sf::Time time);
 	void ShowActiveFigure(const Pos& chosenPos, const Map& map);

@@ -24,8 +24,8 @@ protected:
 	static float MiniMax(Map map, bool isAIMoveNow, int depth, float alpha, float beta);
 
 public:
-	PlayerWithAIGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties) 
-		: TwoPlayersGame{ window, resource, _mapProperties } { }
+	PlayerWithAIGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties, GameMode mode) 
+		: TwoPlayersGame{ window, resource, _mapProperties, mode } { }
 
 	void virtual SetPlayers(std::string name1, std::string name2, sf::Time timeLimit = sf::seconds(0));
 

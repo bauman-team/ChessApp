@@ -1,4 +1,5 @@
 #include "Menu.h"
+#include "meta-inf.h"
 
 const std::string Menu::botName{ "bot" };
 
@@ -6,6 +7,7 @@ Menu::Menu(sf::RenderWindow& window, std::string widgetsFile) : menuGui{ window 
 {
 	menuGui.loadWidgetsFromFile(widgetsFile);
 	LoadIcons();
+	menuGui.get<tgui::Label>("Version")->setText(VER);
 	if (menuGui.get<tgui::RadioButton>("TwoPlayersRB")->isChecked())
 		ShowTwoPlayersSettings();
 	else if (menuGui.get<tgui::RadioButton>("OnePlayerRB")->isChecked())

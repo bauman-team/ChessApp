@@ -1,7 +1,7 @@
 #include "Drawer.h"
 
-Drawer::Drawer(sf::RenderWindow* _window, const Resources& resources, const MapProperties& properties, GameSet SetExitStatus, Game* game)
-	: sideMenu{ _window, properties, SetExitStatus, game }, window{ _window }, mapProps{ properties }, windowScale{ 1.0, 1.0 },
+Drawer::Drawer(sf::RenderWindow* _window, const Resources& resources, const MapProperties& properties, GameMode mode, GameSet SetExitStatus, GameSet MakeUndoMove, Game* game)
+	: sideMenu{ _window, properties, mode, SetExitStatus, MakeUndoMove, game }, window{ _window }, mapProps{ properties }, windowScale{ 1.0, 1.0 },
 	selectedPosFrom{ Pos::NULL_POS }, selectedPosTo{ Pos::NULL_POS }, selectedFigure{ FigureType::Empty }
 {
 	window->setFramerateLimit(60);

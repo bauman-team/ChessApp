@@ -20,7 +20,8 @@ protected:
 	bool isTimeLimited;
 
 public:
-	TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties);
+	TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties, GameMode mode)
+		: Game{ window, resource, properties, mode }, isTimeLimited{ false } { }
 
 	void virtual Show() override;
 	void virtual ChangeActivePlayer() override;
@@ -29,12 +30,11 @@ public:
 
 	void virtual StartGame() override;
 
-	void virtual SetPlayers(std::string name1, std::string name2, sf::Time timeLimit = sf::seconds(0));
+	void virtual SetPlayers(std::string name1, std::string name2, sf::Time timeLimit = sf::seconds(0)) override;
+
+	void virtual MakeUndoMove() override;
 
 	bool IsTimeLimited() const { return isTimeLimited; }
-
-	// Methods for testing
-	static void SpeedTestingOnProcessorThread(Map &map, Color activeColor, int count, std::atomic<int> &crucialCount);
 
 	virtual ~TwoPlayersGame() override
 	{

@@ -1,9 +1,7 @@
 #include "TwoPlayersGame.h"
 
 CHESSENGINE_API extern std::mutex mut1;
-
-TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
-	: Game{ window, resource, properties }, isTimeLimited{ false } { }
+extern std::mutex mut3;
 
 void TwoPlayersGame::Show()
 {
@@ -108,12 +106,17 @@ void TwoPlayersGame::SetPlayers(std::string name1, std::string name2, sf::Time t
 	activePlayer = player1;
 }
 
-inline void TwoPlayersGame::SpeedTestingOnProcessorThread(Map& map, Color activeColor, int count, std::atomic<int>& crucialCount)
+void TwoPlayersGame::MakeUndoMove()
 {
-	for (auto i = 0; i < count; ++i)
+	mut3.lock();
+	if (map.GetMovesCount() > 1)
 	{
-		map.FindAllPossibleMoves(activeColor);
+		mut1.lock();
+		map.UndoMove();
+		map.UndoMove();
 		map.ClearPossibleMoves();
+		mut1.unlock();
+		status = map.CheckGameFinal(activePlayer->GetColor());
 	}
-	++crucialCount;
+	mut3.unlock();
 }

@@ -8,14 +8,14 @@
 #include <intrin.h> 
 #endif
 
+#define DebugInfo
 //#define SmartBotTest
 //#define TestWeightAndBitboards
 CHESSENGINE_API extern std::mutex mut1;
-std::mutex mut2;
-// TODO: delete test
+std::mutex mut2; // TODO: mutable class member PlayerWithAIGame
+std::mutex mut3; // TODO: mutable class member TwoPlayersGame
 const float PlayerWithAIGame::figureWeight[FIGURE_TYPES]{ 900, 90, 30, 30, 50, 10, 900, 90, 30, 30, 50, 10 }; // black
-const float PlayerWithAIGame::figureWeightTest[FIGURE_TYPES]{ 900, 90, 30, 30, 50, 10, 900, 90, 30, 30, 50, 10 }; // white
-int PlayerWithAIGame::winWhite{ 0 };
+int PlayerWithAIGame::winWhite{ 0 }; // TODO: delete test
 int PlayerWithAIGame::winBlack{ 0 };
 
 bool PlayerWithAIGame::isPlayerMoveFirst{ false };
@@ -164,7 +164,7 @@ std::vector<MoveInfo> PlayerWithAIGame::StartAI(double timeForWaiting)
 			{
 				auto copyMap{ MAP };
 				copyMap.Move(moves[j]);
-				auto score{ std::pair<int, float>(j, PlayerWithAIGame::MiniMax(copyMap, false, DEPTH, -10'000, 10'000)) }; // isPlayerMoveFirst ? DEPTH + 1 : 
+				auto score{ std::pair<int, float>(j, PlayerWithAIGame::MiniMax(copyMap, false, DEPTH, -10'000, 10'000)) };
 				mut2.lock();
 				movesScore.push_back(score);
 				mut2.unlock();
@@ -198,10 +198,6 @@ float PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Col
 {
 	auto score{ 0.0f }, scoreTest{ 0.0f };
 	auto selected{ FigureType::Empty };
-#ifdef TestWeightAndBitboards
-	if (isPlayerMoveFirst) // for testing
-	{
-#endif
 #ifdef UseAvx
 		float x[64]{ 0.0 }, y[64]{ 0.0 }, z[64]{ 0.0 };
 		for (auto i = 0; i != 64; ++i)
@@ -234,20 +230,6 @@ float PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Col
 				score += (selectedMap.GetColor(selected) == playerColor ? 1.0 : -1.0)
 				* (figureWeight[toUType(selected)] + bitboards[toUType(selected)][i / 8][i % 8]);
 		}
-#endif
-#ifdef TestWeightAndBitboards
-	}
-	else
-	{
-		// white
-		for (auto i = 0; i != 64; ++i)
-		{
-			selected = selectedMap.GetFigureType(i);
-			if (selected != FigureType::Empty)
-				score += (selectedMap.GetColor(selected) == playerColor ? 1.0 : -1.0)
-				* (figureWeightTest[toUType(selected)] + bitboards[toUType(selected)][i / 8][i % 8]);
-		}
-	}
 #endif
 	return score;
 }
@@ -324,8 +306,8 @@ void PlayerWithAIGame::SetPlayers(std::string name1, std::string name2, sf::Time
 	if (timeLimit != sf::seconds(0))
 		isTimeLimited = true;
 	isPlayerMoveFirst = (name2 == Menu::GetBotName());
-	player1 = new Player{ Color::White, name1, timeLimit, name2 != Menu::GetBotName() };
-	player2 = new Player{ Color::Black, name2, timeLimit, name2 == Menu::GetBotName() };
+	player1 = new Player{ Color::White, name1, timeLimit, !isPlayerMoveFirst };
+	player2 = new Player{ Color::Black, name2, timeLimit, isPlayerMoveFirst };
 	activePlayer = isPlayerMoveFirst ? player1 : player2;
 }
 
@@ -338,21 +320,25 @@ void PlayerWithAIGame::ChangeActivePlayer()
 	mut1.unlock();
 	map.ClearPossibleMoves();
 	activePlayer = (activePlayer == player2) ? player1 : player2;
+	std::lock_guard<std::mutex> g(mut3);
 	status = map.CheckGameFinal(activePlayer->GetColor());
 	if (status != GameStatus::Pat && status != GameStatus::Mat)
 	{
+#ifdef DebugInfo
 		std::cout << "\n\tStart!";
 		positionsCount = 0;
 		sf::Clock clock;
+#endif
 		auto bestMove{ StartAI() };
+#ifdef DebugInfo
 		auto time{ clock.getElapsedTime() };
 		std::cout << "\n\tTime of calculating (in milliseconds): " << time.asMilliseconds()
 			<< "\n\tCount of calculated positions: " << positionsCount << "\n\tEnd!";
+#endif
 		map.Move(bestMove);
 		map.ClearPossibleMoves();
 		activePlayer = (activePlayer == player2) ? player1 : player2;
 		status = map.CheckGameFinal(activePlayer->GetColor());
-
 		if (stopTime && status != GameStatus::Pat && status != GameStatus::Mat)
 		{
 			activePlayer->StartTimer();
