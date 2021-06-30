@@ -39,11 +39,13 @@ public:
 	void UndoMove();
 
 	// functions for bot to easy do and undo different moves
-	void DoImitationMove(const Pos& from, const Pos& to) noexcept;
+	void DoImitationMove(const Pos& from, const Pos& to) noexcept; // TODO: same method Move without MovesLog
 	void UndoImitationMove(const Pos& from, const Pos& to, FigureType eatenType) noexcept;
 
+	// methods for Castling
 	auto GetPossibleCastling() const noexcept { return possibleCastling; }
 	void DisableCastlingForKing(const Color& kingColor);
+	void DisableCastlingForRook(const Color& kingColor);
 
 	auto GetMap() const noexcept { return map; }
 

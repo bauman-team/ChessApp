@@ -50,15 +50,19 @@ Map::Map(Map&& map) noexcept = default;
 
 GameStatus Map::CheckGameFinal(const Color &activePlayerColor)
 {
-	FindAllPossibleMoves(activePlayerColor);
 	if (Figure::IsShahFor(activePlayerColor, map))
 	{
+		DisableCastlingForKing(activePlayerColor);
+		DisableCastlingForRook(activePlayerColor);
+		FindAllPossibleMoves(activePlayerColor);
 		if (!GetAllPossibleMoves().empty())
 			return GameStatus::Shah;
 		return GameStatus::Mat;
 	}
 	else
 	{
+		DisableCastlingForRook(activePlayerColor);
+		FindAllPossibleMoves(activePlayerColor);
 		if (!GetAllPossibleMoves().empty())
 			return GameStatus::Play;
 		return GameStatus::Pat;
@@ -142,23 +146,19 @@ void Map::Move(std::vector<MoveInfo> move)
 			map[toUType((*it).GetTypeActiveFigure())] -= (*it).GetPosBeforeMove().ToBitboard();
 		map[toUType((*it).GetTypeActiveFigure())] += (*it).GetPosAfterMove().ToBitboard();
 	}
+	for (it = move.begin(); it != move.end(); ++it)
+		movesLog.push_back(MoveInfo((*it).GetPosBeforeMove(), (*it).GetPosAfterMove(), (*it).GetTypeActiveFigure(), (*it).GetTypeEatenFigure(),
+		 possibleCastling, (*it).GetCaptureEnPassant(), (*it).GetNumOfMove())); // save info about move
 	it = move.begin();
 	for (auto i = 0; i != 4; ++i)
 		possibleCastling[i] = (*it).GetPossibleCastling()[i];
-	// TODO: delete CRUTCH!!!
-	if (Figure::IsShahFor(GetColor((*it).GetTypeActiveFigure()) == Color::White ? Color::Black : Color::White, map)) // if King is attacked => castling disabled
-	{
-		DisableCastlingForKing(GetColor((*it).GetTypeActiveFigure()) == Color::White ? Color::Black : Color::White);
-		for (; it != move.end(); ++it)
-			movesLog.push_back(std::move(MoveInfo((*it).GetPosBeforeMove(), (*it).GetPosAfterMove(), (*it).GetTypeActiveFigure(), (*it).GetTypeEatenFigure(), possibleCastling, (*it).GetCaptureEnPassant(), (*it).GetNumOfMove())));
-	}
-	else 
-		movesLog.insert(movesLog.end(), move.begin(), move.end()); // save info about move
 }
 
 void Map::UndoMove()
 {
 	auto info{ GetLastMoveInfo() };
+	for (auto i = 0; i != 4; ++i)
+		possibleCastling[i] = info.GetPossibleCastling()[i];
 	while (info != MoveInfo::NULL_INFO && info.GetNumOfMove() == countOfMoves)
 	{
 		movesLog.pop_back();
@@ -169,11 +169,6 @@ void Map::UndoMove()
 			map[toUType(info.GetTypeActiveFigure())] += info.GetPosBeforeMove().ToBitboard();
 		info = GetLastMoveInfo();
 	}
-	if (info != MoveInfo::NULL_INFO)
-		possibleCastling = info.GetPossibleCastling();
-	else
-		for (auto i = 0; i != 4; ++i)
-			possibleCastling[i] = true;
 	--countOfMoves; //dec counter
 }
 
@@ -211,6 +206,28 @@ void Map::DisableCastlingForKing(const Color& kingColor) // if made a King move 
 	auto kingCoeff{ static_cast<uint8_t>(2 * toUType(kingColor)) };
 	possibleCastling[kingCoeff] = false;
 	possibleCastling[kingCoeff + 1] = false;
+}
+
+void Map::DisableCastlingForRook(const Color& kingColor) // if Rook was eaten
+{
+	auto kingCoeff{ static_cast<uint8_t>(2 * toUType(kingColor)) };
+	if (possibleCastling[kingCoeff] || possibleCastling[kingCoeff + 1])
+	{
+		if (kingColor == Color::White)
+		{
+			if (GetFigureType(Pos{ 0, 0 }) != FigureType::Rook_white)
+				possibleCastling[kingCoeff] = false;
+			if (GetFigureType(Pos{ 7, 0 }) != FigureType::Rook_white)
+				possibleCastling[kingCoeff + 1] = false;
+		}
+		else
+		{
+			if (GetFigureType(Pos{ 0, 7 }) != FigureType::Rook_black)
+				possibleCastling[kingCoeff] = false;
+			if (GetFigureType(Pos{ 7, 7 }) != FigureType::Rook_black)
+				possibleCastling[kingCoeff + 1] = false;
+		}
+	}
 }
 
 Color Map::GetColor(const Pos& pos) const noexcept

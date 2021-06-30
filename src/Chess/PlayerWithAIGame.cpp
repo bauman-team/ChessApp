@@ -246,6 +246,9 @@ float PlayerWithAIGame::MiniMax(Map map, bool isAIMoveNow, int depth, float alph
 		auto AIColor{ isPlayerMoveFirst ? Color::Black : Color::White };
 		auto bestMove{ -infScore };
 		auto start{ AIColor == Color::Black ? 0 : 6 }; // used fixed enum order
+		if (Figure::IsShahFor(AIColor, map.GetMap()))
+			map.DisableCastlingForKing(AIColor);
+		map.DisableCastlingForRook(AIColor);
 		for (auto i = start; i != start + 6; ++i)
 		{
 			uint64_t j{ 1 };
@@ -275,6 +278,9 @@ float PlayerWithAIGame::MiniMax(Map map, bool isAIMoveNow, int depth, float alph
 		auto playerColor{ isPlayerMoveFirst ? Color::White : Color::Black };
 		auto bestMove{ infScore };
 		auto start{ playerColor == Color::Black ? 0 : 6 }; // used fixed enum order
+		if (Figure::IsShahFor(playerColor, map.GetMap()))
+			map.DisableCastlingForKing(playerColor);
+		map.DisableCastlingForRook(playerColor);
 		for (auto i = start; i != start + 6; ++i)
 		{
 			uint64_t j{ 1 };
