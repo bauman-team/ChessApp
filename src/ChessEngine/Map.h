@@ -1,40 +1,30 @@
 #pragma once
 #include "MoveInfo.h"
+#include <mutex>
 
 enum class CHESSENGINE_API GameStatus { Play, Shah, Mat, Pat, TimeIsOver, Exit };
 enum class CHESSENGINE_API MoveStatus { Made, NeedFigureType, NotFound };
-enum class FigureType;
-enum class Color;
-enum class BoardPos;
-
-class MoveInfo;
-class Figure;
-
 
 class CHESSENGINE_API Map
 {
 	std::array<uint64_t, FIGURE_TYPES>  map;
 	std::vector<MoveInfo> movesLog;
-	std::vector<std::vector<MoveInfo>> allPossibleMoves;
+	MovesInfo allPossibleMoves;
 	std::array<bool, 4> possibleCastling; // first 2 elements for white king, last for black
 	uint16_t countOfMoves;
-
 public:
-	Map(); 
-	Map(const std::array<uint64_t, FIGURE_TYPES> _map);
-	Map(const Map& map);
-	Map(Map && map) noexcept;
+	Map() noexcept; 
+	Map(const std::array<uint64_t, FIGURE_TYPES> _map) noexcept;
+	Map(const Map& baseMap) noexcept;
+	Map& operator=(const Map& baseMap) noexcept;
 
 	GameStatus CheckGameFinal(const Color &activePlayerColor);
 
 	std::vector<Pos> GetPossibleMovesFrom(const Pos& figurePosition) const;
-	const auto GetAllPossibleMoves() const { return allPossibleMoves; }
-
+	const auto GetAllPossibleMoves() const noexcept { return allPossibleMoves; }
 	void FindAllPossibleMoves(const Color& activeColor); 
-
 	MoveStatus MakeMove(const Pos& previousPosition, const Pos& nextPosition, const FigureType selectedFigure);
-	void ClearPossibleMoves();
-	
+	void ClearPossibleMoves() noexcept { allPossibleMoves.clear(); }
 	void Move(std::vector<MoveInfo> move);
 	void UndoMove();
 
@@ -44,19 +34,19 @@ public:
 
 	// methods for Castling
 	auto GetPossibleCastling() const noexcept { return possibleCastling; }
-	void DisableCastlingForKing(const Color& kingColor);
-	void DisableCastlingForRook(const Color& kingColor);
+	void DisableCastlingForKing(const Color& kingColor) noexcept;
+	void DisableCastlingForRook(const Color& kingColor) noexcept;
 
 	auto GetMap() const noexcept { return map; }
-
-	Color GetColor(const Pos& pos) const noexcept;
-	Color GetColor(const FigureType type) const noexcept;
-	FigureType GetFigureType(const Pos& pos) const noexcept;
-	FigureType GetFigureType(const int index) const;
-
+	auto GetFigureType(const Pos& pos) const noexcept { return GetFigureType(pos.ToIndex()); }
+	FigureType GetFigureType(const int index) const noexcept;
+	Color GetColor(const Pos& pos) const noexcept { return Figure::GetFigureTypeColor(GetFigureType(pos)); }
+	auto GetColor(const FigureType type) const noexcept { return Figure::GetFigureTypeColor(type); }
 	const MoveInfo GetLastMoveInfo() const noexcept;
-	const std::vector<MoveInfo>& GetMovesLog() const;
-	auto GetMovesCount() const { return countOfMoves; }
+	const auto& GetMovesLog() const noexcept { return movesLog; }
+	auto GetMovesCount() const noexcept { return countOfMoves; }
+
+	mutable std::mutex mut;
 
 	static const uint8_t offsetHorizontal;
 	static const uint8_t offsetVertical;

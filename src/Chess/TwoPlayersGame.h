@@ -3,7 +3,6 @@
 #include "Player.h"
 
 #include <thread>
-#include <mutex>
 #include <atomic> // for supporting linux
 //#include <ctime>
 //#include <cstdlib>
@@ -18,7 +17,7 @@ protected:
 	Player* activePlayer;
 
 	bool isTimeLimited;
-
+	mutable std::mutex mut;
 public:
 	TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties, GameMode mode)
 		: Game{ window, resource, properties, mode }, isTimeLimited{ false } { }

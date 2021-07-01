@@ -123,7 +123,7 @@ void SideMenu::UpdateSideMenu(std::vector<MoveInfo> info)
 				figuresSprites[toUType(it->GetTypeActiveFigure())].setColor(sf::Color{ 255, 255, 255, 255 });
 				figuresSprites[toUType(it->GetTypeActiveFigure())].setPosition(moveId.length() * scale - 5, 10);
 				drawFrame->draw(figuresSprites[toUType(it->GetTypeActiveFigure())]);
-				if (it->GetTypeEatenFigure() != FigureType::Empty)
+				if (it->isEatenFigureExists())
 				{
 					figuresSprites[toUType(it->GetTypeEatenFigure())].setPosition(moveId.length() * scale + afterMoveColumn + 30, 10);
 					figuresSprites[toUType(it->GetTypeEatenFigure())].setColor(sf::Color{ 255, 255, 255, 100 }); // transparent figure

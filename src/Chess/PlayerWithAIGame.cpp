@@ -11,9 +11,6 @@
 #define DebugInfo
 //#define SmartBotTest
 //#define TestWeightAndBitboards
-CHESSENGINE_API extern std::mutex mut1;
-std::mutex mut2; // TODO: mutable class member PlayerWithAIGame
-std::mutex mut3; // TODO: mutable class member TwoPlayersGame
 const float PlayerWithAIGame::figureWeight[FIGURE_TYPES]{ 900, 90, 30, 30, 50, 10, 900, 90, 30, 30, 50, 10 }; // black
 int PlayerWithAIGame::winWhite{ 0 }; // TODO: delete test
 int PlayerWithAIGame::winBlack{ 0 };
@@ -148,26 +145,28 @@ std::atomic<int> positionsCount{ 0 }; // TODO: delete debug counter
 
 std::vector<MoveInfo> PlayerWithAIGame::StartAI(double timeForWaiting)
 {
+	std::mutex mutPushScore;
 	std::vector<std::pair<int, float>> movesScore{ };
 	std::atomic<uint16_t> countWorkingThreads{ 0 };
 	auto moves{ map.GetAllPossibleMoves() };
 	auto countOfMovesInThread{ 0 }, from{ 0 }, countOfMoves{ static_cast<int>(moves.size()) };
 	for (auto i = countOfThreads; i >= 0 && countOfMoves > 0; --i)
 	{
+		auto MAP{ map };
 		++countWorkingThreads; // add to active process count
 		from = moves.size() - countOfMoves;
 		countOfMovesInThread = ceil(countOfMoves / i); // count checking of moves in this thread
 		countOfMoves -= countOfMovesInThread; // count checking of moves is left
-		auto MAP{ map };
-		std::thread th{ [from, countOfMovesInThread, moves, &movesScore, MAP, &countWorkingThreads]() {
+		std::thread th{ [MAP, &mutPushScore, from, countOfMovesInThread, moves, &movesScore, &countWorkingThreads]() {
+			auto copyMap{ MAP };
 			for (auto j = from; j != from + countOfMovesInThread; ++j)
 			{
-				auto copyMap{ MAP };
 				copyMap.Move(moves[j]);
 				auto score{ std::pair<int, float>(j, PlayerWithAIGame::MiniMax(copyMap, false, DEPTH, -10'000, 10'000)) };
-				mut2.lock();
+				copyMap.UndoMove();
+				mutPushScore.lock();
 				movesScore.push_back(score);
-				mut2.unlock();
+				mutPushScore.unlock();
 			}
 			--countWorkingThreads;
 			} };
@@ -321,12 +320,14 @@ void PlayerWithAIGame::ChangeActivePlayer()
 {
 	auto stopTime{ isTimeLimited };
 	isTimeLimited = false;
-	mut1.lock();
+	map.mut.lock();
 	drawer.ClearSelect();
-	mut1.unlock();
+	map.mut.unlock();
 	map.ClearPossibleMoves();
 	activePlayer = (activePlayer == player2) ? player1 : player2;
-	std::lock_guard<std::mutex> g(mut3);
+#ifndef SmartBotTest
+	std::lock_guard<std::mutex> g(mut);
+#endif
 	status = map.CheckGameFinal(activePlayer->GetColor());
 	if (status != GameStatus::Pat && status != GameStatus::Mat)
 	{
@@ -371,10 +372,10 @@ void PlayerWithAIGame::ChangeActivePlayer()
 			<< ", winBlack = " << winBlack << "\nStart new!";
 		if ((winWhite + winBlack) % 10 == 0)
 			system("pause");
-		mut1.lock();
+		map.mut.lock();
 		map.ClearPossibleMoves();
 		map = Map();
-		mut1.unlock();
+		map.mut.unlock();
 		ChangeActivePlayer();
 	}
 #endif

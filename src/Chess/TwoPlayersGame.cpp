@@ -1,28 +1,25 @@
 #include "TwoPlayersGame.h"
 
-CHESSENGINE_API extern std::mutex mut1;
-extern std::mutex mut3;
-
 void TwoPlayersGame::Show()
 {
 	drawer.WindowIsResized();
-	mut1.lock();
+	map.mut.lock();
 	drawer.ShowMap(map);
 	drawer.ShowSideMenu(map);
-	mut1.unlock();
+	map.mut.unlock();
 
 	if (isTimeLimited && !activePlayer->GetIsBot())
 		drawer.ShowTimer(activePlayer->GetRemainingTime());
 	if (activePlayer->HasTime())
 	{
-		mut1.lock();
+		map.mut.lock();
 		auto selectedPos = drawer.GetSelectedPositionFrom();
 		if (selectedPos.IsValid() && !drawer.GetSelectedPositionTo().IsValid())
 		{
 			drawer.ShowActiveFigure(selectedPos, map);
 			drawer.ShowPossibleMoves(selectedPos, map);
 		}
-		mut1.unlock();
+		map.mut.unlock();
 	}
 	else
 		status = GameStatus::TimeIsOver;
@@ -33,10 +30,10 @@ void TwoPlayersGame::ChangeActivePlayer()
 	auto stopTime{ isTimeLimited };
 	isTimeLimited = false; // stop game timer
 
-	mut1.lock();
+	map.mut.lock();
 	map.ClearPossibleMoves();
 	drawer.ClearSelect();
-	mut1.unlock();
+	map.mut.unlock();
 
 	sf::sleep(sf::seconds(2));
 
@@ -73,9 +70,9 @@ void TwoPlayersGame::SetPosition(int mouseX, int mouseY)
 				}
 				else
 				{
-					mut1.lock();
+					map.mut.lock();
 					drawer.SetSelectedPositionTo(position, map);
-					mut1.unlock();
+					map.mut.unlock();
 				}
 			}
 			else // select position
@@ -83,9 +80,9 @@ void TwoPlayersGame::SetPosition(int mouseX, int mouseY)
 		}
 		else if (drawer.GetSelectedPositionTo().IsValid())
 		{
-			mut1.lock();
+			map.mut.lock();
 			drawer.SetSelectedFigure(mouseX, mouseY);
-			mut1.unlock();
+			map.mut.unlock();
 		}
 	}
 }
@@ -108,15 +105,16 @@ void TwoPlayersGame::SetPlayers(std::string name1, std::string name2, sf::Time t
 
 void TwoPlayersGame::MakeUndoMove()
 {
-	mut3.lock();
+	mut.lock();
 	if (map.GetMovesCount() > 1)
 	{
-		mut1.lock();
+		map.mut.lock();
 		map.UndoMove();
 		map.UndoMove();
 		map.ClearPossibleMoves();
-		mut1.unlock();
+		drawer.ClearSelect();
+		map.mut.unlock();
 		status = map.CheckGameFinal(activePlayer->GetColor());
 	}
-	mut3.unlock();
+	mut.unlock();
 }

@@ -1,14 +1,12 @@
 #include "pch.h"
 #include "Map.h"
-#include <mutex>
 
-CHESSENGINE_API std::mutex mut1;
 const uint8_t Map::offsetHorizontal{ 1 }, Map::offsetVertical{ 8 }, Map::offsetMainDiag{ 7 }, Map::offsetSideDiag{ 9 };
 const uint64_t Map::knightBorderAB{ 18'229'723'555'195'321'596 }, Map::knightBorderGH{ 4'557'430'888'798'830'399 },
 Map::mapLeftBorder{ 72'340'172'838'076'673 }, Map::mapRightBorder{ 9'259'542'123'273'814'144 },
 Map::mapUpBorder{ 18'374'686'479'671'623'680 }, Map::mapDownBorder{ 255 };
 
-Map::Map()
+Map::Map() noexcept
 { // 0 - left down
 	map[toUType(FigureType::Rook_black)] = 9'295'429'630'892'703'744;
 	map[toUType(FigureType::Knight_black)] = 4'755'801'206'503'243'776;
@@ -22,31 +20,27 @@ Map::Map()
 	map[toUType(FigureType::Queen_white)] = 8;
 	map[toUType(FigureType::King_white)] = 16;
 	map[toUType(FigureType::Pawn_white)] = 65'280;
-	for (auto i = 0; i != 4; ++i)
-		possibleCastling[i] = true;
+	possibleCastling.fill(true);
 	countOfMoves = 0;
 }
 
-Map::Map(const std::array<uint64_t, FIGURE_TYPES> _map) : Map()
+Map::Map(const std::array<uint64_t, FIGURE_TYPES> _map) noexcept : Map()
 {
 	for (auto i = 0; i != FIGURE_TYPES; ++i)
 		map[i] = _map[i];
 }
 
-Map::Map(const Map& baseMap)
-{
-	for (auto i = 0; i != FIGURE_TYPES; ++i)
-	{
-		map[i] = baseMap.map[i];
-		if (i < 4)
-			possibleCastling[i] = baseMap.possibleCastling[i];
-	}
-	if (!baseMap.movesLog.empty())
-		movesLog = baseMap.movesLog;
-	countOfMoves = baseMap.countOfMoves;
-}
+Map::Map(const Map& baseMap) noexcept 
+	: map(baseMap.map), possibleCastling(baseMap.possibleCastling), movesLog(baseMap.movesLog), countOfMoves(baseMap.countOfMoves) { }
 
-Map::Map(Map&& map) noexcept = default;
+Map& Map::operator=(const Map& baseMap) noexcept
+{
+	map = baseMap.map;
+	possibleCastling = baseMap.possibleCastling;
+	movesLog = baseMap.movesLog;
+	countOfMoves = baseMap.countOfMoves;
+	return *this;
+}
 
 GameStatus Map::CheckGameFinal(const Color &activePlayerColor)
 {
@@ -103,35 +97,30 @@ void Map::FindAllPossibleMoves(const Color& activeColor)
 		}
 	}
 	Figure::EraseForbiddenMoves(allMoves, copyMap);
-	mut1.lock();
+	mut.lock();
 	if (!allMoves.empty())
 		allPossibleMoves = std::move(allMoves);
-	mut1.unlock();
+	mut.unlock();
 }
 
 MoveStatus Map::MakeMove(const Pos& previousPosition, const Pos& nextPosition, const FigureType selectedFigure)
 {
 	auto it{ allPossibleMoves.cbegin() }, end{ allPossibleMoves.cend() };
-	std::vector<std::vector<MoveInfo>> moves;
+	MovesInfo moves;
 	for (; it != end; ++it)
 		if (((*it)[0].GetPosBeforeMove() == previousPosition && (*it)[0].GetPosAfterMove() == nextPosition) &&
 			(selectedFigure == FigureType::Empty || selectedFigure == (*it)[1].GetTypeActiveFigure())) // search move in the vector of possible moves
 			moves.push_back(*it);
 	if (moves.size() == 1)
 	{
-		mut1.lock();
+		mut.lock();
 		Move(moves[0]);
-		mut1.unlock();
+		mut.unlock();
 		return MoveStatus::Made;
 	}
 	else if (moves.size() > 1)
 		return MoveStatus::NeedFigureType;
 	return MoveStatus::NotFound;
-}
-
-void Map::ClearPossibleMoves()
-{
-	allPossibleMoves.clear();
 }
 
 void Map::Move(std::vector<MoveInfo> move)
@@ -140,7 +129,7 @@ void Map::Move(std::vector<MoveInfo> move)
 	auto it = move.begin();
 	for (; it != move.end(); ++it)
 	{
-		if ((*it).GetTypeEatenFigure() != FigureType::Empty)
+		if ((*it).isEatenFigureExists())
 			map[toUType((*it).GetTypeEatenFigure())] -= (*it).GetPosAfterMove().ToBitboard();
 		if ((*it).GetPosBeforeMove().IsValid()) // used for pawn transform move
 			map[toUType((*it).GetTypeActiveFigure())] -= (*it).GetPosBeforeMove().ToBitboard();
@@ -162,7 +151,7 @@ void Map::UndoMove()
 	while (info != MoveInfo::NULL_INFO && info.GetNumOfMove() == countOfMoves)
 	{
 		movesLog.pop_back();
-		if (info.GetTypeEatenFigure() != FigureType::Empty)
+		if (info.isEatenFigureExists())
 			map[toUType(info.GetTypeEatenFigure())] += info.GetPosAfterMove().ToBitboard();
 		map[toUType(info.GetTypeActiveFigure())] -= info.GetPosAfterMove().ToBitboard();
 		if (info.GetPosBeforeMove().IsValid()) // used for pawn transform move
@@ -201,14 +190,14 @@ void Map::UndoImitationMove(const Pos& from, const Pos& to, FigureType eatenType
 	
 }
 
-void Map::DisableCastlingForKing(const Color& kingColor) // if made a King move or was attacked disable possible castling
+void Map::DisableCastlingForKing(const Color& kingColor) noexcept // if made a King move or was attacked disable possible castling
 {
 	auto kingCoeff{ static_cast<uint8_t>(2 * toUType(kingColor)) };
 	possibleCastling[kingCoeff] = false;
 	possibleCastling[kingCoeff + 1] = false;
 }
 
-void Map::DisableCastlingForRook(const Color& kingColor) // if Rook was eaten
+void Map::DisableCastlingForRook(const Color& kingColor) noexcept // if Rook was eaten
 {
 	auto kingCoeff{ static_cast<uint8_t>(2 * toUType(kingColor)) };
 	if (possibleCastling[kingCoeff] || possibleCastling[kingCoeff + 1])
@@ -230,22 +219,7 @@ void Map::DisableCastlingForRook(const Color& kingColor) // if Rook was eaten
 	}
 }
 
-Color Map::GetColor(const Pos& pos) const noexcept
-{
-	return Figure::GetFigureTypeColor(GetFigureType(pos));
-}
-
-Color Map::GetColor(const FigureType type) const noexcept
-{
-	return Figure::GetFigureTypeColor(type);
-}
-
-FigureType Map::GetFigureType(const Pos& pos) const noexcept
-{
-	return GetFigureType(pos.ToIndex());
-}
-
-FigureType Map::GetFigureType(const int index) const
+FigureType Map::GetFigureType(const int index) const noexcept
 {
 	auto bitboard{ 1ULL << index };
 	for (auto i = 0; i != FIGURE_TYPES; ++i)
@@ -259,9 +233,4 @@ const MoveInfo Map::GetLastMoveInfo() const noexcept
 	if (!movesLog.empty())
 		return movesLog.back();
 	return {};
-}
-
-const std::vector<MoveInfo>& Map::GetMovesLog() const
-{
-	return movesLog;
 }
