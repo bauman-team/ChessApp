@@ -2,7 +2,7 @@
 #include "Pos.h"
 #include <iostream>
 
-#define UseAsm
+//#define UseAsm
 
 const Pos Pos::NULL_POS{ };
 

@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Map.h"
-
 TEST(MoveTest, PawnTest) {
 	std::array<uint64_t, FIGURE_TYPES> map;
 	map[toUType(FigureType::Rook_black)] = 0;
@@ -32,7 +31,7 @@ TEST(MoveTest, PawnTest) {
 
 	EXPECT_TRUE(existMoves == 2);
 
-	
+
 	testingMap.ClearPossibleMoves();
 	testingMap.FindAllPossibleMoves(Color::White);
 	moves = testingMap.GetAllPossibleMoves();

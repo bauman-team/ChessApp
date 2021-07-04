@@ -84,37 +84,7 @@ int main()
 			case sf::Event::KeyPressed:
 				if (!game && (event.key.code == sf::Keyboard::Enter)) // button Enter press handler (start game)
 				{
-					if (menu.CanStartGame())
-					{
-						auto inputValues{ menu.GetInitialData() };
-						if (inputValues.mode == GameMode::TwoPlayers)
-							game = std::make_shared<TwoPlayersGame>(&window, res, prop, GameMode::TwoPlayers);
-						else
-							game = std::make_shared<PlayerWithAIGame>(&window, res, prop, GameMode::PlayerAndBot);
-						game->SetPlayers(inputValues.firstName, inputValues.secondName, inputValues.time);
-						while (!thSetCellIsFinished.expired()) sf::sleep(sf::seconds(0.1));
-						thSetCellIsFinished = game;
-						thSetCell = std::thread{ [game]() {
-									game->StartGame(); } };
-						thSetCell.detach();
-					#ifdef _WIN32
-						window.setActive(false);
-						thDraw = std::thread{ [&backgroundGameColor, &game, &window]() {
-							while (sf::sleep(sf::seconds(0.05)), mut4.lock(), game && (window.setActive(true), window.isOpen()))
-							{
-								window.clear(backgroundGameColor);
-								if (game)
-									game->Show();
-								window.display();
-								window.setActive(false);
-								mut4.unlock();
-							}
-							window.setActive(false);
-							mut4.unlock();
-							} };
-						thDraw.detach();
-					#endif
-					}
+					menu.CanStartGame();
 				}
 				else if (!game && (event.key.code == sf::Keyboard::Escape))
 				{

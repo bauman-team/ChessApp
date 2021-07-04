@@ -152,18 +152,16 @@ std::vector<MoveInfo> PlayerWithAIGame::StartAI(double timeForWaiting)
 	auto countOfMovesInThread{ 0 }, from{ 0 }, countOfMoves{ static_cast<int>(moves.size()) };
 	for (auto i = countOfThreads; i >= 0 && countOfMoves > 0; --i)
 	{
-		auto MAP{ map };
 		++countWorkingThreads; // add to active process count
 		from = moves.size() - countOfMoves;
 		countOfMovesInThread = ceil(countOfMoves / i); // count checking of moves in this thread
 		countOfMoves -= countOfMovesInThread; // count checking of moves is left
-		std::thread th{ [MAP, &mutPushScore, from, countOfMovesInThread, moves, &movesScore, &countWorkingThreads]() {
-			auto copyMap{ MAP };
+		std::thread th{ [map = map, &mutPushScore, from, countOfMovesInThread, moves, &movesScore, &countWorkingThreads]() mutable {
 			for (auto j = from; j != from + countOfMovesInThread; ++j)
 			{
-				copyMap.Move(moves[j]);
-				auto score{ std::pair<int, float>(j, PlayerWithAIGame::MiniMax(copyMap, false, DEPTH, -10'000, 10'000)) };
-				copyMap.UndoMove();
+				map.Move(moves[j]);
+				auto score{ std::pair<int, float>(j, PlayerWithAIGame::MiniMax(map, false, DEPTH, -10'000, 10'000)) };
+				map.UndoMove();
 				mutPushScore.lock();
 				movesScore.push_back(score);
 				mutPushScore.unlock();

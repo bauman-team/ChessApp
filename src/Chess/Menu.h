@@ -16,7 +16,6 @@ struct InitialData
 class Menu
 {
 	tgui::Gui menuGui;
-	Game* game;
 	InitialData initData;
 	tgui::Vector2f menuSize;
 
