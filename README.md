@@ -44,7 +44,10 @@ cmake --build . --config Debug
 
 - On windows:
 
+If you uncomment #define UseAsm, you need to use the cmake flag (-A Win32), and also, possibly, move the compiled dynamic libraries (.dll) to the folder with the executable files of the program.
+
 Release:
+
 ```powershell
 cmake .. -DCMAKE_BUILD_TYPE:STRING=Release
 cmake --build . --config Release

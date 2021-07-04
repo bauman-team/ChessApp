@@ -1,5 +1,4 @@
 #pragma once
-#include <TGUI/TGUI.hpp>
 #include "Game.h"
 
 class Game;
@@ -17,7 +16,6 @@ struct InitialData
 class Menu
 {
 	tgui::Gui menuGui;
-	Game* game;
 	InitialData initData;
 	tgui::Vector2f menuSize;
 

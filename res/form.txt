@@ -4,36 +4,6 @@ Renderer.1 {
     backgroundcolorhover = white;
     bordercolor = #3C3C3C;
     bordercolordisabled = #7D7D7D;
-    bordercolorhover = black;
-    borders = (1, 1, 1, 1);
-    caretcolor = black;
-    caretwidth = 1;
-    defaulttextcolor = #A0A0A0;
-    padding = (0, 0, 0, 0);
-    selectedtextbackgroundcolor = #006EFF;
-    selectedtextcolor = white;
-    textcolor = #3C3C3C;
-    textcolordisabled = #7D7D7D;
-    texture = None;
-    texturedisabled = None;
-    texturefocused = None;
-    texturehover = None;
-}
-
-Renderer.2 {
-    backgroundcolor = transparent;
-    bordercolor = #3C3C3C;
-    borders = (0, 0, 0, 0);
-    textcolor = #3C3C3C;
-    texturebackground = None;
-}
-
-Renderer.3 {
-    backgroundcolor = #F5F5F5;
-    backgroundcolordisabled = #E6E6E6;
-    backgroundcolorhover = white;
-    bordercolor = #3C3C3C;
-    bordercolordisabled = #7D7D7D;
     bordercolorfocused = #1E1EB4;
     bordercolorhover = black;
     borders = (1, 1, 1, 1);
@@ -52,6 +22,54 @@ Renderer.3 {
     textureuncheckeddisabled = None;
     textureuncheckedfocused = None;
     textureuncheckedhover = None;
+}
+
+Renderer.2 {
+    backgroundcolor = transparent;
+    bordercolor = #3C3C3C;
+    borders = (0, 0, 0, 0);
+    textcolor = #3C3C3C;
+    texturebackground = None;
+
+    scrollbar {
+        arrowbackgroundcolor = #F5F5F5;
+        arrowbackgroundcolorhover = white;
+        arrowcolor = #3C3C3C;
+        arrowcolorhover = black;
+        texturearrowdown = None;
+        texturearrowdownhover = None;
+        texturearrowup = None;
+        texturearrowuphover = None;
+        texturethumb = None;
+        texturethumbhover = None;
+        texturetrack = None;
+        texturetrackhover = None;
+        thumbcolor = #DCDCDC;
+        thumbcolorhover = #E6E6E6;
+        trackcolor = #F5F5F5;
+    }
+}
+
+Renderer.3 {
+    backgroundcolor = #F5F5F5;
+    backgroundcolordisabled = #E6E6E6;
+    backgroundcolorhover = white;
+    bordercolor = #3C3C3C;
+    bordercolordisabled = #7D7D7D;
+    bordercolorhover = black;
+    borders = (1, 1, 1, 1);
+    caretcolor = black;
+    caretwidth = 1;
+    defaulttextcolor = #A0A0A0;
+    padding = (0, 0, 0, 0);
+    selectedtextbackgroundcolor = #006EFF;
+    selectedtextcolor = white;
+    textcolor = #3C3C3C;
+    textcolordisabled = #7D7D7D;
+    texture = None;
+    texturedisabled = None;
+    texturefocused = None;
+    texturehover = None;
 }
 
 Button.StartButton {
@@ -148,12 +166,12 @@ Label.ModeLabel {
 }
 
 RadioButton.TwoPlayersRB {
+    Checked = true;
     Position = (50, 290);
     Size = (18, 18);
     Text = "2 players";
     TextSize = 15;
-    renderer = &3;
-    Checked = true;
+    renderer = &1;
 }
 
 RadioButton.OnePlayerRB {
@@ -161,7 +179,7 @@ RadioButton.OnePlayerRB {
     Size = (18, 18);
     Text = Bot;
     TextSize = 15;
-    renderer = &3;
+    renderer = &1;
 }
 
 Label.TimeLabel {
@@ -232,7 +250,7 @@ EditBox.FirstPlayerName {
     TextSize = 13;
     TextWidthLimited = true;
     Visible = false;
-    renderer = &1;
+    renderer = &3;
 }
 
 EditBox.SecondPlayerName {
@@ -244,7 +262,7 @@ EditBox.SecondPlayerName {
     TextSize = 13;
     TextWidthLimited = true;
     Visible = false;
-    renderer = &1;
+    renderer = &3;
 }
 
 Tabs.ColorsTab {
@@ -292,5 +310,38 @@ Label.MessageLabel {
         textcolor = red;
         textstyle = Italic;
         texturebackground = None;
+    }
+}
+
+Label.Version {
+    Position = (660, 530);
+    ScrollbarPolicy = Never;
+    Size = (33.2, 18);
+    TextSize = 13;
+
+    Renderer {
+        backgroundcolor = transparent;
+        bordercolor = #3C3C3C;
+        borders = (0, 0, 0, 0);
+        textcolor = #3C3C3C;
+        texturebackground = None;
+
+        scrollbar {
+            arrowbackgroundcolor = #F5F5F5;
+            arrowbackgroundcolorhover = white;
+            arrowcolor = #3C3C3C;
+            arrowcolorhover = black;
+            texturearrowdown = None;
+            texturearrowdownhover = None;
+            texturearrowup = None;
+            texturearrowuphover = None;
+            texturethumb = None;
+            texturethumbhover = None;
+            texturetrack = None;
+            texturetrackhover = None;
+            thumbcolor = #DCDCDC;
+            thumbcolorhover = #E6E6E6;
+            trackcolor = #F5F5F5;
+        }
     }
 }

@@ -6,6 +6,7 @@
 
 class Map;
 class Game;
+enum class GameMode;
 
 using GameSet = void(Game::*)();
 
@@ -20,9 +21,10 @@ class SideMenu
 	const uint16_t infoBlockWidth{ 300 };
 	const uint16_t infoBlockHeight{ 70 };
 	const uint8_t splitLineWidth{ 3 };
+	uint16_t countOfRecords{ 0 };
 
 public:
-	SideMenu(sf::RenderWindow* window, const MapProperties& properties, GameSet SetExitStatus, Game* game);
+	SideMenu(sf::RenderWindow* window, const MapProperties& properties, GameMode mode, GameSet SetExitStatus, GameSet MakeUndoMove, Game* game);
 
 	void SetSprites(sf::Sprite *_figuresSprites);
 	void ResizeWindowForGame(sf::RenderWindow* window, const MapProperties& properties);

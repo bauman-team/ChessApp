@@ -1,3 +1,4 @@
+//#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 #include "PlayerWithAIGame.h"
 #include "Game.h"
 std::mutex mut4;
@@ -32,21 +33,22 @@ int main()
 	prop.SetSideMenuWidth(300);
 
 	sf::Color backgroundGameColor{ 208, 167, 130, 255 };
-
-	Game* game = nullptr; // TODO: goto stack ???
+	
+	std::shared_ptr<Game> game{ };
+	std::weak_ptr<Game> thSetCellIsFinished{ };
 	Menu menu{ window, "../res/form.txt" };
 
 	std::thread thSetCell{ };
-	#ifdef _WIN32
+#ifdef _WIN32
 	std::thread thDraw;
-	#endif
-	auto thSetCellIsFinished{ true }; // TODO: because main thread is not joinable???
+#endif
+	//auto thSetCellIsFinished{ true }; // TODO: because main thread is not joinable???
 
 	//((PlayerWithAIGame*)game)->output();
 	while(sf::sleep(sf::seconds(0.05)), window.isOpen())
 	{
 		if (!game)
-			window.clear(sf::Color::White); // TODO: select back color in menu/game
+			window.clear(sf::Color::White);
 		#ifndef _WIN32
 		else
 			window.clear(backgroundGameColor);
@@ -59,24 +61,22 @@ int main()
 			case sf::Event::Closed:
 				if (game)
 					game->Save();
-				#ifdef _WIN32
+			#ifdef _WIN32
 				mut4.lock();
-				#endif
+			#endif
 				window.close();
-				#ifdef _WIN32
+			#ifdef _WIN32
 				mut4.unlock();
-				#endif
+			#endif
 				break;
 			case sf::Event::MouseButtonPressed:
 				if (game && (game->GetStatus() == GameStatus::Play || game->GetStatus() == GameStatus::Shah) && event.mouseButton.button == sf::Mouse::Left)
 				{
 					auto mousePos{ sf::Mouse::getPosition(window) };
-					if (thSetCellIsFinished)
+					if (game.use_count() == 1)
 					{
-						thSetCellIsFinished = false;
-						thSetCell = std::thread{ [&game, &thSetCellIsFinished, mousePos]() {
-							game->SetPosition(mousePos.x, mousePos.y);
-							thSetCellIsFinished = true; } };
+						thSetCell = std::thread{ [game, mousePos]() {
+							game->SetPosition(mousePos.x, mousePos.y); } };
 						thSetCell.detach();
 					}
 				}
@@ -84,57 +84,19 @@ int main()
 			case sf::Event::KeyPressed:
 				if (!game && (event.key.code == sf::Keyboard::Enter)) // button Enter press handler (start game)
 				{
-					if (menu.CanStartGame())
-					{
-						auto inputValues{ menu.GetInitialData() };
-						if (inputValues.mode == GameMode::TwoPlayers)
-							game = new TwoPlayersGame{ &window, res, prop };
-						else
-							game = new PlayerWithAIGame{ &window, res, prop };
-						game->SetPlayers(inputValues.firstName, inputValues.secondName, inputValues.time);
-						game->StartGame();
-						#ifdef _WIN32
-						window.setActive(false);
-						thDraw = std::thread{ [&game, &window]() {
-							while (sf::sleep(sf::seconds(0.05)), mut4.lock(), game && (window.setActive(true), window.isOpen()))
-							{
-								window.clear(backgroundGameColor);
-								if (game)
-									game->Show();
-								window.display();
-								window.setActive(false);
-								mut4.unlock();
-							}
-							window.setActive(false);
-							mut4.unlock();
-							} };
-						thDraw.detach();
-						#endif
-						if (typeid(*game) == typeid(PlayerWithAIGame))
-						{
-							if (!((PlayerWithAIGame*)game)->GetIsPlayerMoveFirst()) // if the first move of the bot
-							{
-								while (!thSetCellIsFinished) sf::sleep(sf::seconds(0.1));
-								thSetCellIsFinished = false;
-								thSetCell = std::thread{ [&game, &thSetCellIsFinished]() {
-									game->ChangeActivePlayer();
-									thSetCellIsFinished = true; } };
-								thSetCell.detach();
-							}
-						}
-					}
+					menu.CanStartGame();
 				}
 				else if (!game && (event.key.code == sf::Keyboard::Escape))
 				{
 					if (game)
 						game->Save();
-					#ifdef _WIN32
+				#ifdef _WIN32
 					mut4.lock();
-					#endif
+				#endif
 					window.close();
-					#ifdef _WIN32
+				#ifdef _WIN32
 					mut4.unlock();
-					#endif
+				#endif
 				}
 				break;
 			}
@@ -143,16 +105,14 @@ int main()
 				game->HandleEvent(event); // for side menu
 				if (game->GetStatus() == GameStatus::Exit) // button exit is clicked (was opened start menu)
 				{
-					#ifdef _WIN32
+				#ifdef _WIN32
 					mut4.lock();
-					#endif
+				#endif
 					game->ActivateMenuSettings(menu);
-					if (thSetCellIsFinished)
-						delete game; // TODO: ??? MEMORY LEAK game delete (why memory clear, when theard don't finished?) 
 					game = nullptr;
-					#ifdef _WIN32
+				#ifdef _WIN32
 					mut4.unlock();
-					#endif
+				#endif
 				}
 			}
 			if (!game)
@@ -162,14 +122,18 @@ int main()
 		{
 			auto inputValues{ menu.GetInitialData() };
 			if (inputValues.mode == GameMode::TwoPlayers)
-				game = new TwoPlayersGame{ &window, res, prop };
+				game = std::make_shared<TwoPlayersGame>(&window, res, prop, GameMode::TwoPlayers);
 			else
-				game = new PlayerWithAIGame{ &window, res, prop };
-			game->SetPlayers(inputValues.firstName, inputValues.secondName, inputValues.time);
-			game->StartGame();
-			#ifdef _WIN32
+				game = std::make_shared<PlayerWithAIGame>(&window, res, prop, GameMode::PlayerAndBot);
+			game->SetPlayers(inputValues.firstName, inputValues.secondName, inputValues.time); // TODO: delete
+			while (!thSetCellIsFinished.expired()) sf::sleep(sf::seconds(0.1));
+			thSetCellIsFinished = game;
+			thSetCell = std::thread{ [game]() {
+						game->StartGame(); } };
+			thSetCell.detach();
+		#ifdef _WIN32
 			window.setActive(false);
-			thDraw = std::thread{ [&game, &window]() {
+			thDraw = std::thread{ [&backgroundGameColor, &game, &window]() {
 				while (sf::sleep(sf::seconds(0.05)), mut4.lock(), game && (window.setActive(true), window.isOpen()))
 				{
 					window.clear(backgroundGameColor);
@@ -183,25 +147,13 @@ int main()
 				mut4.unlock();
 				} };
 			thDraw.detach();
-			#endif
-			if (typeid(*game) == typeid(PlayerWithAIGame))
-			{
-				if (!((PlayerWithAIGame*)game)->GetIsPlayerMoveFirst()) // if the first move of the bot
-				{
-					while (!thSetCellIsFinished) sf::sleep(sf::seconds(0.1));
-					thSetCellIsFinished = false;
-					thSetCell = std::thread{ [&game, &thSetCellIsFinished]() {
-						game->ChangeActivePlayer();
-						thSetCellIsFinished = true; } };
-					thSetCell.detach();
-				}
-			}
+		#endif
 		}
-		#ifndef _WIN32
+	#ifndef _WIN32
 		(game) ? game->Show() : menu.Show();
 		window.display();
-		#endif
-		#ifdef _WIN32
+	#endif
+	#ifdef _WIN32
 		if (!game)
 		{
 			mut4.lock();
@@ -209,8 +161,7 @@ int main()
 			window.display();
 			mut4.unlock();
 		}
-		#endif
+	#endif
 	}
-	delete game;
 	return EXIT_SUCCESS;
 }

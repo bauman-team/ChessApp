@@ -1,6 +1,6 @@
 #pragma once
-#include "Menu.h"
 #include "Drawer.h"
+#include "Menu.h"
 #include <SFML/Window.hpp>
 
 enum class GameMode { TwoPlayers, PlayerAndBot };
@@ -16,13 +16,14 @@ protected:
 
 	
 public:
-	Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
-		: drawer{ window, resource, properties, &Game::SetExitStatus, this }, status{ GameStatus::Play } { }
+	Game(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties, GameMode mode)
+		: drawer{ window, resource, properties, mode, &Game::SetExitStatus, &Game::MakeUndoMove, this }, status{ GameStatus::Play } { }
 	void virtual StartGame() = 0;
 	void virtual Show() = 0;
 	void virtual ChangeActivePlayer() = 0;
 	void virtual SetPosition(int mouseX, int mouseY) = 0; 
 	void virtual SetPlayers(std::string name1, std::string name2, sf::Time timeLimit = sf::seconds(0)) = 0;
+	void virtual MakeUndoMove() = 0;
 
 	volatile GameStatus GetStatus() const { return status; }
 	void HandleEvent(sf::Event& event);

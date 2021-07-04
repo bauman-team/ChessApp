@@ -1,78 +1,52 @@
 #pragma once
 #include "MoveInfo.h"
+#include <mutex>
 
 enum class CHESSENGINE_API GameStatus { Play, Shah, Mat, Pat, TimeIsOver, Exit };
-enum class FigureType;
-enum class Color;
-enum class BoardPos;
-
-class MoveInfo;
-class Figure;
-class PlayerWithAIGame;
-
-
-struct CHESSENGINE_API OneFigureMoves
-{
-	Pos from;
-	std::vector<Pos> to;
-};
-
+enum class CHESSENGINE_API MoveStatus { Made, NeedFigureType, NotFound };
 
 class CHESSENGINE_API Map
 {
-	friend class PlayerWithAIGame;
-
-	uint64_t map[FIGURE_TYPES];
-	std::vector<MoveInfo> movesHistory;
-	std::vector<OneFigureMoves> allPossibleMoves;
-	std::array<bool, 4> possibleCastling;
+	std::array<uint64_t, FIGURE_TYPES>  map;
+	std::vector<MoveInfo> movesLog;
+	MovesInfo allPossibleMoves;
+	std::array<bool, 4> possibleCastling; // first 2 elements for white king, last for black
 	uint16_t countOfMoves;
-
-	void Move(const Pos& from, const Pos& to);
-	void SetToEmpty(const Pos& target);
-	void PawnToQueen(const Pos& target);
-	void RookCastling(const Pos& kingFrom, const Pos& kingTo);
 public:
-	Map(); 
-	Map(const Map& map);
+	Map() noexcept; 
+	Map(const std::array<uint64_t, FIGURE_TYPES> _map) noexcept;
+	Map(const Map& baseMap) noexcept;
+	Map& operator=(const Map& baseMap) noexcept;
 
 	GameStatus CheckGameFinal(const Color &activePlayerColor);
 
 	std::vector<Pos> GetPossibleMovesFrom(const Pos& figurePosition) const;
-	const std::vector<OneFigureMoves>& GetAllPossibleMoves() const { return allPossibleMoves; }
-
-	void FindAllPossibleMoves(const Color& activeColor);
-
-	bool MakeMove(const Pos& previousPosition, const Pos& nextPosition);
-	void ClearPossibleMoves();
-	
+	const auto GetAllPossibleMoves() const noexcept { return allPossibleMoves; }
+	void FindAllPossibleMoves(const Color& activeColor); 
+	MoveStatus MakeMove(const Pos& previousPosition, const Pos& nextPosition, const FigureType selectedFigure);
+	void ClearPossibleMoves() noexcept { allPossibleMoves.clear(); }
+	void Move(std::vector<MoveInfo> move);
 	void UndoMove();
 
 	// functions for bot to easy do and undo different moves
-	void DoImitationMove(const Pos& from, const Pos& to) noexcept;
+	void DoImitationMove(const Pos& from, const Pos& to) noexcept; // TODO: same method Move without MovesLog
 	void UndoImitationMove(const Pos& from, const Pos& to, FigureType eatenType) noexcept;
 
-	BoardPos CheckEmpty(const Pos& from, const Pos& to) const noexcept;
+	// methods for Castling
+	auto GetPossibleCastling() const noexcept { return possibleCastling; }
+	void DisableCastlingForKing(const Color& kingColor) noexcept;
+	void DisableCastlingForRook(const Color& kingColor) noexcept;
 
-	bool IsShahFor(const Color kingColor) const noexcept;
-	void EraseForbiddenMoves(OneFigureMoves& figureMoves) noexcept;
-
-	// castling methods
-	bool IsCastlingAllowedForKing(const Pos& kingPos) const noexcept;
-	bool IsCastlingAllowedWithRook(const Pos& rookPos, const Color& rookColor) const noexcept;
-	void DisableCastlingForKing(const Color& kingColor);
-	void DisableCastlingWithRook(const Pos& rookPos, const Color& rookColor);
-
-	Color GetColor(const Pos& pos) const noexcept;
-	Color GetColor(const FigureType type) const noexcept;
-	FigureType GetFigureType(const Pos& pos) const noexcept;
-	FigureType GetFigureType(const int index) const;
-
+	auto GetMap() const noexcept { return map; }
+	auto GetFigureType(const Pos& pos) const noexcept { return GetFigureType(pos.ToIndex()); }
+	FigureType GetFigureType(const int index) const noexcept;
+	Color GetColor(const Pos& pos) const noexcept { return Figure::GetFigureTypeColor(GetFigureType(pos)); }
+	auto GetColor(const FigureType type) const noexcept { return Figure::GetFigureTypeColor(type); }
 	const MoveInfo GetLastMoveInfo() const noexcept;
-	const std::vector<MoveInfo>& GetMovesHistory() const;
-	uint16_t GetMovesCount() const { return countOfMoves; }
+	const auto& GetMovesLog() const noexcept { return movesLog; }
+	auto GetMovesCount() const noexcept { return countOfMoves; }
 
-	~Map(){}
+	mutable std::mutex mut;
 
 	static const uint8_t offsetHorizontal;
 	static const uint8_t offsetVertical;

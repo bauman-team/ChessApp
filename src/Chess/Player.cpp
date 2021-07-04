@@ -1,3 +1,4 @@
+#include <SFML/Window.hpp>
 #include "Player.h"
 
 void Player::StartTimer()

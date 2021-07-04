@@ -1,18 +1,10 @@
 #include "pch.h"
 #include "MoveInfo.h"
 
-const AdditionalInfo AdditionalInfo::NULL_INFO{ };
 const MoveInfo MoveInfo::NULL_INFO{ };
 
-bool AdditionalInfo::operator==(const AdditionalInfo comp) const
-{
-	if (castling != comp.castling
-		|| isCaptureEnPassant != comp.isCaptureEnPassant)
-		return false;
-	return true;
-}
-
-AdditionalInfo::AdditionalInfo(std::array<bool, 4> _castling, bool _isCaptureEnPassant) : castling{ 0 }, isCaptureEnPassant{ 0 }
+MoveInfo::MoveInfo(const Pos& _from, const Pos& _to, FigureType _activeFigure, FigureType _eatenFigure, std::array<bool, 4> _castling, bool _isCaptureEnPassant, uint16_t _numOfMove)
+	: activeFigure{ _activeFigure }, eatenFigure{ _eatenFigure }, from{ _from }, to{ _to }, castling{ 0 }, isCaptureEnPassant{ 0 }, numOfMove{ _numOfMove }
 {
 	auto add{ 1 };
 	if (_isCaptureEnPassant)
@@ -25,36 +17,20 @@ AdditionalInfo::AdditionalInfo(std::array<bool, 4> _castling, bool _isCaptureEnP
 	}
 }
 
-MoveInfo::MoveInfo() : from{ }, to{ }, activeFigure{ FigureType::Empty }, eatenFigure{ FigureType::Empty }, additionalInfo{ AdditionalInfo::NULL_INFO }, numOfMove{ 0 } { }
-
-MoveInfo::MoveInfo(const MoveInfo& copy)
-{
-	activeFigure = copy.activeFigure;
-	eatenFigure = copy.eatenFigure;
-	from = copy.from;
-	to = copy.to;
-	additionalInfo = copy.additionalInfo;
-	numOfMove = copy.numOfMove;
-}
-
-bool MoveInfo::isEatenFigureExists() const
-{
-	return eatenFigure != FigureType::Empty;
-}
-
-bool MoveInfo::operator==(const MoveInfo& comp) const
+bool MoveInfo::operator==(const MoveInfo& comp) const noexcept
 {
 	if (activeFigure != comp.activeFigure
 		|| eatenFigure != comp.eatenFigure
 		|| from != comp.from 
 		|| to != comp.to
-		|| additionalInfo != comp.additionalInfo
+		|| castling != comp.castling
+		|| isCaptureEnPassant != comp.isCaptureEnPassant
 		|| numOfMove != comp.numOfMove)
 		return false;
 	return true;
 }
 
-bool MoveInfo::operator!=(const MoveInfo& comp) const
+bool MoveInfo::operator!=(const MoveInfo& comp) const noexcept
 {
 	return !(*this == comp);
 }

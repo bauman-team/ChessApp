@@ -1,30 +1,25 @@
 #include "TwoPlayersGame.h"
 
-CHESSENGINE_API extern std::mutex mut1;
-
-TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties)
-	: Game{ window, resource, properties }, isTimeLimited{ false } { }
-
 void TwoPlayersGame::Show()
 {
 	drawer.WindowIsResized();
-	mut1.lock();
+	map.mut.lock();
 	drawer.ShowMap(map);
 	drawer.ShowSideMenu(map);
-	mut1.unlock();
+	map.mut.unlock();
 
 	if (isTimeLimited && !activePlayer->GetIsBot())
 		drawer.ShowTimer(activePlayer->GetRemainingTime());
 	if (activePlayer->HasTime())
 	{
-		mut1.lock();
-		auto chosenPos = activePlayer->GetChosenPosition();
-		if (chosenPos != Pos::NULL_POS)
+		map.mut.lock();
+		auto selectedPos = drawer.GetSelectedPositionFrom();
+		if (selectedPos.IsValid() && !drawer.GetSelectedPositionTo().IsValid())
 		{
-			drawer.ShowActiveFigure(chosenPos, map);
-			drawer.ShowPossibleMoves(chosenPos, map);
+			drawer.ShowActiveFigure(selectedPos, map);
+			drawer.ShowPossibleMoves(selectedPos, map);
 		}
-		mut1.unlock();
+		map.mut.unlock();
 	}
 	else
 		status = GameStatus::TimeIsOver;
@@ -35,28 +30,15 @@ void TwoPlayersGame::ChangeActivePlayer()
 	auto stopTime{ isTimeLimited };
 	isTimeLimited = false; // stop game timer
 
-	mut1.lock();
+	map.mut.lock();
 	map.ClearPossibleMoves();
-	activePlayer->SetChosenPosition({ });
-	mut1.unlock();
+	drawer.ClearSelect();
+	map.mut.unlock();
 
 	sf::sleep(sf::seconds(2));
 
 	activePlayer = activePlayer == player2 ? player1 : player2;
 
-	/*sf::Clock clock; // test of speed algorithm calculation possible moves
-	std::atomic<int> crucialCount = 0;
-	int countOfThreads = 50, i = 0;
-	while (crucialCount != countOfThreads)
-	{
-		for (; i != countOfThreads; ++i)
-		{
-			Map *copy = new Map(map);
-			std::thread th(SpeedTestingOnProcessorThread, std::ref(*copy), activePlayer->GetColor(), 20000, std::ref(crucialCount));
-			th.detach();
-		}
-	}
-	sf::Time time = clock.getElapsedTime();*/	
 	status = map.CheckGameFinal(activePlayer->GetColor());
 	drawer.RotateBoard();
 	if (stopTime && status != GameStatus::Pat && status != GameStatus::Mat)
@@ -71,21 +53,36 @@ void TwoPlayersGame::SetPosition(int mouseX, int mouseY)
 	if (activePlayer->HasTime())
 	{
 		auto position{ drawer.TransformMousePosition(mouseX, mouseY) }; // transform coords on window to position on map
-		if (position != Pos::NULL_POS)
+		if (position.IsValid() && // if position is correct
+			(activePlayer->GetColor() == Color::Black ? // rotate for black
+				position = Pos{ static_cast<uint8_t>(7 - position.GetX()), static_cast<uint8_t>(7 - position.GetY()) } : position,
+				!drawer.GetSelectedPositionTo().IsValid() || drawer.GetSelectedPositionTo() == position))
 		{
-			if (activePlayer->GetColor() == Color::Black)
+			if (drawer.GetSelectedPositionFrom().IsValid()) // if chosen position exists
 			{
-				position = Pos{ static_cast<uint8_t>(7 - position.GetX()), static_cast<uint8_t>(7 - position.GetY()) };
+				MoveStatus status = map.MakeMove(drawer.GetSelectedPositionFrom(), position, drawer.GetSelectedFigure()); // try to move
+				if (status == MoveStatus::Made)
+					ChangeActivePlayer();
+				else if (status == MoveStatus::NotFound)
+				{
+					drawer.ClearSelect();
+					drawer.SetSelectedPositionFrom(position);
+				}
+				else
+				{
+					map.mut.lock();
+					drawer.SetSelectedPositionTo(position, map);
+					map.mut.unlock();
+				}
 			}
-			if (position.IsValid()) // if position is correct
-			{
-				if (activePlayer->GetChosenPosition() != Pos::NULL_POS && // if chosen position exists and
-					activePlayer->GetColor() != map.GetColor(position) &&  // position and activePlayer colors aren't same
-					map.MakeMove(activePlayer->GetChosenPosition(), position)) // try to move
-						ChangeActivePlayer();
-				else // select position
-					activePlayer->SetChosenPosition(position);
-			}
+			else // select position
+				drawer.SetSelectedPositionFrom(position);
+		}
+		else if (drawer.GetSelectedPositionTo().IsValid())
+		{
+			map.mut.lock();
+			drawer.SetSelectedFigure(mouseX, mouseY);
+			map.mut.unlock();
 		}
 	}
 }
@@ -106,12 +103,18 @@ void TwoPlayersGame::SetPlayers(std::string name1, std::string name2, sf::Time t
 	activePlayer = player1;
 }
 
-inline void TwoPlayersGame::SpeedTestingOnProcessorThread(Map& map, Color activeColor, int count, std::atomic<int>& crucialCount)
+void TwoPlayersGame::MakeUndoMove()
 {
-	for (auto i = 0; i < count; ++i)
+	mut.lock();
+	if (map.GetMovesCount() > 1)
 	{
-		map.FindAllPossibleMoves(activeColor);
+		map.mut.lock();
+		map.UndoMove();
+		map.UndoMove();
 		map.ClearPossibleMoves();
+		drawer.ClearSelect();
+		map.mut.unlock();
+		status = map.CheckGameFinal(activePlayer->GetColor());
 	}
-	++crucialCount;
+	mut.unlock();
 }
