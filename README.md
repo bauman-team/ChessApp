@@ -1,4 +1,4 @@
-# Game chess pc.
+# Game chess for pc.
 
 ### For frontend used libraries [TGUI](https://tgui.net/), [SFML](https://www.sfml-dev.org/).
 
