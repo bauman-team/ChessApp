@@ -1,4 +1,4 @@
-# Game chess for windows pc.
+# Game chess pc.
 
 ### For frontend used libraries [TGUI](https://tgui.net/), [SFML](https://www.sfml-dev.org/).
 
@@ -9,9 +9,6 @@
 
 ### In develop branch
 - Playing mode with NN (Nerual Network)
-- Improving side menu
-- Add pawn transform
-- Add scaling
 - Improving interface with statistics
 - Game completion menu when someone won
 - Choose started figures positions of game
