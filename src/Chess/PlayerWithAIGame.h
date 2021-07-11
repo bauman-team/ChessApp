@@ -8,26 +8,23 @@ class PlayerWithAIGame : public TwoPlayersGame
 {
 private:
 	const static float figureWeight[FIGURE_TYPES];
-	const static float figureWeightTest[FIGURE_TYPES]; // for testing
 	static int winWhite;
 	static int winBlack;
-	const static float bitboards[FIGURE_TYPES][8][8];
+	const static float bitboards[FIGURE_TYPES][64];
+protected:
 	const static float infScore;
 	const static int errorRate;
-protected:
+	const int countOfThreads;
+	std::vector<std::future<void>> Threads;
 	static bool isPlayerMoveFirst;
-	const static int DEPTH;
-	const static int countOfThreads;
+	const int DEPTH; // searching depth of move
 
 	std::vector<MoveInfo> StartAI(double timeForWaiting = 0);
 	static float CalculatePositionScore(const Map& selectedMap, const Color AIColor);
 	static float MiniMax(Map map, bool isAIMoveNow, int depth, float alpha, float beta);
 
 public:
-	PlayerWithAIGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties, GameMode mode) 
-		: TwoPlayersGame{ window, resource, _mapProperties, mode } { }
-
-	void virtual SetPlayers(std::string name1, std::string name2, sf::Time timeLimit = sf::seconds(0));
+	PlayerWithAIGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties, GameMode mode, std::string name1, std::string name2, sf::Time timeLimit = sf::seconds(0));
 
 	void virtual ChangeActivePlayer() override;
 	void virtual StartGame() override;

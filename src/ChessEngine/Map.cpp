@@ -83,18 +83,17 @@ void Map::FindAllPossibleMoves(const Color& activeColor)
 	auto copyMap{ *this };
 	auto start{ activeColor == Color::Black ? 0 : 6 }; // used fixed enum order
 	auto allMoves{ allPossibleMoves };
-	for (auto i = start; i != start + 6; ++i)
+	uint64_t j{ 1 };
+	while (j) // check all positions
 	{
-		uint64_t j{ 1 };
-		while (j) // check all positions
-		{
+		for (auto i = start; i != start + 6; ++i)
 			if (j & copyMap.map[i]) // is selected figure position
 			{
 				auto oneFigureMoves = Figure::FindPossibleMoves(Pos::BitboardToPosition(j), static_cast<FigureType>(i), copyMap); // find figure possible moves without checking shah
 				allMoves.insert(allMoves.end(), oneFigureMoves.begin(), oneFigureMoves.end());
+				break;
 			}
-			j <<= 1;
-		}
+		j <<= 1;
 	}
 	Figure::EraseForbiddenMoves(allMoves, copyMap);
 	mut.lock();

@@ -13,7 +13,7 @@ SideMenu::SideMenu(sf::RenderWindow* window, const MapProperties& properties, Ga
 	exitButton->connect(tgui::Signals::Button::Clicked, SetExitStatus, game);
 	gameGui.add(exitButton);
 	exitButton->setWidgetName("ExitButton");
-	if (mode == GameMode::PlayerAndBot)
+	if (mode == GameMode::PlayerWithBot)
 	{
 		auto undoMoveButton{ tgui::Button::create() };
 		undoMoveButton->setText("UNDO");

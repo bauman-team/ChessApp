@@ -77,7 +77,7 @@ bool Menu::CanStartGame()
 			errorMessage = "Enter the name!";
 		else
 		{
-			initData.mode = GameMode::PlayerAndBot;
+			initData.mode = GameMode::PlayerWithBot;
 			if (menuGui.get<tgui::Tabs>("ColorsTab")->getSelected() == "White")
 			{
 				initData.firstName = name;

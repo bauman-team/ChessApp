@@ -11,135 +11,133 @@
 #define DebugInfo
 //#define SmartBotTest
 //#define TestWeightAndBitboards
-const float PlayerWithAIGame::figureWeight[FIGURE_TYPES]{ 900, 90, 30, 30, 50, 10, 900, 90, 30, 30, 50, 10 }; // black
+const float PlayerWithAIGame::figureWeight[FIGURE_TYPES]{ 900, 90, 30, 30, 50, 10, 900, 90, 30, 30, 50, 10 };
 int PlayerWithAIGame::winWhite{ 0 }; // TODO: delete test
 int PlayerWithAIGame::winBlack{ 0 };
 
 bool PlayerWithAIGame::isPlayerMoveFirst{ false };
-const float PlayerWithAIGame::bitboards[FIGURE_TYPES][8][8]{
-		{ { -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0 }, //King_black
-		  { -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0 },
-		  { -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0 },
-		  { -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0 },
-		  { -2.0, -3.0, -3.0, -4.0, -4.0, -3.0, -3.0, -2.0 },
-		  { -1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0 },
-		  {  2.0,  2.0,  0.0,  0.0,  0.0,  0.0,  2.0,  2.0 },
-		  {  2.0,  3.0,  1.0,  0.0,  0.0,  1.0,  3.0,  2.0 } },
-		    											   
-		    											   
-		{ { -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0 }, //Queen_black
-		  { -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0 },
-		  { -1.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0 },
-		  { -0.5,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5 },
-		  { -0.5,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0,  0.0 },
-		  { -1.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.5, -1.0 },
-		  { -1.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.0, -1.0 },
-		  { -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0 } },
-		    											   
-		    											   
-		{ { -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0 }, //Bishop_black
-		  { -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0 },
-		  { -1.0,  0.0,  0.5,  1.0,  1.0,  0.5,  0.0, -1.0 },
-		  { -1.0,  0.5,  0.5,  1.0,  1.0,  0.5,  0.5, -1.0 },
-		  { -1.0,  0.0,  1.0,  1.0,  1.0,  1.0,  0.0, -1.0 },
-		  { -1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0 },
-		  { -1.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.5, -1.0 },
-		  { -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0 } },
-		    											   
-		    											   
-		{ { -5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0 }, //Knight_black
-		  { -4.0, -2.0,  0.0,  0.0,  0.0,  0.0, -2.0, -4.0 },
-		  { -3.0,  0.0,  1.0,  1.5,  1.5,  1.0,  0.0, -3.0 },
-		  { -3.0,  0.5,  1.5,  2.0,  2.0,  1.5,  0.5, -3.0 },
-		  { -3.0,  0.0,  1.5,  2.0,  2.0,  1.5,  0.0, -3.0 },
-		  { -3.0,  0.5,  1.0,  1.5,  1.5,  1.0,  0.5, -3.0 },
-		  { -4.0, -2.0,  0.0,  0.5,  0.5,  0.0, -2.0, -4.0 },
-		  { -5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0 } },
-		    											   
-		    											   
-		{ {  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 }, //Rook_black
-		  {  0.5,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  0.5 },
-		  { -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5 },
-		  { -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5 },
-		  { -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5 },
-		  { -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5 },
-		  { -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5 },
-		  {  0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0 } },
-		    											   
-		    											   
-		{ {  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 }, //Pawn_black
-		  {  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0 },
-		  {  1.0,  1.0,  2.0,  3.0,  3.0,  2.0,  1.0,  1.0 },
-		  {  0.5,  0.5,  1.0,  2.5,  2.5,  1.0,  0.5,  0.5 },
-		  {  0.0,  0.0,  0.0,  2.0,  2.0,  0.0,  0.0,  0.0 },
-		  {  0.5, -0.5, -1.0,  0.0,  0.0, -1.0, -0.5,  0.5 },
-		  {  0.5,  1.0,  1.0, -2.0, -2.0,  1.0,  1.0,  0.5 },
-		  {  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 } },
-		    											   
-		    											   
-		{ {  2.0,  3.0,  1.0,  0.0,  0.0,  1.0,  3.0,  2.0 }, //King_white
-		  {  2.0,  2.0,  0.0,  0.0,  0.0,  0.0,  2.0,  2.0 },
-		  { -1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0 },
-		  { -2.0, -3.0, -3.0, -4.0, -4.0, -3.0, -3.0, -2.0 },
-		  { -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0 },
-		  { -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0 },
-		  { -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0 },
-		  { -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0 } },
-		    											   
-		    											   
-		{ { -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0 }, //Queen_white
-		  { -1.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0, -1.0 },
-		  { -1.0,  0.5,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0 },
-		  {  0.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5 },
-		  { -0.5,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5 },
-		  { -1.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0 },
-		  { -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0 },
-		  { -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0 } },
-		    											   
-		    											   
-		{ { -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0 }, //Bishop_white
-		  { -1.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.5, -1.0 },
-		  { -1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0 },
-		  { -1.0,  0.0,  1.0,  1.0,  1.0,  1.0,  0.0, -1.0 },
-		  { -1.0,  0.5,  0.5,  1.0,  1.0,  0.5,  0.5, -1.0 },
-		  { -1.0,  0.0,  0.5,  1.0,  1.0,  0.5,  0.0, -1.0 },
-		  { -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0 },
-		  { -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0 } },
-		    											   
-		    											   
-		{ { -5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0 }, //Knight_white
-		  { -4.0, -2.0,  0.0,  0.5,  0.5,  0.0, -2.0, -4.0 },
-		  { -3.0,  0.5,  1.0,  1.5,  1.5,  1.0,  0.5, -3.0 },
-		  { -3.0,  0.0,  1.5,  2.0,  2.0,  1.5,  0.0, -3.0 },
-		  { -3.0,  0.5,  1.5,  2.0,  2.0,  1.5,  0.5, -3.0 },
-		  { -3.0,  0.0,  1.0,  1.5,  1.5,  1.0,  0.0, -3.0 },
-		  { -4.0, -2.0,  0.0,  0.0,  0.0,  0.0, -2.0, -4.0 },
-		  { -5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0 } },
-		    											   
-		    											   
-		{ {  0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0 }, //Rook_white
-		  { -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5 },
-		  { -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5 },
-		  { -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5 },
-		  { -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5 },
-		  { -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5 },
-		  {  0.5,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  0.5 },
-		  {  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 } },
-		    											   
-		    											   
-		{ {  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 }, //Pawn_white
-		  {  0.5,  1.0,  1.0, -2.0, -2.0,  1.0,  1.0,  0.5 },
-		  {  0.5, -0.5, -1.0,  0.0,  0.0, -1.0, -0.5,  0.5 },
-		  {  0.0,  0.0,  0.0,  2.0,  2.0,  0.0,  0.0,  0.0 },
-		  {  0.5,  0.5,  1.0,  2.5,  2.5,  1.0,  0.5,  0.5 },
-		  {  1.0,  1.0,  2.0,  3.0,  3.0,  2.0,  1.0,  1.0 },
-		  {  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0 },
-		  {  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 } }
+const float PlayerWithAIGame::bitboards[FIGURE_TYPES][64]{
+		{ -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0, //King_black
+		  -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0,
+		  -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0,
+		  -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0,
+		  -2.0, -3.0, -3.0, -4.0, -4.0, -3.0, -3.0, -2.0,
+		  -1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0,
+		   2.0,  2.0,  0.0,  0.0,  0.0,  0.0,  2.0,  2.0,
+		   2.0,  3.0,  1.0,  0.0,  0.0,  1.0,  3.0,  2.0 },
+		  											   
+		  											   
+		{ -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0, //Queen_black
+		  -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0,
+		  -1.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0,
+		  -0.5,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5,
+		  -0.5,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0,  0.0,
+		  -1.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.5, -1.0,
+		  -1.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.0, -1.0,
+		  -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0 },
+		  											   
+		  											   
+		{ -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0, //Bishop_black
+		  -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0,
+		  -1.0,  0.0,  0.5,  1.0,  1.0,  0.5,  0.0, -1.0,
+		  -1.0,  0.5,  0.5,  1.0,  1.0,  0.5,  0.5, -1.0,
+		  -1.0,  0.0,  1.0,  1.0,  1.0,  1.0,  0.0, -1.0,
+		  -1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0,
+		  -1.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.5, -1.0,
+		  -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0 },
+		  											   
+		  											   
+		{ -5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0, //Knight_black
+		  -4.0, -2.0,  0.0,  0.0,  0.0,  0.0, -2.0, -4.0,
+		  -3.0,  0.0,  1.0,  1.5,  1.5,  1.0,  0.0, -3.0,
+		  -3.0,  0.5,  1.5,  2.0,  2.0,  1.5,  0.5, -3.0,
+		  -3.0,  0.0,  1.5,  2.0,  2.0,  1.5,  0.0, -3.0,
+		  -3.0,  0.5,  1.0,  1.5,  1.5,  1.0,  0.5, -3.0,
+		  -4.0, -2.0,  0.0,  0.5,  0.5,  0.0, -2.0, -4.0,
+		  -5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0 },
+		  											   
+		  											   
+		{  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, //Rook_black
+		   0.5,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  0.5,
+		  -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+		  -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+		  -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+		  -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+		  -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+		   0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0 },
+		  											   
+		  											   
+		{  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, //Pawn_black
+		   5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,
+		   1.0,  1.0,  2.0,  3.0,  3.0,  2.0,  1.0,  1.0,
+		   0.5,  0.5,  1.0,  2.5,  2.5,  1.0,  0.5,  0.5,
+		   0.0,  0.0,  0.0,  2.0,  2.0,  0.0,  0.0,  0.0,
+		   0.5, -0.5, -1.0,  0.0,  0.0, -1.0, -0.5,  0.5,
+		   0.5,  1.0,  1.0, -2.0, -2.0,  1.0,  1.0,  0.5,
+		   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 },
+		  											   
+		  											   
+		{  2.0,  3.0,  1.0,  0.0,  0.0,  1.0,  3.0,  2.0, //King_white
+		   2.0,  2.0,  0.0,  0.0,  0.0,  0.0,  2.0,  2.0,
+		  -1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0,
+		  -2.0, -3.0, -3.0, -4.0, -4.0, -3.0, -3.0, -2.0,
+		  -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0,
+		  -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0,
+		  -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0,
+		  -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0 },
+		  											   
+		  											   
+		{ -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0, //Queen_white
+		  -1.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0, -1.0,
+		  -1.0,  0.5,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0,
+		   0.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5,
+		  -0.5,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5,
+		  -1.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0,
+		  -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0,
+		  -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0 },
+		  											   
+		  											   
+		{ -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0, //Bishop_white
+		  -1.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.5, -1.0,
+		  -1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0,
+		  -1.0,  0.0,  1.0,  1.0,  1.0,  1.0,  0.0, -1.0,
+		  -1.0,  0.5,  0.5,  1.0,  1.0,  0.5,  0.5, -1.0,
+		  -1.0,  0.0,  0.5,  1.0,  1.0,  0.5,  0.0, -1.0,
+		  -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0,
+		  -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0 },
+		  											   
+		  											   
+		{ -5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0, //Knight_white
+		  -4.0, -2.0,  0.0,  0.5,  0.5,  0.0, -2.0, -4.0,
+		  -3.0,  0.5,  1.0,  1.5,  1.5,  1.0,  0.5, -3.0,
+		  -3.0,  0.0,  1.5,  2.0,  2.0,  1.5,  0.0, -3.0,
+		  -3.0,  0.5,  1.5,  2.0,  2.0,  1.5,  0.5, -3.0,
+		  -3.0,  0.0,  1.0,  1.5,  1.5,  1.0,  0.0, -3.0,
+		  -4.0, -2.0,  0.0,  0.0,  0.0,  0.0, -2.0, -4.0,
+		  -5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0 },
+		  											   
+		  											   
+		{  0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0, //Rook_white
+		  -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+		  -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+		  -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+		  -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+		  -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5,
+		   0.5,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  0.5,
+		   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 },
+		  											   
+		  											   
+		{  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, //Pawn_white
+		   0.5,  1.0,  1.0, -2.0, -2.0,  1.0,  1.0,  0.5,
+		   0.5, -0.5, -1.0,  0.0,  0.0, -1.0, -0.5,  0.5,
+		   0.0,  0.0,  0.0,  2.0,  2.0,  0.0,  0.0,  0.0,
+		   0.5,  0.5,  1.0,  2.5,  2.5,  1.0,  0.5,  0.5,
+		   1.0,  1.0,  2.0,  3.0,  3.0,  2.0,  1.0,  1.0,
+		   5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,
+		   0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 }
 };
 const float PlayerWithAIGame::infScore{ 9999 };
 const int PlayerWithAIGame::errorRate{ 20 };
-const int PlayerWithAIGame::DEPTH{ 2 }; // searching depth of move
-const int PlayerWithAIGame::countOfThreads{ 8 };
 
 std::atomic<int> positionsCount{ 0 }; // TODO: delete debug counter
 
@@ -147,16 +145,14 @@ std::vector<MoveInfo> PlayerWithAIGame::StartAI(double timeForWaiting)
 {
 	std::mutex mutPushScore;
 	std::vector<std::pair<int, float>> movesScore{ };
-	std::atomic<uint16_t> countWorkingThreads{ 0 };
 	auto moves{ map.GetAllPossibleMoves() };
 	auto countOfMovesInThread{ 0 }, from{ 0 }, countOfMoves{ static_cast<int>(moves.size()) };
 	for (auto i = countOfThreads; i >= 0 && countOfMoves > 0; --i)
 	{
-		++countWorkingThreads; // add to active process count
 		from = moves.size() - countOfMoves;
 		countOfMovesInThread = ceil(countOfMoves / i); // count checking of moves in this thread
 		countOfMoves -= countOfMovesInThread; // count checking of moves is left
-		std::thread th{ [map = map, &mutPushScore, from, countOfMovesInThread, moves, &movesScore, &countWorkingThreads]() mutable {
+		Threads.push_back(std::async([map = map, DEPTH = DEPTH, &mutPushScore, from, countOfMovesInThread, moves, &movesScore]() mutable { // without std::launch::async to support more processors
 			for (auto j = from; j != from + countOfMovesInThread; ++j)
 			{
 				map.Move(moves[j]);
@@ -166,17 +162,15 @@ std::vector<MoveInfo> PlayerWithAIGame::StartAI(double timeForWaiting)
 				movesScore.push_back(score);
 				mutPushScore.unlock();
 			}
-			--countWorkingThreads;
-			} };
-		th.detach();
+		}));
 	}
 
-	sf::sleep(sf::seconds(timeForWaiting));
-
-	if (timeForWaiting == 0) 
-		while (countWorkingThreads != 0)
-			sf::sleep(sf::seconds(0.03));
-
+	sf::sleep(sf::seconds(timeForWaiting)); // TODO: delete
+	auto begin = Threads.cbegin(), end = Threads.cend();
+	if (timeForWaiting == 0)
+		for (auto it = begin; it != end; ++it)
+			(*it).wait();
+	Threads.resize(0);
 	std::sort(movesScore.begin(), movesScore.end(), [](const std::pair<int, float>& left, const std::pair<int, float>& right)
 		{
 			return left.second > right.second;
@@ -184,8 +178,10 @@ std::vector<MoveInfo> PlayerWithAIGame::StartAI(double timeForWaiting)
 	// Additional error rate
 	if (rand() % 100 < errorRate && (*movesScore.begin()).second != infScore && movesScore.size() > 1)
 	{
+#ifdef DebugInfo
 		for (auto i = 0; i != std::min(3, static_cast<int>(movesScore.size())); ++i)
 			std::cout << "\n\t" + moves[(*(movesScore.begin() + i)).first][0].GetPosBeforeMove().ToString() + "  -->  " + moves[(*(movesScore.begin() + i)).first][0].GetPosAfterMove().ToString();
+#endif
 		return moves[(*(movesScore.begin() + (rand() % std::min(3, static_cast<int>(moves.size() - 1))) + 1)).first];
 	}
 	return moves[(*movesScore.begin()).first];
@@ -204,7 +200,7 @@ float PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Col
 			{
 				x[i] = selectedMap.GetColor(selected) == playerColor ? 1.0 : -1.0;
 				y[i] = figureWeight[toUType(selected)];
-				z[i] = bitboards[toUType(selected)][i / 8][i % 8];
+				z[i] = bitboards[toUType(selected)][i];
 			}
 		}
 		for (auto i = 0; i != 64; i += 8)
@@ -219,13 +215,19 @@ float PlayerWithAIGame::CalculatePositionScore(const Map& selectedMap, const Col
 		}
 #endif
 #ifndef UseAvx
-		// black
-		for (auto i = 0; i != 64; ++i)
+		auto playerColorCoeff{ playerColor == Color::Black ? 1.0 : -1.0 };
+		uint64_t j{ 1 };
+		auto k{ 0 };
+		while (j) // check all positions
 		{
-			selected = selectedMap.GetFigureType(i);
-			if (selected != FigureType::Empty)
-				score += (selectedMap.GetColor(selected) == playerColor ? 1.0 : -1.0)
-				* (figureWeight[toUType(selected)] + bitboards[toUType(selected)][i / 8][i % 8]);
+			for (auto i = 0; i != FIGURE_TYPES; ++i)
+				if (j & selectedMap.GetMap()[i]) // is selected figure position
+				{
+					score += (i < 6 ? playerColorCoeff : -playerColorCoeff) * (figureWeight[i] + bitboards[i][k]);
+					break;
+				}
+			j <<= 1;
+			++k;
 		}
 #endif
 	return score;
@@ -246,14 +248,13 @@ float PlayerWithAIGame::MiniMax(Map map, bool isAIMoveNow, int depth, float alph
 		if (Figure::IsShahFor(AIColor, map.GetMap()))
 			map.DisableCastlingForKing(AIColor);
 		map.DisableCastlingForRook(AIColor);
-		for (auto i = start; i != start + 6; ++i)
+		uint64_t j{ 1 };
+		while (j) // check all positions
 		{
-			uint64_t j{ 1 };
-			while (j) // check all positions
-			{
+			for (auto i = start; i != start + 6; ++i)
 				if (j & map.GetMap()[i]) // is selected figure position
 				{
-					auto oneFigureMoves = Figure::FindPossibleMoves(Pos::BitboardToPosition(j), static_cast<FigureType>(i), map); // find figure possible moves without checking shah
+					auto oneFigureMoves{ Figure::FindPossibleMoves(Pos::BitboardToPosition(j), static_cast<FigureType>(i), map) }; // find figure possible moves without checking shah
 					for (auto moveItr = oneFigureMoves.begin(); moveItr != oneFigureMoves.end(); ++moveItr)
 					{
 						map.Move(*moveItr);
@@ -264,9 +265,9 @@ float PlayerWithAIGame::MiniMax(Map map, bool isAIMoveNow, int depth, float alph
 						if (beta <= alpha)
 							return bestMove;
 					}
+					break;
 				}
-				j <<= 1;
-			}
+			j <<= 1;
 		}
 		return bestMove;
 	}
@@ -278,14 +279,13 @@ float PlayerWithAIGame::MiniMax(Map map, bool isAIMoveNow, int depth, float alph
 		if (Figure::IsShahFor(playerColor, map.GetMap()))
 			map.DisableCastlingForKing(playerColor);
 		map.DisableCastlingForRook(playerColor);
-		for (auto i = start; i != start + 6; ++i)
+		uint64_t j{ 1 };
+		while (j) // check all positions
 		{
-			uint64_t j{ 1 };
-			while (j) // check all positions
-			{
+			for (auto i = start; i != start + 6; ++i)
 				if (j & map.GetMap()[i]) // is selected figure position
 				{
-					auto oneFigureMoves = Figure::FindPossibleMoves(Pos::BitboardToPosition(j), static_cast<FigureType>(i), map); // find figure possible moves without checking shah
+					auto oneFigureMoves{ Figure::FindPossibleMoves(Pos::BitboardToPosition(j), static_cast<FigureType>(i), map) }; // find figure possible moves without checking shah
 					for (auto moveItr = oneFigureMoves.begin(); moveItr != oneFigureMoves.end(); ++moveItr)
 					{
 						map.Move(*moveItr);
@@ -296,22 +296,27 @@ float PlayerWithAIGame::MiniMax(Map map, bool isAIMoveNow, int depth, float alph
 						if (beta <= alpha)
 							return bestMove;
 					}
+					break;
 				}
-				j <<= 1;
-			}
+			j <<= 1;
 		}
 		return bestMove;
 	}
 }
 
-void PlayerWithAIGame::SetPlayers(std::string name1, std::string name2, sf::Time timeLimit)
-{
-	if (timeLimit != sf::seconds(0))
-		isTimeLimited = true;
-	isPlayerMoveFirst = (name2 == Menu::GetBotName());
-	player1 = new Player{ Color::White, name1, timeLimit, !isPlayerMoveFirst };
-	player2 = new Player{ Color::Black, name2, timeLimit, isPlayerMoveFirst };
-	activePlayer = isPlayerMoveFirst ? player1 : player2;
+PlayerWithAIGame::PlayerWithAIGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& _mapProperties, GameMode mode, std::string name1, std::string name2, sf::Time timeLimit)
+	: TwoPlayersGame{ window, resource, _mapProperties, mode, name1, name2, timeLimit }, DEPTH{ 2 }, countOfThreads{ 8 }
+{ 
+	if (mode == GameMode::PlayerWithBot)
+	{
+		Threads.reserve(countOfThreads);
+		if (timeLimit != sf::seconds(0))
+			isTimeLimited = true;
+		isPlayerMoveFirst = (name2 == Menu::GetBotName());
+		player1 = std::make_unique<Player>(Color::White, name1, timeLimit, !isPlayerMoveFirst);
+		player2 = std::make_unique<Player>(Color::Black, name2, timeLimit, isPlayerMoveFirst);
+		activePlayer = std::move(isPlayerMoveFirst ? player1 : player2);
+	}
 }
 
 void PlayerWithAIGame::ChangeActivePlayer()
@@ -322,7 +327,7 @@ void PlayerWithAIGame::ChangeActivePlayer()
 	drawer.ClearSelect();
 	map.mut.unlock();
 	map.ClearPossibleMoves();
-	activePlayer = (activePlayer == player2) ? player1 : player2;
+	ChangePlayer();
 #ifndef SmartBotTest
 	std::lock_guard<std::mutex> g(mut);
 #endif
@@ -342,7 +347,7 @@ void PlayerWithAIGame::ChangeActivePlayer()
 #endif
 		map.Move(bestMove);
 		map.ClearPossibleMoves();
-		activePlayer = (activePlayer == player2) ? player1 : player2;
+		ChangePlayer();
 		status = map.CheckGameFinal(activePlayer->GetColor());
 		if (stopTime && status != GameStatus::Pat && status != GameStatus::Mat)
 		{
@@ -353,7 +358,7 @@ void PlayerWithAIGame::ChangeActivePlayer()
 #ifdef SmartBotTest
 	if (status != GameStatus::Pat && status != GameStatus::Mat && map.GetMovesCount() < 300)
 	{
-		activePlayer = (activePlayer == player2) ? player1 : player2;
+		ChangePlayer();
 		isPlayerMoveFirst = !isPlayerMoveFirst;
 		ChangeActivePlayer();
 	}

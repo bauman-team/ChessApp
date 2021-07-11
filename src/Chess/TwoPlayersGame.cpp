@@ -1,5 +1,18 @@
 #include "TwoPlayersGame.h"
 
+TwoPlayersGame::TwoPlayersGame(sf::RenderWindow* window, const Resources& resource, const MapProperties& properties, GameMode mode, std::string name1, std::string name2, sf::Time timeLimit)
+	: Game{ window, resource, properties, mode }, isTimeLimited{ false } 
+{
+	if (mode == GameMode::TwoPlayers)
+	{
+		if (timeLimit != sf::seconds(0))
+			isTimeLimited = true;
+		player1 = std::make_unique<Player>(Color::White, name1, timeLimit);
+		player2 = std::make_unique<Player>(Color::Black, name2, timeLimit);
+		activePlayer = std::move(player1);
+	}
+}
+
 void TwoPlayersGame::Show()
 {
 	drawer.WindowIsResized();
@@ -37,7 +50,7 @@ void TwoPlayersGame::ChangeActivePlayer()
 
 	sf::sleep(sf::seconds(2));
 
-	activePlayer = activePlayer == player2 ? player1 : player2;
+	ChangePlayer();
 
 	status = map.CheckGameFinal(activePlayer->GetColor());
 	drawer.RotateBoard();
@@ -46,6 +59,22 @@ void TwoPlayersGame::ChangeActivePlayer()
 		activePlayer->StartTimer(); // restart game(move) clock
 		isTimeLimited = stopTime;
 	}
+}
+
+void TwoPlayersGame::ChangePlayer()
+{
+	std::unique_ptr<Player> tempPlayer;
+	if (player1)
+	{
+		tempPlayer = std::move(player1);
+		player2 = std::move(activePlayer);
+	}
+	else
+	{
+		tempPlayer = std::move(player2);
+		player1 = std::move(activePlayer);
+	}
+	activePlayer = std::move(tempPlayer);
 }
 
 void TwoPlayersGame::SetPosition(int mouseX, int mouseY)
@@ -92,15 +121,6 @@ void TwoPlayersGame::StartGame()
 	map.FindAllPossibleMoves(activePlayer->GetColor());
 	if (isTimeLimited)
 		activePlayer->StartTimer();
-}
-
-void TwoPlayersGame::SetPlayers(std::string name1, std::string name2, sf::Time timeLimit)
-{
-	if (timeLimit != sf::seconds(0))
-		isTimeLimited = true;
-	player1 = new Player{ Color::White, name1, timeLimit };
-	player2 = new Player{ Color::Black, name2, timeLimit };
-	activePlayer = player1;
 }
 
 void TwoPlayersGame::MakeUndoMove()
